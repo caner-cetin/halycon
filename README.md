@@ -1,17 +1,22 @@
 # halycon
 
-utilities for Amazon SP API, mostly for finding cure for my annoyances
+utilities for Amazon SP API, mostly for my annoyances
 
 - [halycon](#halycon)
   - [usage](#usage)
     - [pre-built binaries](#pre-built-binaries)
     - [build yourself](#build-yourself)
     - [go](#go)
-  - [UPC to ASIN](#upc-to-asin)
-    - [what](#what)
-    - [why](#why)
-    - [how](#how)
-  - [Shipments from ASIN List](#shipments-from-asin-list)
+  - [Utilities](#utilities)
+    - [UPC to ASIN](#upc-to-asin)
+      - [what](#what)
+      - [why](#why)
+      - [how](#how)
+    - [ASIN to SKU](#asin-to-sku)
+      - [why](#why-1)
+      - [how](#how-1)
+    - [Shipments from SKU Data](#shipments-from-sku-data)
+  - [halycon?](#halycon-1)
 
 ## usage
 
@@ -36,19 +41,20 @@ GOPROXY=direct go install github.com/caner-cetin/halycon@latest
 halycon --help
 ```
 
-## UPC to ASIN
+## Utilities
+### UPC to ASIN
 
-### what
+#### what
 
 converts list of UPCs or a single UPC to ASIN
 
-### why
+#### why
 
 On `Send To Amazon` page, while creating shipment plans, you can search by SKU, Title, ASIN and FNSKU for the products you want to ship.
 
 ![alt text](./static/upc-to-asin-1.jpg)
 
-Guessed what is missing? UPC!!!!!!!!!!!!
+Guess what is missing? UPC!!!!!!!!!!!!
 
 So whenever my brother sends a three page invoice to me like "create shipments for this", I have to do this 
 ```
@@ -62,35 +68,59 @@ send to amazon -> search with asin -> enter quantity
 ```
 (dw, there is another command for creating shipment plans and skipping this process too)
 
-### how
+#### how
 
 single upc, for debugging purposes
 ```bash
-halycon upc-to-asin --single --upc 754603373107 -vvv
+halycon upc-to-asin --single --input 754603373000 -vvv
 ```
 for list of upcs
 ```bash
-halycon upc-to-asin --upc list.txt --output out.txt
+halycon upc-to-asin --input list.txt --output out.txt
 ```
 where list is newline delimited (one per line) text file
 ```bash
-754603337918
-754603337840
+754603337000
 ...
 ```
 output will be in same format.
 ```bash
-B00M553N8E
-B0182K0QJO
+B07H2WGKVB
 ...
 ```
 
-## Shipments from ASIN List
+### ASIN to SKU
 
-Too lazy for this? Not simplified enough?
+#### why
+for creating shipment plans, you need, SKU and ASIN's.
+#### how
+
+single asin, for debugging purposes
+```bash
+halycon upc-to-asin --single --input B07H2WGKVB -vvv
 ```
-send to amazon -> search with asin -> enter quantity
+for list of asins
+```bash
+halycon asin-to-sku -vvv --input out.txt --output out.csv  
 ```
-I got you!
+where input is list of ASIN's
+```bash
+B07H2WGKVB
+...
+```
+and output will be
+```
+ASIN,SKU,Product Name,Quantity
+B07H2WGKVB,some_sku,"Aneco 6 Pairs Over Knee Thigh Socks Knee-High Warm Stocking Women Boot Sock Leg Warmer High Socks for Daily Wear, Cosplay",
+```
+fill the quantities and move on to `Shipments from SKU Data`
+
+
+### Shipments from SKU Data
 
 *uhhh, work in progress*
+
+
+## halycon?
+
+one of ma favourite mono song https://www.youtube.com/watch?v=2_OYaI37bi0

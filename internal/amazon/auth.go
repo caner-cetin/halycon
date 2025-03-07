@@ -11,7 +11,10 @@ import (
 	"time"
 
 	"github.com/caner-cetin/halycon/internal"
-	"github.com/caner-cetin/halycon/internal/amazon/client/catalog"
+	"github.com/caner-cetin/halycon/internal/amazon/catalog/client/catalog"
+	"github.com/caner-cetin/halycon/internal/amazon/fba_inbound/client/fba_inbound"
+	"github.com/caner-cetin/halycon/internal/amazon/fba_inventory/client/fba_inventory"
+	"github.com/caner-cetin/halycon/internal/amazon/listings/client/listings"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
 	"github.com/spf13/viper"
@@ -103,20 +106,75 @@ func (tm *TokenManager) refreshToken() (string, error) {
 	return tm.currentToken, nil
 }
 
+const (
+	CatalogServiceName      = "services.catalog"
+	ListingsServiceName     = "services.listings"
+	FBAInboundServiceName   = "services.fba.inbound"
+	FBAInventoryServiceName = "services.fba.inventory"
+)
+
 type AuthorizedClient struct {
-	originalClient catalog.ClientService
-	authInfo       runtime.ClientAuthInfoWriter
+	services map[string]interface{}
+	authInfo runtime.ClientAuthInfoWriter
 }
 
-func (a *AuthorizedClient) SearchCatalogItems(params *catalog.SearchCatalogItemsParams, opts ...catalog.ClientOption) (*catalog.SearchCatalogItemsOK, error) {
+func (a *AuthorizedClient) AddService(name string, service interface{}) {
+	a.services[name] = service
+}
+
+func (a *AuthorizedClient) GetService(name string) interface{} {
+	return a.services[name]
+}
+
+func (a *AuthorizedClient) GetCatalogService() catalog.ClientService {
+	return a.services[CatalogServiceName].(catalog.ClientService)
+}
+
+func (a *AuthorizedClient) GetListingsService() listings.ClientService {
+	return a.services[ListingsServiceName].(listings.ClientService)
+}
+
+func (a *AuthorizedClient) GetFBAInboundService() fba_inbound.ClientService {
+	return a.services[FBAInboundServiceName].(fba_inbound.ClientService)
+}
+
+func (a *AuthorizedClient) GetFBAInventoryService() fba_inventory.ClientService {
+	return a.services[FBAInventoryServiceName].(fba_inventory.ClientService)
+}
+
+func (a *AuthorizedClient) SearchCatalogItems(params *catalog.SearchCatalogItemsParams) (*catalog.SearchCatalogItemsOK, error) {
+	catalogClient := a.GetCatalogService()
 	authOpt := func(op *runtime.ClientOperation) {
 		op.AuthInfo = a.authInfo
 	}
-
-	return a.originalClient.SearchCatalogItems(params, append(opts, authOpt)...)
+	return catalogClient.SearchCatalogItems(params, authOpt, internal.ConfigureRateLimiting(2, 2))
 }
 
-func NewAuthorizedClient(original catalog.ClientService, token string) *AuthorizedClient {
+func (a *AuthorizedClient) GetCatalogItem(params *catalog.GetCatalogItemParams) (*catalog.GetCatalogItemOK, error) {
+	catalogClient := a.GetCatalogService()
+	authOpt := func(op *runtime.ClientOperation) {
+		op.AuthInfo = a.authInfo
+	}
+	return catalogClient.GetCatalogItem(params, authOpt, internal.ConfigureRateLimiting(2, 2))
+}
+
+func (a *AuthorizedClient) GetListingsItem(params *listings.GetListingsItemParams) (*listings.GetListingsItemOK, error) {
+	listingsClient := a.GetListingsService()
+	authOpt := func(op *runtime.ClientOperation) {
+		op.AuthInfo = a.authInfo
+	}
+	return listingsClient.GetListingsItem(params, authOpt, internal.ConfigureRateLimiting(5, 10))
+}
+
+func (a *AuthorizedClient) GetFBAInventorySummaries(params *fba_inventory.GetInventorySummariesParams) (*fba_inventory.GetInventorySummariesOK, error) {
+	inventoryClient := a.GetFBAInventoryService()
+	authOpt := func(op *runtime.ClientOperation) {
+		op.AuthInfo = a.authInfo
+	}
+	return inventoryClient.GetInventorySummaries(params, authOpt, internal.ConfigureRateLimiting(2, 2))
+}
+
+func NewAuthorizedClient(token string) *AuthorizedClient {
 	authInfo := runtime.ClientAuthInfoWriterFunc(func(r runtime.ClientRequest, _ strfmt.Registry) error {
 		// doesnt work without Authorization header
 		if err := r.SetHeaderParam("Authorization", "Bearer "+token); err != nil {
@@ -127,7 +185,7 @@ func NewAuthorizedClient(original catalog.ClientService, token string) *Authoriz
 	})
 
 	return &AuthorizedClient{
-		originalClient: original,
-		authInfo:       authInfo,
+		services: map[string]interface{}{},
+		authInfo: authInfo,
 	}
 }

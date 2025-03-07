@@ -44,6 +44,8 @@ func init() {
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	rootCmd.AddCommand(getlookupAsinFromUpcCmd())
+	rootCmd.AddCommand(getLookupSkuFromAsinCmd())
+	rootCmd.AddCommand(getShipmentCmd())
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
 	rootCmd.PersistentFlags().CountVarP(&verbosity, "verbose", "v", "verbose output (-v: info, -vv: debug, -vvv: trace)")

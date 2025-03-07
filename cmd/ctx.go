@@ -5,7 +5,10 @@ import (
 
 	"github.com/caner-cetin/halycon/internal"
 	"github.com/caner-cetin/halycon/internal/amazon"
-	"github.com/caner-cetin/halycon/internal/amazon/client/catalog"
+	"github.com/caner-cetin/halycon/internal/amazon/catalog/client/catalog"
+	"github.com/caner-cetin/halycon/internal/amazon/fba_inbound/client/fba_inbound"
+	"github.com/caner-cetin/halycon/internal/amazon/fba_inventory/client/fba_inventory"
+	"github.com/caner-cetin/halycon/internal/amazon/listings/client/listings"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -17,8 +20,18 @@ const (
 	ResourceAmazon ResourceType = iota
 )
 
+type ServiceType int
+
+const (
+	ServiceCatalog ServiceType = iota
+	ServiceListings
+	ServiceFBAInbound
+	ServiceFBAInventory
+)
+
 type ResourceConfig struct {
-	ResourceTypes []ResourceType
+	Resources []ResourceType
+	Services  []ServiceType
 }
 
 type AppCtx struct {
@@ -31,7 +44,7 @@ type AppCtx struct {
 func WrapCommandWithResources(fn func(cmd *cobra.Command, args []string), config ResourceConfig) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
 		app := AppCtx{}
-		for _, resource := range config.ResourceTypes {
+		for _, resource := range config.Resources {
 			switch resource {
 			case ResourceAmazon:
 				if !viper.IsSet(internal.CONFIG_KEY_AMAZON_AUTH_CLIENT_ID) {
@@ -58,7 +71,19 @@ func WrapCommandWithResources(fn func(cmd *cobra.Command, args []string), config
 				host := viper.GetString(internal.CONFIG_KEY_AMAZON_AUTH_HOST)
 				basePath := "/"
 				scheme := "https"
-				app.Amazon.Client = amazon.NewAuthorizedClient(catalog.NewClientWithBearerToken(host, basePath, scheme, token), token)
+				app.Amazon.Client = amazon.NewAuthorizedClient(token)
+				for _, service := range config.Services {
+					switch service {
+					case ServiceCatalog:
+						app.Amazon.Client.AddService(amazon.CatalogServiceName, catalog.NewClientWithBearerToken(host, basePath, scheme, token))
+					case ServiceListings:
+						app.Amazon.Client.AddService(amazon.ListingsServiceName, listings.NewClientWithBearerToken(host, basePath, scheme, token))
+					case ServiceFBAInbound:
+						app.Amazon.Client.AddService(amazon.FBAInboundServiceName, fba_inbound.NewClientWithBearerToken(host, basePath, scheme, token))
+					case ServiceFBAInventory:
+						app.Amazon.Client.AddService(amazon.FBAInventoryServiceName, fba_inventory.NewClientWithBearerToken(host, basePath, scheme, token))
+					}
+				}
 				app.Amazon.Token = token
 
 			}

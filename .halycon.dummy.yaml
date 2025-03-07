@@ -1,5 +1,6 @@
 # values with placeholders are optional
 amazon:
+  # required for all operations
   auth:
     # client ID and secret of application
     client:
@@ -13,3 +14,27 @@ amazon:
   # marketplace ids for all kinds of operations, US will be registered by default
   marketplace_id: 
     - ATVPDKIKX0DER
+  fba:
+    # required for creating FBA inbound shipment plans
+    #
+    # https://developer-docs.amazon.com/sp-api/lang-tr_TR/docs/fulfillment-inbound-api-v2024-03-20-reference#addressinput
+    ship_from:
+      # Street address information.
+      address_line_1: 
+      # Additional street address information, optional.
+      address_line_2:
+      city:
+      # The name of the business, optional.
+      company_name:
+      # The country code in two-character ISO 3166-1 alpha-2 format, required, set to US by default.
+      country_code: US
+      # Optional.
+      email:
+      # The name of the individual who is the primary contact.
+      name:
+      phone_number: 
+      postal_code:
+      # The state or province code, optional.
+      state_or_province_code: 
+
+
