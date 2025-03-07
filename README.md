@@ -16,6 +16,7 @@ utilities for Amazon SP API, mostly for my annoyances
       - [why](#why-1)
       - [how](#how-1)
     - [Shipments from SKU Data](#shipments-from-sku-data)
+      - [how](#how-2)
   - [halycon?](#halycon-1)
 
 ## usage
@@ -97,7 +98,7 @@ for creating shipment plans, you need, SKU and ASIN's.
 
 single asin, for debugging purposes
 ```bash
-halycon upc-to-asin --single --input B07H2WGKVB -vvv
+halycon asin-to-sku --single --input B07H2WGKVB -vvv
 ```
 for list of asins
 ```bash
@@ -113,12 +114,28 @@ and output will be
 ASIN,SKU,Product Name,Quantity
 B07H2WGKVB,some_sku,"Aneco 6 Pairs Over Knee Thigh Socks Knee-High Warm Stocking Women Boot Sock Leg Warmer High Socks for Daily Wear, Cosplay",
 ```
-fill the quantities and move on to `Shipments from SKU Data`
+fill the quantity column and move on to `Shipments from SKU Data`
 
 
 ### Shipments from SKU Data
 
-*uhhh, work in progress*
+#### how
+```bash
+halycon shipment create -i sku.csv -v
+```
+where the input is the output of `asin-to-sku` command
+```
+ASIN,SKU,Product Name,Quantity
+B07H2WGKVB,some_sku,"Aneco 6 Pairs Over Knee Thigh Socks Knee-High Warm Stocking Women Boot Sock Leg Warmer High Socks for Daily Wear, Cosplay",5
+```
+
+so for creating a shipment from list of UPCs (which is one of the main goals here), usual workflow is
+```bash
+halycon upc-to-asin      -i upc.txt -o asin.txt
+halycon asin-to-sku      -i asin.txt -o sku.csv
+halycon shipment create  -i sku.csv
+```
+then confirm and finalize the shipment on dashboard.
 
 
 ## halycon?

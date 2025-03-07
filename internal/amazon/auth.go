@@ -15,6 +15,7 @@ import (
 	"github.com/caner-cetin/halycon/internal/amazon/fba_inbound/client/fba_inbound"
 	"github.com/caner-cetin/halycon/internal/amazon/fba_inventory/client/fba_inventory"
 	"github.com/caner-cetin/halycon/internal/amazon/listings/client/listings"
+	"github.com/caner-cetin/halycon/internal/config"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
 	"github.com/spf13/viper"
@@ -97,8 +98,8 @@ func (tm *TokenManager) refreshToken() (string, error) {
 	tm.expiresAt = time.Now().Add(time.Duration(tokenResp.ExpiresIn-300) * time.Second)
 	if tokenResp.RefreshToken != "" {
 		tm.config.RefreshToken = tokenResp.RefreshToken
-		if viper.IsSet(internal.CONFIG_KEY_AMAZON_AUTH_REFRESH_TOKEN) {
-			viper.Set(internal.CONFIG_KEY_AMAZON_AUTH_REFRESH_TOKEN, tokenResp.RefreshToken)
+		if viper.IsSet(config.AMAZON_AUTH_REFRESH_TOKEN.Key) {
+			viper.Set(config.AMAZON_AUTH_REFRESH_TOKEN.Key, tokenResp.RefreshToken)
 			viper.WriteConfig()
 		}
 	}
@@ -172,6 +173,14 @@ func (a *AuthorizedClient) GetFBAInventorySummaries(params *fba_inventory.GetInv
 		op.AuthInfo = a.authInfo
 	}
 	return inventoryClient.GetInventorySummaries(params, authOpt, internal.ConfigureRateLimiting(2, 2))
+}
+
+func (a *AuthorizedClient) CreateFBAInboundPlan(params *fba_inbound.CreateInboundPlanParams) (*fba_inbound.CreateInboundPlanAccepted, error) {
+	inboundClient := a.GetFBAInboundService()
+	authOpt := func(op *runtime.ClientOperation) {
+		op.AuthInfo = a.authInfo
+	}
+	return inboundClient.CreateInboundPlan(params, authOpt, internal.ConfigureRateLimiting(2, 2))
 }
 
 func NewAuthorizedClient(token string) *AuthorizedClient {

@@ -14,6 +14,7 @@ import (
 	"github.com/caner-cetin/halycon/internal"
 	"github.com/caner-cetin/halycon/internal/amazon"
 	"github.com/caner-cetin/halycon/internal/amazon/fba_inventory/client/fba_inventory"
+	"github.com/caner-cetin/halycon/internal/config"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -130,9 +131,9 @@ func getAsinToMskuMap(amazonClient *amazon.AuthorizedClient) (map[string]FBAProd
 	var i = 0
 	for {
 		params := fba_inventory.GetInventorySummariesParams{}
-		params.MarketplaceIds = viper.GetStringSlice(internal.CONFIG_KEY_AMAZON_MARKETPLACE_ID)
+		params.MarketplaceIds = viper.GetStringSlice(config.AMAZON_MARKETPLACE_ID.Key)
 		params.GranularityType = "Marketplace"
-		params.GranularityID = viper.GetStringSlice(internal.CONFIG_KEY_AMAZON_MARKETPLACE_ID)[0]
+		params.GranularityID = viper.GetStringSlice(config.AMAZON_MARKETPLACE_ID.Key)[0]
 		params.Details = aws.Bool(true)
 
 		if nextToken != nil {

@@ -45,7 +45,7 @@ func (t *RateLimitedTransport) RoundTrip(req *http.Request) (*http.Response, err
 }
 
 func NewRateLimitedClient(requestsPerSecond float64, burst int) *http.Client {
-	limiter := rate.NewLimiter(rate.Every(time.Second*time.Duration(requestsPerSecond)), burst)
+	limiter := rate.NewLimiter(rate.Limit(requestsPerSecond), burst)
 	transport := &RateLimitedTransport{
 		Base:        http.DefaultTransport,
 		RateLimiter: limiter,

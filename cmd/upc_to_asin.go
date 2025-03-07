@@ -8,8 +8,11 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/aws/smithy-go/ptr"
 	"github.com/caner-cetin/halycon/internal"
 	"github.com/caner-cetin/halycon/internal/amazon/catalog/client/catalog"
+	"github.com/caner-cetin/halycon/internal/amazon/catalog/models"
+	"github.com/caner-cetin/halycon/internal/config"
 	"github.com/go-openapi/strfmt"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
@@ -45,47 +48,53 @@ func getlookupAsinFromUpcCmd() *cobra.Command {
 func lookupAsinFromUpc(cmd *cobra.Command, args []string) {
 	if lookupAsinFromUpcConfig.Input == "" {
 		cmd.Help()
-		log.Fatal().Msg("[--upc / -u] flag is required")
+		log.Fatal().Msg("[--input / -i] flag is required")
 	}
 	var ctx = cmd.Context()
 	var app = ctx.Value(internal.APP_CONTEXT).(AppCtx)
 
-	var identifiersType = "UPC"
 	var queryIdentifiers []string
 	if lookupAsinFromUpcConfig.Single {
 		queryIdentifiers = append(queryIdentifiers, strings.TrimSpace(lookupAsinFromUpcConfig.Input))
 	} else {
 		contents, err := os.ReadFile(lookupAsinFromUpcConfig.Input)
 		if err != nil {
+			ev := log.With().Str("path", lookupAsinFromUpcConfig.Input).Err(err).Logger()
 			if os.IsNotExist(err) {
-				log.Fatal().Err(err).Msgf("path %s does not exist", lookupAsinFromUpcConfig.Input)
+				ev.Fatal().Msg("path does not exist")
 			}
-			log.Fatal().Err(err).Msg("unknown error while reading contents of text file")
+			ev.Fatal().Msg("unknown error while opening file")
 		}
 		scanner := bufio.NewScanner(bytes.NewBuffer(contents))
 		scanner.Split(bufio.ScanLines)
 		for scanner.Scan() {
-			log.Trace().Bytes("upc", scanner.Bytes()).Msg("reading")
-			queryIdentifiers = append(queryIdentifiers, strings.TrimSpace(string(scanner.Bytes())))
+			line := scanner.Text()
+			cleaned := internal.CleanUPC(line)
+			log.Trace().Str("original", line).Str("cleaned", cleaned).Msg("reading")
+			queryIdentifiers = append(queryIdentifiers, cleaned)
 		}
 	}
-
-	params := catalog.NewSearchCatalogItemsParams()
-	params.SetContext(ctx)
-	params.SetMarketplaceIds(viper.GetStringSlice(internal.CONFIG_KEY_AMAZON_MARKETPLACE_ID))
-	params.SetIdentifiersType(&identifiersType)
-	params.SetIdentifiers(queryIdentifiers)
-	params.SetIncludedData([]string{"identifiers", "attributes", "summaries"})
-	result, err := app.Amazon.Client.SearchCatalogItems(params)
-	if err != nil {
-		log.Fatal().Err(err).Msg("error while searching catalog items")
-	}
-	if result.Payload == nil || len(result.Payload.Items) == 0 {
-		log.Warn().Msg("no items found for given UPC or UPC list")
-		return
+	var results []*models.ItemSearchResults
+	for identifiers := range slices.Chunk(queryIdentifiers, 10) {
+		log.Trace().Interface("identifiers", identifiers).Msg("searching next batch")
+		params := catalog.NewSearchCatalogItemsParams()
+		params.SetContext(ctx)
+		params.SetMarketplaceIds(viper.GetStringSlice(config.AMAZON_MARKETPLACE_ID.Key))
+		params.SetIdentifiersType(ptr.String("UPC"))
+		params.SetIdentifiers(identifiers)
+		params.SetIncludedData([]string{"identifiers", "attributes", "summaries"})
+		result, err := app.Amazon.Client.SearchCatalogItems(params)
+		if err != nil {
+			log.Fatal().Err(err).Msg("error while searching catalog items")
+		}
+		if result.Payload == nil || len(result.Payload.Items) == 0 {
+			log.Warn().Interface("batch", identifiers).Msg("no items found for this batch of UPCs")
+			continue
+		}
+		results = append(results, result.Payload)
 	}
 	if lookupAsinFromUpcConfig.Single {
-		item := result.Payload.Items[0]
+		item := results[0].Items[0]
 		if err := item.Asin.Validate(strfmt.Default); err != nil {
 			log.Fatal().Err(err).Msg("cannot validate the ASIN string")
 		}
@@ -107,28 +116,41 @@ func lookupAsinFromUpc(cmd *cobra.Command, args []string) {
 		defer os.Remove(output_tmp.Name())
 		writer := bufio.NewWriter(output_tmp)
 
-		var found []string
-		for _, item := range result.Payload.Items {
-			ev := log.With().Str("asin", string(*item.Asin)).Logger()
-			if err := item.Asin.Validate(strfmt.Default); err != nil {
-				ev.Fatal().Err(err).Msg("cannot validate the ASIN string")
-			}
-			if err := item.Identifiers.Validate(strfmt.Default); err != nil {
-				ev.Fatal().Err(err).Msg("cannot validate identifiers")
-			}
-			ev.Trace().Msg("writing")
-			writer.WriteString(string(*item.Asin) + "\n")
+		upcToAsin := make(map[string]string)
 
-			for _, id := range item.Identifiers {
-				for _, identifier := range id.Identifiers {
-					if *identifier.IdentifierType == "UPC" {
-						found = append(found, *identifier.Identifier)
+		for _, result := range results {
+			for _, item := range result.Items {
+				ev := log.With().Str("asin", string(*item.Asin)).Logger()
+				if err := item.Asin.Validate(strfmt.Default); err != nil {
+					ev.Fatal().Err(err).Msg("cannot validate the ASIN string")
+				}
+				if err := item.Identifiers.Validate(strfmt.Default); err != nil {
+					ev.Fatal().Err(err).Msg("cannot validate identifiers")
+				}
+				ev.Trace().Msg("writing")
+
+				for _, id := range item.Identifiers {
+					for _, identifier := range id.Identifiers {
+						if *identifier.IdentifierType == "UPC" {
+							upc := *identifier.Identifier
+							upcToAsin[upc] = string(*item.Asin)
+							break
+						}
 					}
 				}
 			}
 		}
 
+		for _, upc := range queryIdentifiers {
+			if asin, found := upcToAsin[upc]; found {
+				log.Trace().Str("upc", upc).Str("asin", asin).Msg("writing matched pair")
+				writer.WriteString(asin + "\n")
+			} else {
+				log.Warn().Str("upc", upc).Msg("no ASIN found for UPC")
+			}
+		}
 		writer.Flush()
+
 		_, err = output_tmp.Seek(0, io.SeekStart)
 		if err != nil {
 			log.Fatal().Err(err).Send()
@@ -141,16 +163,6 @@ func lookupAsinFromUpc(cmd *cobra.Command, args []string) {
 		_, err = io.Copy(output, output_tmp)
 		if err != nil {
 			log.Fatal().Err(err).Send()
-		}
-
-		var not_found []string
-		for _, queryIdentifier := range queryIdentifiers {
-			if !slices.Contains(found, queryIdentifier) {
-				not_found = append(not_found, queryIdentifier)
-			}
-		}
-		if len(not_found) != 0 {
-			log.Warn().Interface("upc", not_found).Msg("queries with no results")
 		}
 	}
 }

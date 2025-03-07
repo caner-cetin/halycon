@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/caner-cetin/halycon/internal"
+	"github.com/caner-cetin/halycon/internal/config"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
@@ -75,9 +75,10 @@ func initConfig() {
 		fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
 	}
 
-	viper.SetDefault(internal.CONFIG_KEY_AMAZON_AUTH_ENDPOINT, internal.DEFAULT_AMAZON_AUTH_ENDPOINT)
-	viper.SetDefault(internal.CONFIG_KEY_AMAZON_AUTH_HOST, internal.DEFAULT_AMAZON_AUTH_HOST)
-	viper.SetDefault(internal.CONFIG_KEY_AMAZON_MARKETPLACE_ID, []string{internal.DEFAULT_AMAZON_MARKETPLACE_ID})
+	viper.SetDefault(config.AMAZON_AUTH_ENDPOINT.Key, config.AMAZON_AUTH_ENDPOINT.Default)
+	viper.SetDefault(config.AMAZON_AUTH_HOST.Key, config.AMAZON_AUTH_HOST.Default)
+	viper.SetDefault(config.AMAZON_MARKETPLACE_ID.Key, []string{config.AMAZON_MARKETPLACE_ID.Default})
+	viper.SetDefault(config.AMAZON_FBA_SHIP_FROM_COUNTRY_CODE.Key, config.AMAZON_FBA_SHIP_FROM_COUNTRY_CODE.Default)
 
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	switch verbosity {
