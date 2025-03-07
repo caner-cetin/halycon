@@ -1,0 +1,15 @@
+# values with placeholders are optional
+amazon:
+  auth:
+    # client ID and secret of application
+    client:
+      id: 
+      secret:
+    # refresh token, acquired from self-authorizing the application
+    refresh_token:
+    endpoint: https://api.amazon.com/auth/o2/token
+    # host for bearer token
+    host: sellingpartnerapi-na.amazon.com
+  # marketplace ids for all kinds of operations, US will be registered by default
+  marketplace_id: 
+    - ATVPDKIKX0DER
