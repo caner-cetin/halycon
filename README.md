@@ -24,7 +24,7 @@ fill the `.halycon.dummy.yaml`, rename to `.halycon.yaml`, move the config to ho
 
 ### pre-built binaries
 
-i will upload binaries to releases soon tm
+https://github.com/caner-cetin/halycon/releases
 
 ### build yourself / development
 
