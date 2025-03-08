@@ -4,12 +4,12 @@ import (
 	"context"
 
 	"github.com/caner-cetin/halycon/internal"
-	"github.com/caner-cetin/halycon/internal/amazon"
 	"github.com/caner-cetin/halycon/internal/amazon/catalog/client/catalog"
 	"github.com/caner-cetin/halycon/internal/amazon/fba_inbound/client/fba_inbound"
 	"github.com/caner-cetin/halycon/internal/amazon/fba_inventory/client/fba_inventory"
 	"github.com/caner-cetin/halycon/internal/amazon/listings/client/listings"
 	"github.com/caner-cetin/halycon/internal/config"
+	sp_api "github.com/caner-cetin/halycon/internal/sp-api"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -37,7 +37,7 @@ type ResourceConfig struct {
 
 type AppCtx struct {
 	Amazon struct {
-		Client *amazon.AuthorizedClient
+		Client *sp_api.Client
 		Token  string
 	}
 }
@@ -57,13 +57,13 @@ func WrapCommandWithResources(fn func(cmd *cobra.Command, args []string), resour
 				if !viper.IsSet(config.AMAZON_AUTH_REFRESH_TOKEN.Key) {
 					log.Fatal().Msg("amazon refresh token is not set")
 				}
-				var auth = amazon.AuthConfig{
+				var auth = sp_api.AuthConfig{
 					ClientID:     viper.GetString(config.AMAZON_AUTH_CLIENT_ID.Key),
 					ClientSecret: viper.GetString(config.AMAZON_AUTH_CLIENT_SECRET.Key),
 					RefreshToken: viper.GetString(config.AMAZON_AUTH_REFRESH_TOKEN.Key),
 					Endpoint:     viper.GetString(config.AMAZON_AUTH_ENDPOINT.Key),
 				}
-				var tokenManager = amazon.NewTokenManager(auth)
+				var tokenManager = sp_api.NewTokenManager(auth)
 				token, err := tokenManager.GetAccessToken()
 				if err != nil {
 					log.Fatal().Err(err).Msg("error while acquiring access token")
@@ -72,17 +72,17 @@ func WrapCommandWithResources(fn func(cmd *cobra.Command, args []string), resour
 				host := viper.GetString(config.AMAZON_AUTH_HOST.Key)
 				basePath := "/"
 				scheme := "https"
-				app.Amazon.Client = amazon.NewAuthorizedClient(token)
+				app.Amazon.Client = sp_api.NewAuthorizedClient(token)
 				for _, service := range resourceConfig.Services {
 					switch service {
 					case ServiceCatalog:
-						app.Amazon.Client.AddService(amazon.CatalogServiceName, catalog.NewClientWithBearerToken(host, basePath, scheme, token))
+						app.Amazon.Client.AddService(sp_api.CatalogServiceName, catalog.NewClientWithBearerToken(host, basePath, scheme, token))
 					case ServiceListings:
-						app.Amazon.Client.AddService(amazon.ListingsServiceName, listings.NewClientWithBearerToken(host, basePath, scheme, token))
+						app.Amazon.Client.AddService(sp_api.ListingsServiceName, listings.NewClientWithBearerToken(host, basePath, scheme, token))
 					case ServiceFBAInbound:
-						app.Amazon.Client.AddService(amazon.FBAInboundServiceName, fba_inbound.NewClientWithBearerToken(host, basePath, scheme, token))
+						app.Amazon.Client.AddService(sp_api.FBAInboundServiceName, fba_inbound.NewClientWithBearerToken(host, basePath, scheme, token))
 					case ServiceFBAInventory:
-						app.Amazon.Client.AddService(amazon.FBAInventoryServiceName, fba_inventory.NewClientWithBearerToken(host, basePath, scheme, token))
+						app.Amazon.Client.AddService(sp_api.FBAInventoryServiceName, fba_inventory.NewClientWithBearerToken(host, basePath, scheme, token))
 					}
 				}
 				app.Amazon.Token = token

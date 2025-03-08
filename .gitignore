@@ -1,3 +1,5 @@
 .halycon.yaml
 private
 dist
+models
+internal/amazon

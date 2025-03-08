@@ -12,9 +12,9 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/caner-cetin/halycon/internal"
-	"github.com/caner-cetin/halycon/internal/amazon"
 	"github.com/caner-cetin/halycon/internal/amazon/fba_inventory/client/fba_inventory"
 	"github.com/caner-cetin/halycon/internal/config"
+	sp_api "github.com/caner-cetin/halycon/internal/sp-api"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -113,7 +113,7 @@ func lookupSkuFromAsin(cmd *cobra.Command, args []string) {
 
 }
 
-func getAsinToMskuMap(amazonClient *amazon.AuthorizedClient) (map[string]FBAProduct, error) {
+func getAsinToMskuMap(amazonClient *sp_api.Client) (map[string]FBAProduct, error) {
 	cacheFilePath := filepath.Join(os.TempDir(), "halycon_amazon_asin_msku_map.json")
 	var asinSkuMap = make(map[string]FBAProduct)
 	if !lookupSkuFromAsinCfg.ForceRebuildCache {

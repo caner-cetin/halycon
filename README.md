@@ -5,9 +5,8 @@ utilities for Amazon SP API, mostly for my annoyances
 - [halycon](#halycon)
   - [usage](#usage)
     - [pre-built binaries](#pre-built-binaries)
-    - [build yourself](#build-yourself)
-    - [go](#go)
-  - [Utilities](#utilities)
+    - [build yourself / development](#build-yourself--development)
+  - [utilities](#utilities)
     - [UPC to ASIN](#upc-to-asin)
       - [what](#what)
       - [why](#why)
@@ -27,22 +26,17 @@ fill the `.halycon.dummy.yaml`, rename to `.halycon.yaml`, move the config to ho
 
 i will upload binaries to releases soon tm
 
-### build yourself
+### build yourself / development
 
 ```bash
+# for swagger models
+just generate
 just build-current
 mv ./dist/halycon /usr/local/bin/halycon
 halycon --help
 ```
 
-### go
-
-```bash
-GOPROXY=direct go install github.com/caner-cetin/halycon@latest
-halycon --help
-```
-
-## Utilities
+## utilities
 ### UPC to ASIN
 
 #### what
@@ -136,7 +130,6 @@ halycon asin-to-sku      -i asin.txt -o sku.csv
 halycon shipment create  -i sku.csv
 ```
 then confirm and finalize the shipment on dashboard.
-
 
 ## halycon?
 
