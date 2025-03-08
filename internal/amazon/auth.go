@@ -19,6 +19,7 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
 	"github.com/spf13/viper"
+	"golang.org/x/time/rate"
 )
 
 type AuthConfig struct {
@@ -114,9 +115,18 @@ const (
 	FBAInventoryServiceName = "services.fba.inventory"
 )
 
+const (
+	SearchCatalogItemsRLKey    = "rate_limiter.catalog.searchItems"
+	GetCatalogItemsRLKey       = "rate_limiter.catalog.getItems"
+	GetListingsItemRLKey       = "rate_limiter.listings.getItem"
+	FBAInventorySummariesRLKey = "rate_limiter.fba.inventorySummaries"
+	CreateInboundPlanRLKey     = "rate_limiter.fba.createInboundPlan"
+)
+
 type AuthorizedClient struct {
-	services map[string]interface{}
-	authInfo runtime.ClientAuthInfoWriter
+	services     map[string]interface{}
+	rateLimiters map[string]*rate.Limiter
+	authInfo     runtime.ClientAuthInfoWriter
 }
 
 func (a *AuthorizedClient) AddService(name string, service interface{}) {
@@ -148,7 +158,7 @@ func (a *AuthorizedClient) SearchCatalogItems(params *catalog.SearchCatalogItems
 	authOpt := func(op *runtime.ClientOperation) {
 		op.AuthInfo = a.authInfo
 	}
-	return catalogClient.SearchCatalogItems(params, authOpt, internal.ConfigureRateLimiting(2, 2))
+	return catalogClient.SearchCatalogItems(params, authOpt, internal.WithRateLimit(a.rateLimiters[SearchCatalogItemsRLKey]))
 }
 
 func (a *AuthorizedClient) GetCatalogItem(params *catalog.GetCatalogItemParams) (*catalog.GetCatalogItemOK, error) {
@@ -156,7 +166,7 @@ func (a *AuthorizedClient) GetCatalogItem(params *catalog.GetCatalogItemParams) 
 	authOpt := func(op *runtime.ClientOperation) {
 		op.AuthInfo = a.authInfo
 	}
-	return catalogClient.GetCatalogItem(params, authOpt, internal.ConfigureRateLimiting(2, 2))
+	return catalogClient.GetCatalogItem(params, authOpt, internal.WithRateLimit(a.rateLimiters[GetCatalogItemsRLKey]))
 }
 
 func (a *AuthorizedClient) GetListingsItem(params *listings.GetListingsItemParams) (*listings.GetListingsItemOK, error) {
@@ -164,7 +174,7 @@ func (a *AuthorizedClient) GetListingsItem(params *listings.GetListingsItemParam
 	authOpt := func(op *runtime.ClientOperation) {
 		op.AuthInfo = a.authInfo
 	}
-	return listingsClient.GetListingsItem(params, authOpt, internal.ConfigureRateLimiting(5, 10))
+	return listingsClient.GetListingsItem(params, authOpt, internal.WithRateLimit(a.rateLimiters[GetListingsItemRLKey]))
 }
 
 func (a *AuthorizedClient) GetFBAInventorySummaries(params *fba_inventory.GetInventorySummariesParams) (*fba_inventory.GetInventorySummariesOK, error) {
@@ -172,7 +182,7 @@ func (a *AuthorizedClient) GetFBAInventorySummaries(params *fba_inventory.GetInv
 	authOpt := func(op *runtime.ClientOperation) {
 		op.AuthInfo = a.authInfo
 	}
-	return inventoryClient.GetInventorySummaries(params, authOpt, internal.ConfigureRateLimiting(2, 2))
+	return inventoryClient.GetInventorySummaries(params, authOpt, internal.WithRateLimit(a.rateLimiters[FBAInventorySummariesRLKey]))
 }
 
 func (a *AuthorizedClient) CreateFBAInboundPlan(params *fba_inbound.CreateInboundPlanParams) (*fba_inbound.CreateInboundPlanAccepted, error) {
@@ -180,7 +190,17 @@ func (a *AuthorizedClient) CreateFBAInboundPlan(params *fba_inbound.CreateInboun
 	authOpt := func(op *runtime.ClientOperation) {
 		op.AuthInfo = a.authInfo
 	}
-	return inboundClient.CreateInboundPlan(params, authOpt, internal.ConfigureRateLimiting(2, 2))
+	return inboundClient.CreateInboundPlan(params, authOpt, internal.WithRateLimit(a.rateLimiters[CreateInboundPlanRLKey]))
+}
+
+func (a *AuthorizedClient) SetRateLimits() {
+	a.rateLimiters = map[string]*rate.Limiter{
+		SearchCatalogItemsRLKey:    rate.NewLimiter(rate.Limit(2), 2),
+		GetCatalogItemsRLKey:       rate.NewLimiter(rate.Limit(2), 2),
+		GetListingsItemRLKey:       rate.NewLimiter(rate.Limit(5), 10),
+		FBAInventorySummariesRLKey: rate.NewLimiter(rate.Limit(2), 2),
+		CreateInboundPlanRLKey:     rate.NewLimiter(rate.Limit(2), 2),
+	}
 }
 
 func NewAuthorizedClient(token string) *AuthorizedClient {
@@ -193,8 +213,10 @@ func NewAuthorizedClient(token string) *AuthorizedClient {
 		return r.SetHeaderParam("x-amz-access-token", token)
 	})
 
-	return &AuthorizedClient{
+	a := &AuthorizedClient{
 		services: map[string]interface{}{},
 		authInfo: authInfo,
 	}
+	a.SetRateLimits()
+	return a
 }

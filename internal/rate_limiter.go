@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/go-openapi/runtime"
-	"github.com/go-openapi/runtime/client"
 	"github.com/rs/zerolog/log"
 	"golang.org/x/time/rate"
 )
@@ -27,8 +26,9 @@ func (t *RateLimitedTransport) RoundTrip(req *http.Request) (*http.Response, err
 	}
 	delay := reservation.Delay()
 	if delay > 0 {
-		log.Trace().Dur("delay", delay).
-			Float64("available_tokens", t.RateLimiter.Tokens()).
+		log.Trace().
+			Float64("s", delay.Seconds()).
+			Int64("ms", delay.Milliseconds()).
 			Str("url", req.URL.String()).
 			Msg("rate limit reached")
 		timer := time.NewTimer(delay)
@@ -44,11 +44,10 @@ func (t *RateLimitedTransport) RoundTrip(req *http.Request) (*http.Response, err
 	return t.Base.RoundTrip(req)
 }
 
-func NewRateLimitedClient(requestsPerSecond float64, burst int) *http.Client {
-	limiter := rate.NewLimiter(rate.Limit(requestsPerSecond), burst)
+func NewRateLimitedClient(rl *rate.Limiter) *http.Client {
 	transport := &RateLimitedTransport{
 		Base:        http.DefaultTransport,
-		RateLimiter: limiter,
+		RateLimiter: rl,
 	}
 	return &http.Client{
 		Transport: transport,
@@ -56,14 +55,9 @@ func NewRateLimitedClient(requestsPerSecond float64, burst int) *http.Client {
 	}
 }
 
-func NewRateLimitedRuntime(requestsPerSecond float64, burst int, schemes []string, host string, basePath string) runtime.ClientTransport {
-	httpClient := NewRateLimitedClient(requestsPerSecond, burst)
-	return client.NewWithClient(host, basePath, schemes, httpClient)
-}
-
-func ConfigureRateLimiting(requestsPerSecond float64, burst int) func(op *runtime.ClientOperation) {
+func WithRateLimit(rl *rate.Limiter) func(op *runtime.ClientOperation) {
 	return func(op *runtime.ClientOperation) {
-		httpClient := NewRateLimitedClient(requestsPerSecond, burst)
+		httpClient := NewRateLimitedClient(rl)
 		op.Client = httpClient
 	}
 }
