@@ -18,11 +18,12 @@ const (
 )
 
 const (
-	SearchCatalogItemsRLKey    = "rate_limiter.catalog.searchItems"
-	GetCatalogItemsRLKey       = "rate_limiter.catalog.getItems"
-	GetListingsItemRLKey       = "rate_limiter.listings.getItem"
-	FBAInventorySummariesRLKey = "rate_limiter.fba.inventorySummaries"
-	CreateInboundPlanRLKey     = "rate_limiter.fba.createInboundPlan"
+	SearchCatalogItemsRLKey        = "rate_limiter.catalog.searchItems"
+	GetCatalogItemsRLKey           = "rate_limiter.catalog.getItems"
+	GetListingsItemRLKey           = "rate_limiter.listings.getItem"
+	FBAInventorySummariesRLKey     = "rate_limiter.fba.inventorySummaries"
+	CreateInboundPlanRLKey         = "rate_limiter.fba.createInboundPlan"
+	GetInboundOperationStatusRLKey = "rate_limiter.fba.getInboundOperationStatus"
 )
 
 type Client struct {
@@ -56,52 +57,37 @@ func (a *Client) GetFBAInventoryService() fba_inventory.ClientService {
 }
 
 func (a *Client) SearchCatalogItems(params *catalog.SearchCatalogItemsParams) (*catalog.SearchCatalogItemsOK, error) {
-	catalogClient := a.GetCatalogService()
-	authOpt := func(op *runtime.ClientOperation) {
-		op.AuthInfo = a.authInfo
-	}
-	return catalogClient.SearchCatalogItems(params, authOpt, WithRateLimit(a.rateLimiters[SearchCatalogItemsRLKey]))
+	return a.GetCatalogService().SearchCatalogItems(params, a.WithAuth(), a.WithRateLimit(SearchCatalogItemsRLKey))
 }
 
 func (a *Client) GetCatalogItem(params *catalog.GetCatalogItemParams) (*catalog.GetCatalogItemOK, error) {
-	catalogClient := a.GetCatalogService()
-	authOpt := func(op *runtime.ClientOperation) {
-		op.AuthInfo = a.authInfo
-	}
-	return catalogClient.GetCatalogItem(params, authOpt, WithRateLimit(a.rateLimiters[GetCatalogItemsRLKey]))
+	return a.GetCatalogService().GetCatalogItem(params, a.WithAuth(), a.WithRateLimit(GetCatalogItemsRLKey))
 }
 
 func (a *Client) GetListingsItem(params *listings.GetListingsItemParams) (*listings.GetListingsItemOK, error) {
-	listingsClient := a.GetListingsService()
-	authOpt := func(op *runtime.ClientOperation) {
-		op.AuthInfo = a.authInfo
-	}
-	return listingsClient.GetListingsItem(params, authOpt, WithRateLimit(a.rateLimiters[GetListingsItemRLKey]))
+	return a.GetListingsService().GetListingsItem(params, a.WithAuth(), a.WithRateLimit(GetListingsItemRLKey))
 }
 
 func (a *Client) GetFBAInventorySummaries(params *fba_inventory.GetInventorySummariesParams) (*fba_inventory.GetInventorySummariesOK, error) {
-	inventoryClient := a.GetFBAInventoryService()
-	authOpt := func(op *runtime.ClientOperation) {
-		op.AuthInfo = a.authInfo
-	}
-	return inventoryClient.GetInventorySummaries(params, authOpt, WithRateLimit(a.rateLimiters[FBAInventorySummariesRLKey]))
+	return a.GetFBAInventoryService().GetInventorySummaries(params, a.WithAuth(), a.WithRateLimit(FBAInventorySummariesRLKey))
 }
 
 func (a *Client) CreateFBAInboundPlan(params *fba_inbound.CreateInboundPlanParams) (*fba_inbound.CreateInboundPlanAccepted, error) {
-	inboundClient := a.GetFBAInboundService()
-	authOpt := func(op *runtime.ClientOperation) {
-		op.AuthInfo = a.authInfo
-	}
-	return inboundClient.CreateInboundPlan(params, authOpt, WithRateLimit(a.rateLimiters[CreateInboundPlanRLKey]))
+	return a.GetFBAInboundService().CreateInboundPlan(params, a.WithAuth(), a.WithRateLimit(CreateInboundPlanRLKey))
+}
+
+func (a *Client) GetInboundOperationStatus(params *fba_inbound.GetInboundOperationStatusParams) (*fba_inbound.GetInboundOperationStatusOK, error) {
+	return a.GetFBAInboundService().GetInboundOperationStatus(params, a.WithAuth(), a.WithRateLimit(GetInboundOperationStatusRLKey))
 }
 
 func (a *Client) SetRateLimits() {
 	a.rateLimiters = map[string]*rate.Limiter{
-		SearchCatalogItemsRLKey:    rate.NewLimiter(rate.Limit(2), 2),
-		GetCatalogItemsRLKey:       rate.NewLimiter(rate.Limit(2), 2),
-		GetListingsItemRLKey:       rate.NewLimiter(rate.Limit(5), 10),
-		FBAInventorySummariesRLKey: rate.NewLimiter(rate.Limit(2), 2),
-		CreateInboundPlanRLKey:     rate.NewLimiter(rate.Limit(2), 2),
+		SearchCatalogItemsRLKey:        rate.NewLimiter(rate.Limit(2), 2),
+		GetCatalogItemsRLKey:           rate.NewLimiter(rate.Limit(2), 2),
+		GetListingsItemRLKey:           rate.NewLimiter(rate.Limit(5), 10),
+		FBAInventorySummariesRLKey:     rate.NewLimiter(rate.Limit(2), 2),
+		CreateInboundPlanRLKey:         rate.NewLimiter(rate.Limit(2), 2),
+		GetInboundOperationStatusRLKey: rate.NewLimiter(rate.Limit(2), 6),
 	}
 }
 
@@ -121,4 +107,17 @@ func NewAuthorizedClient(token string) *Client {
 	}
 	a.SetRateLimits()
 	return a
+}
+
+func (a *Client) WithRateLimit(key string) func(op *runtime.ClientOperation) {
+	return func(op *runtime.ClientOperation) {
+		httpClient := NewRateLimitedClient(a.rateLimiters[key])
+		op.Client = httpClient
+	}
+}
+
+func (a *Client) WithAuth() func(op *runtime.ClientOperation) {
+	return func(op *runtime.ClientOperation) {
+		op.AuthInfo = a.authInfo
+	}
 }

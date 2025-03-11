@@ -54,10 +54,3 @@ func NewRateLimitedClient(rl *rate.Limiter) *http.Client {
 		// Timeout:   30 * time.Second
 	}
 }
-
-func WithRateLimit(rl *rate.Limiter) func(op *runtime.ClientOperation) {
-	return func(op *runtime.ClientOperation) {
-		httpClient := NewRateLimitedClient(rl)
-		op.Client = httpClient
-	}
-}

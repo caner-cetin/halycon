@@ -3,3 +3,4 @@ private
 dist
 models
 internal/amazon
+.DS_Store

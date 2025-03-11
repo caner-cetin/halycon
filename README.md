@@ -127,9 +127,29 @@ so for creating a shipment from list of UPCs (which is one of the main goals her
 ```bash
 halycon upc-to-asin      -i upc.txt -o asin.txt
 halycon asin-to-sku      -i asin.txt -o sku.csv
-halycon shipment create  -i sku.csv
+halycon shipment create  -i sku.csv -v
 ```
-then confirm and finalize the shipment on dashboard.
+after this, operation and workflow ID will be displayed
+```bash
+2:40AM INF success! inbound_plan_id=wf00a0e0a5-XXXX-XXX-XXXX-XXXXXXXXXXXX operation_id=78200213-XXXX-XXX-XXXX-XXXXXXXXXXXX
+```
+then, if requested, `https://sellercentral.amazon.com/fba/sendtoamazon/confirm_content_step?wf=wf00a0e0a5-XXXX-XXX-XXXX-XXXXXXXXXXXX` will open with default browser for confirming and finalizing the shipment on dashboard.
+
+if you see the error `Please review SKUs with errors or unconfirmed SKUs` on dashboard, check the operation status.
+```bash
+halycon shipment operation status -i 78200213-XXXX-XXX-XXXX-XXXXXXXXXXXX -v
+```
+which will give you the status, if success or in progress, message will be displayed with `INFO` level, so you may not see anything.
+```bash
+2:40AM INF id=78200213-XXXX-XXX-XXXX-XXXXXXXXXXXX status=SUCCESS
+```
+if operation failed, problems will be displayed line by line
+```bash
+halycon shipment operation status -i 0aa45ad9-XXXX-XXX-XXXX-XXXXXXXXXXXX
+2:34AM WRN id=0aa45ad9-XXXX-XXX-XXXX-XXXXXXXXXXXX status=FAILED
+2:34AM WRN problem 1 code=FBA_INB_0049 details="There's an input error with the resource 'SU-XXXX-XXXX'." severity=ERROR
+```
+
 
 ## halycon?
 

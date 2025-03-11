@@ -3,6 +3,7 @@ package cmd
 import (
 	"encoding/csv"
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -29,14 +30,29 @@ var (
 		Run: WrapCommandWithResources(createShipmentPlan, ResourceConfig{Resources: []ResourceType{ResourceAmazon}, Services: []ServiceType{ServiceFBAInbound}}),
 	}
 	createShipmentPlanCfg = CreateShipmentPlanConfig{}
-
-	shipmentCmd = &cobra.Command{
+	shipmentCmd           = &cobra.Command{
 		Use: "shipment",
 	}
 )
 
+var (
+	operationStatusCmd = &cobra.Command{
+		Use: "status",
+		Run: WrapCommandWithResources(getOperationStatusCmd, ResourceConfig{Resources: []ResourceType{ResourceAmazon}, Services: []ServiceType{ServiceFBAInbound}}),
+	}
+
+	operationCmd = &cobra.Command{
+		Use: "operation",
+	}
+	operationId string
+)
+
 func getShipmentCmd() *cobra.Command {
 	createShipmentPlanCmd.PersistentFlags().StringVarP(&createShipmentPlanCfg.Input, "input", "i", "", "comma delimited input consisting ASIN, SKU, product name, quantity in order (output of asin to sku command)")
+
+	operationStatusCmd.PersistentFlags().StringVarP(&operationId, "id", "i", "", "operation id")
+	operationCmd.AddCommand(operationStatusCmd)
+	shipmentCmd.AddCommand(operationCmd)
 
 	shipmentCmd.AddCommand()
 	shipmentCmd.AddCommand(createShipmentPlanCmd)
@@ -50,21 +66,23 @@ func createShipmentPlan(cmd *cobra.Command, args []string) {
 	params.Body = new(models.CreateInboundPlanRequest)
 	params.Body.DestinationMarketplaces = viper.GetStringSlice(config.AMAZON_MARKETPLACE_ID.Key)
 
+	ev := log.Fatal()
 	if !viper.IsSet(config.AMAZON_FBA_SHIP_FROM_ADDRESS_LINE_1.Key) {
-		log.Fatal().Msg("shipment address line 1 must be set")
+		ev.Msg("shipment address line 1 must be set")
 	}
 	if !viper.IsSet(config.AMAZON_FBA_SHIP_FROM_CITY.Key) {
-		log.Fatal().Msg("shipment city must be set")
+		ev.Msg("shipment city must be set")
 	}
 	if !viper.IsSet(config.AMAZON_FBA_SHIP_FROM_NAME.Key) {
-		log.Fatal().Msg("contact name must be set")
+		ev.Msg("contact name must be set")
 	}
 	if !viper.IsSet(config.AMAZON_FBA_SHIP_FROM_PHONE_NUMBER.Key) {
-		log.Fatal().Msg("phone number must be set")
+		ev.Msg("phone number must be set")
 	}
 	if !viper.IsSet(config.AMAZON_FBA_SHIP_FROM_POSTAL_CODE.Key) {
-		log.Fatal().Msg("postal code must be set")
+		ev.Msg("postal code must be set")
 	}
+	ev.Discard()
 	params.Body.SourceAddress = &models.AddressInput{
 		AddressLine1: ptr.String(viper.GetString(config.AMAZON_FBA_SHIP_FROM_ADDRESS_LINE_1.Key)),
 		City:         ptr.String(viper.GetString(config.AMAZON_FBA_SHIP_FROM_CITY.Key)),
@@ -178,6 +196,15 @@ func createShipmentPlan(cmd *cobra.Command, args []string) {
 	}
 
 	log.Info().Str("inbound_plan_id", *result.Payload.InboundPlanID).Str("operation_id", *result.Payload.OperationID).Msg("success!")
+	shouldOpenPlan := internal.PromptFor("Open plan with default browser? [y/N]")
+	if strings.TrimSpace(strings.ToLower(strings.ToLower(shouldOpenPlan))) == "y" {
+		// todo: change .com, I dont know how other marketplaces works.
+		url := fmt.Sprintf("https://sellercentral.amazon.com/fba/sendtoamazon/confirm_content_step?wf=%s", *result.Payload.InboundPlanID)
+		err = internal.OpenURL(url)
+		if err != nil {
+			log.Fatal().Str("url", url).Err(err).Send()
+		}
+	}
 }
 
 type ItemRequirements struct {
@@ -245,5 +272,33 @@ func savePrepRequirements(prepRequirements PrepRequirements) {
 	err = os.WriteFile(cacheFile, data, 0644)
 	if err != nil {
 		log.Warn().Err(err).Msg("could not write item requirements cache")
+	}
+}
+
+func getOperationStatusCmd(cmd *cobra.Command, args []string) {
+	ctx := cmd.Context()
+	app := ctx.Value(internal.APP_CONTEXT).(AppCtx)
+	params := fba_inbound.NewGetInboundOperationStatusParams()
+	params.OperationID = operationId
+	status, err := app.Amazon.Client.GetInboundOperationStatus(params)
+	if err != nil {
+		log.Fatal().Err(err).Send()
+	}
+	logger := log.With().
+		Str("id", *status.Payload.OperationID).
+		Str("status", string(*status.Payload.OperationStatus)).
+		Logger()
+	if *status.Payload.OperationStatus == "FAILED" {
+		logger.Warn().Send()
+	} else {
+		logger.Info().Send()
+	}
+	for i, problem := range status.Payload.OperationProblems {
+		log.Warn().
+			Str("code", *problem.Code).
+			Str("message", *problem.Message).
+			Str("details", *problem.Details).
+			Str("severity", *problem.Severity).
+			Msgf("problem %d", i+1)
 	}
 }
