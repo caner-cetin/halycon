@@ -8,6 +8,7 @@ import (
 	"github.com/caner-cetin/halycon/internal/amazon/fba_inbound/client/fba_inbound"
 	"github.com/caner-cetin/halycon/internal/amazon/fba_inventory/client/fba_inventory"
 	"github.com/caner-cetin/halycon/internal/amazon/listings/client/listings"
+	"github.com/caner-cetin/halycon/internal/amazon/product_type_definitions/client/definitions"
 	"github.com/caner-cetin/halycon/internal/config"
 	sp_api "github.com/caner-cetin/halycon/internal/sp-api"
 	"github.com/rs/zerolog/log"
@@ -28,6 +29,7 @@ const (
 	ServiceListings
 	ServiceFBAInbound
 	ServiceFBAInventory
+	ServiceProductTypeDefinitions
 )
 
 type ResourceConfig struct {
@@ -83,6 +85,8 @@ func WrapCommandWithResources(fn func(cmd *cobra.Command, args []string), resour
 						app.Amazon.Client.AddService(sp_api.FBAInboundServiceName, fba_inbound.NewClientWithBearerToken(host, basePath, scheme, token))
 					case ServiceFBAInventory:
 						app.Amazon.Client.AddService(sp_api.FBAInventoryServiceName, fba_inventory.NewClientWithBearerToken(host, basePath, scheme, token))
+					case ServiceProductTypeDefinitions:
+						app.Amazon.Client.AddService(sp_api.ProductTypeDefinitionsServiceName, definitions.NewClientWithBearerToken(host, basePath, scheme, token))
 					}
 				}
 				app.Amazon.Token = token

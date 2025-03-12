@@ -46,6 +46,7 @@ func init() {
 	rootCmd.AddCommand(getlookupAsinFromUpcCmd())
 	rootCmd.AddCommand(getLookupSkuFromAsinCmd())
 	rootCmd.AddCommand(getShipmentCmd())
+	rootCmd.AddCommand(getDefinitionsCmd())
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
 	rootCmd.PersistentFlags().CountVarP(&verbosity, "verbose", "v", "verbose output (-v: info, -vv: debug, -vvv: trace)")

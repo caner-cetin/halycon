@@ -5,25 +5,18 @@ import (
 	"github.com/caner-cetin/halycon/internal/amazon/fba_inbound/client/fba_inbound"
 	"github.com/caner-cetin/halycon/internal/amazon/fba_inventory/client/fba_inventory"
 	"github.com/caner-cetin/halycon/internal/amazon/listings/client/listings"
+	"github.com/caner-cetin/halycon/internal/amazon/product_type_definitions/client/definitions"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
 	"golang.org/x/time/rate"
 )
 
 const (
-	CatalogServiceName      = "services.catalog"
-	ListingsServiceName     = "services.listings"
-	FBAInboundServiceName   = "services.fba.inbound"
-	FBAInventoryServiceName = "services.fba.inventory"
-)
-
-const (
-	SearchCatalogItemsRLKey        = "rate_limiter.catalog.searchItems"
-	GetCatalogItemsRLKey           = "rate_limiter.catalog.getItems"
-	GetListingsItemRLKey           = "rate_limiter.listings.getItem"
-	FBAInventorySummariesRLKey     = "rate_limiter.fba.inventorySummaries"
-	CreateInboundPlanRLKey         = "rate_limiter.fba.createInboundPlan"
-	GetInboundOperationStatusRLKey = "rate_limiter.fba.getInboundOperationStatus"
+	CatalogServiceName                = "services.catalog"
+	ListingsServiceName               = "services.listings"
+	FBAInboundServiceName             = "services.fba.inbound"
+	FBAInventoryServiceName           = "services.fba.inventory"
+	ProductTypeDefinitionsServiceName = "services.listings.product_type.definitions"
 )
 
 type Client struct {
@@ -56,6 +49,9 @@ func (a *Client) GetFBAInventoryService() fba_inventory.ClientService {
 	return a.services[FBAInventoryServiceName].(fba_inventory.ClientService)
 }
 
+func (a *Client) GetProductTypeDefinitionsService() definitions.ClientService {
+	return a.services[ProductTypeDefinitionsServiceName].(definitions.ClientService)
+}
 func (a *Client) SearchCatalogItems(params *catalog.SearchCatalogItemsParams) (*catalog.SearchCatalogItemsOK, error) {
 	return a.GetCatalogService().SearchCatalogItems(params, a.WithAuth(), a.WithRateLimit(SearchCatalogItemsRLKey))
 }
@@ -80,14 +76,35 @@ func (a *Client) GetInboundOperationStatus(params *fba_inbound.GetInboundOperati
 	return a.GetFBAInboundService().GetInboundOperationStatus(params, a.WithAuth(), a.WithRateLimit(GetInboundOperationStatusRLKey))
 }
 
+func (a *Client) SearchProductTypeDefinitions(params *definitions.SearchDefinitionsProductTypesParams) (*definitions.SearchDefinitionsProductTypesOK, error) {
+	return a.GetProductTypeDefinitionsService().SearchDefinitionsProductTypes(params, a.WithAuth(), a.WithRateLimit(SearchProductTypeDefinitionsRLKey))
+}
+
+func (a *Client) GetProductTypeDefinition(params *definitions.GetDefinitionsProductTypeParams) (*definitions.GetDefinitionsProductTypeOK, error) {
+	return a.GetProductTypeDefinitionsService().GetDefinitionsProductType(params, a.WithAuth(), a.WithRateLimit(GetProductTypeDefinitionRLKey))
+}
+
+const (
+	SearchCatalogItemsRLKey           = "rate_limiter.catalog.searchItems"
+	GetCatalogItemsRLKey              = "rate_limiter.catalog.getItems"
+	GetListingsItemRLKey              = "rate_limiter.listings.getItem"
+	FBAInventorySummariesRLKey        = "rate_limiter.fba.inventorySummaries"
+	CreateInboundPlanRLKey            = "rate_limiter.fba.createInboundPlan"
+	GetInboundOperationStatusRLKey    = "rate_limiter.fba.getInboundOperationStatus"
+	SearchProductTypeDefinitionsRLKey = "rate_limiter.listings.search_product_type_definitions"
+	GetProductTypeDefinitionRLKey     = "rate_limiter.listings.get_product_type_definitions"
+)
+
 func (a *Client) SetRateLimits() {
 	a.rateLimiters = map[string]*rate.Limiter{
-		SearchCatalogItemsRLKey:        rate.NewLimiter(rate.Limit(2), 2),
-		GetCatalogItemsRLKey:           rate.NewLimiter(rate.Limit(2), 2),
-		GetListingsItemRLKey:           rate.NewLimiter(rate.Limit(5), 10),
-		FBAInventorySummariesRLKey:     rate.NewLimiter(rate.Limit(2), 2),
-		CreateInboundPlanRLKey:         rate.NewLimiter(rate.Limit(2), 2),
-		GetInboundOperationStatusRLKey: rate.NewLimiter(rate.Limit(2), 6),
+		SearchCatalogItemsRLKey:           rate.NewLimiter(rate.Limit(2), 2),
+		GetCatalogItemsRLKey:              rate.NewLimiter(rate.Limit(2), 2),
+		GetListingsItemRLKey:              rate.NewLimiter(rate.Limit(5), 10),
+		FBAInventorySummariesRLKey:        rate.NewLimiter(rate.Limit(2), 2),
+		CreateInboundPlanRLKey:            rate.NewLimiter(rate.Limit(2), 2),
+		GetInboundOperationStatusRLKey:    rate.NewLimiter(rate.Limit(2), 6),
+		SearchProductTypeDefinitionsRLKey: rate.NewLimiter(rate.Limit(5), 10),
+		GetProductTypeDefinitionRLKey:     rate.NewLimiter(rate.Limit(5), 10),
 	}
 }
 
