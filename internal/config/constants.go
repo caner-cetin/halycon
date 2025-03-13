@@ -23,4 +23,5 @@ var (
 	AMAZON_FBA_SHIP_FROM_POSTAL_CODE    = Config{Key: "amazon.fba.ship_from.postal_code"}
 	AMAZON_FBA_SHIP_FROM_STATE_PROVINCE = Config{Key: "amazon.fba.ship_from.state_or_province_code"}
 	AMAZON_MERCHANT_TOKEN               = Config{Key: "amazon.merchant_token"}
+	AMAZON_DEFAULT_LANGUAGE_TAG         = Config{Key: "amazon.default_language_tag", Default: "en_US"}
 )

@@ -183,15 +183,15 @@ halycon definition search --item "Aneco 6 Pairs Over Knee Thigh Socks Knee-High 
 attributes are required for [`PUT /listings/2021-08-01/items/{sellerId}/{sku}`](https://developer-docs.amazon.com/sp-api/lang-tr_TR/docs/listings-items-api-v2021-08-01-reference#listingsitemputrequest)
 #### how
 ```bash
-halycon definition get --type SOCKS -v
+halycon definition get --type SOCKS -v --detailed
 ```
-no examples on this, because, `--detailed` output is over 500, compact output is around 150 lines.
+example output [can be found here](./static/example/wallet_definition.txt)
 
-if you are on mac, I highly suggest you piping the result to `pbcopy`
+save the definition reference somewhere for creating listing later 
 ```bash
-halycon definition get --type SOCKS -v | pbcopy
+halycon definition get --type SOCKS -v --detailed > reference.json
 ```
-and paste the output somewhere for easier reading.
+remember, ctrl+f is your friend.
 
 ### Create Listing
 ### how
@@ -210,8 +210,6 @@ halycon definition get --type SOCKS -v
 6:21PM INF basic info display_name=Sock locale=en_US requirements=LISTING
 ```
 then, with the attributes from same `definition get` command, fill the rest of json.
-
-i am really sorry for the attributes syntax. dont blame me, blame the ones that rejects you over an inverted binary tree but unable to design and document a single API.
 ```json
   {
     "productType": "SOCKS",
@@ -235,13 +233,70 @@ i am really sorry for the attributes syntax. dont blame me, blame the ones that 
         "language_tag": "en_US",
         "marketplace_id": "ATVPDKIKX0DER"
       }],
+        // random example i just pulled from a wallet
+       "bullet_point": [
+        {
+          "value": "TEAM HERITAGE: Features team design......",
+          "marketplace_id": "ATVPDKIKX0DER",
+          "language_tag": "en_US"
+        },
+        {
+          "value": "PREMIUM MATERIAL: Crafted from high-quality black faux leather with durable stitching for long-lasting everyday use",
+          "marketplace_id": "ATVPDKIKX0DER",
+          "language_tag": "en_US"
+        },
+        {
+          "value": "PREMIUM MATERIAL: Crafted from high-quality black faux leather with durable stitching for long-lasting everyday use",
+          "marketplace_id": "ATVPDKIKX0DER",
+          "language_tag": "en_US"
+        },
+        ...
+      ],
       ...
     }
   },
 ```
-:3
+if you are gigalazy like me, use the `--fill-marketplace-id` flag, this will visit every object and add the `"marketplace_id": ...` for you, which, should save some time.
 
-todo...
+when using `--fill-marketplace-id`, first marketplace ID from config is used, if you need to specify a different `marketplace_id`, just write it in the attribute. autofill will skip the object if `marketplace_id` key is already present.
+
+`--fill-language-tag` also exists, and works with the same logic in `--fill-marketplace-id`. so if you use both, you just have to write
+```json
+  {
+    "productType": "SOCKS",
+    "requirements": "LISTING",
+    "attributes": {
+     "country_of_origin": [{"value": "US"}],
+      "item_name": [{"value": "Aneco 6 Pairs Over Knee Thigh Socks Knee-High Warm Stocking Women Boot Sock Leg Warmer High Socks for Daily Wear, Cosplay"}],
+      "item_type_keyword": [{"value": "Thigh highs"}],
+      "brand": [{"value":"something something"}],
+        // random example i just pulled from a wallet
+       "bullet_point": [
+        {"value": "TEAM HERITAGE: Features team design......"},
+        {"value": "PREMIUM MATERIAL: Crafted from high-quality black faux leather with durable stitching for long-lasting everyday use"},
+        {"value": "PREMIUM MATERIAL: Crafted from high-quality black faux leather with durable stitching for long-lasting everyday use"}
+        ...
+      ],
+      ...
+    }
+  },
+```
+and any extra attributes if required. 
+
+for validation, you can hit
+```bash
+halycon listings create -i thighs.json -v --fill-marketplace-id --fill-language-tag
+```
+whenever you want, there is no need for dry run. on error, operation will fail, and errors will be listed.
+```bash
+9:03AM WRN 'Model Number' is required but not supplied. attribute=model_number code=90220 severity=ERROR
+9:03AM WRN Based on the data from '[ships_globally.value]', the field '"value"' for the attribute 'Compliance - Wallet Type' is not allowed. Expected at most '0' of field '"value"' for attribute 'Compliance - Wallet Type'. attribute=compliance_wallet_type code=90248 severity=ERROR
+9:03AM WRN The provided value for 'Item Weight' is invalid. attribute=item_weight code=4000001 severity=ERROR
+9:03AM WRN 'Target Gender' is required but not supplied. attribute=target_gender code=90220 severity=ERROR
+...
+```
+also the documentation is misleading. setting `MODE` to `VALIDATION_PREVIEW` while creating a listing ([as guided here](https://developer-docs.amazon.com/sp-api/docs/listings-items-api-v2021-08-01-use-case-guide#step-1-preview-errors-for-a-listings-item-put-request)) will end up with `Invalid Payload` error. soo. i cant provide you a "dry run" option even if I wanted to, so just, attempt creating listing over and over again.
+
 
 ## halycon?
 

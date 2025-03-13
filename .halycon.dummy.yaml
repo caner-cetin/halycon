@@ -38,5 +38,6 @@ amazon:
       # TX, AZ, two-character code.
       state_or_province_code: 
   merchant_token:
+  default_language_tag: en_US
 
 

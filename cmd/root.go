@@ -96,5 +96,6 @@ func initConfig() {
 	viper.SetDefault(config.AMAZON_AUTH_HOST.Key, config.AMAZON_AUTH_HOST.Default)
 	viper.SetDefault(config.AMAZON_MARKETPLACE_ID.Key, []string{config.AMAZON_MARKETPLACE_ID.Default})
 	viper.SetDefault(config.AMAZON_FBA_SHIP_FROM_COUNTRY_CODE.Key, config.AMAZON_FBA_SHIP_FROM_COUNTRY_CODE.Default)
+	viper.SetDefault(config.AMAZON_DEFAULT_LANGUAGE_TAG.Key, config.AMAZON_DEFAULT_LANGUAGE_TAG.Default)
 
 }
