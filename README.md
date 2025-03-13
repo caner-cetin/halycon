@@ -211,27 +211,35 @@ halycon definition get --type SOCKS -v
 ```
 then, with the attributes from same `definition get` command, fill the rest of json.
 
-for example, for a wallet:
+i am really sorry for the attributes syntax. dont blame me, blame the ones that rejects you over an inverted binary tree but unable to design and document a single API.
 ```json
   {
     "productType": "WALLET",
     "requirements": "LISTING",
     "attributes": {
-      "country_of_origin": ["US"],
-      "bullet_point": ["mirror", "mirror", "on the wall", "who is the", "most pretty", "of all"],
-      "wallet_card_slot_count": ["6"],
-      "number_of_compartments": ["6"],
-      "number_of_pockets": ["6"],
-      "number_of_sections": ["2"],
-      "item_display_dimensions": ["3\"D x 1\"W x 4\"H"],
-      "item_weight": ["4 Ounces"],
-      "compliance_wallet_type": "billfold",
-      "leather_type": "Genuine Leather",
-      "care_instructions": ["Wipe Clean", "Avoid Water Exposure"],
+     "country_of_origin": [{
+        "value": "US",
+        "marketplace_id": "ATVPDKIKX0DER"
+      }],
+      "item_name": [{
+        "value": "San Francisco Football Faux Leather Bi-Fold Wallet, Black,1946 Design with Gift Box",
+        "language_tag": "en_US",
+        "marketplace_id": "ATVPDKIKX0DER"
+      }],
+      "item_type_keyword": [{
+        "value": "Bi fold Wallet",
+        "marketplace_id": "ATVPDKIKX0DER"
+      }],
+      "brand": [{
+        "value":"VM Sports Shop",
+        "language_tag": "en_US",
+        "marketplace_id": "ATVPDKIKX0DER"
+      }],
       ...
     }
   },
 ```
+:3
 
 todo...
 

@@ -81,50 +81,7 @@ func createListings(cmd *cobra.Command, args []string) {
 	var body models.ListingsItemPutRequest
 	body.ProductType = ptr.String(listing.ProductType)
 	body.Requirements = listing.Requirements
-	// TODO: THIS PIECE OF SHIT DOES NOT WORK
-	// STRAIGHT UP, DOES, NOT, WORK.
-	// 3:00AM WRN The provided value for 'Closure' is invalid. attribute=closure category= code=4000001 severity=ERROR
-	// 3:00AM WRN The provided value for 'Model Name' is invalid. attribute=model_name category= code=4000001 severity=ERROR
-	// 3:00AM WRN The provided value for 'Age Range Description' is invalid. attribute=age_range_description category= code=4000001 severity=ERROR
-	// 3:00AM WRN The provided value for 'Part Number' is invalid. attribute=part_number category= code=4000001 severity=ERROR
-	// 3:00AM WRN The provided value for 'Material' is invalid. attribute=material category= code=4000001 severity=ERROR
-	// 3:00AM WRN The provided value for 'Number Of Pockets' is invalid. attribute=number_of_pockets category= code=4000001 severity=ERROR
-	// 3:00AM WRN The provided value for 'Brand Name' is invalid. attribute=brand category= code=4000001 severity=ERROR
-	// 3:00AM WRN The provided value for 'Number of Sections' is invalid. attribute=number_of_sections category= code=4000001 severity=ERROR
-	// 3:00AM WRN The provided value for 'Country of Origin' is invalid. attribute=country_of_origin category= code=4000001 severity=ERROR
-	// 3:00AM WRN The provided value for 'Lining Description' is invalid. attribute=lining_description category= code=4000001 severity=ERROR
-	// 3:00AM WRN The provided value for 'Is exempt from a supplier declared external identifier' is invalid. attribute=supplier_declared_has_product_identifier_exemption category= code=4000001 severity=ERROR
-	// 3:00AM WRN The provided value for 'Form Factor' is invalid. attribute=form_factor category= code=4000001 severity=ERROR
-	// 3:00AM WRN The provided value for 'Style' is invalid. attribute=style category= code=4000001 severity=ERROR
-	// 3:00AM WRN The provided value for 'Wallet Card Slot Count' is invalid. attribute=wallet_card_slot_count category= code=4000001 severity=ERROR
-	// 3:00AM WRN The provided value for 'Subject Character' is invalid. attribute=subject_character category= code=4000001 severity=ERROR
-	// 3:00AM WRN The provided value for 'Product Description' is invalid. attribute=product_description category= code=4000001 severity=ERROR
-	// 3:00AM WRN The provided value for 'Product Care Instructions' is invalid. attribute=care_instructions category= code=4000001 severity=ERROR
-	// 3:00AM WRN The provided value for 'Dangerous Goods Regulations' is invalid. attribute=supplier_declared_dg_hz_regulation category= code=4000001 severity=ERROR
-	// 3:00AM WRN The provided value for 'Bullet Point' is invalid. attribute=bullet_point category= code=4000001 severity=ERROR
-	// 3:00AM WRN The provided value for 'Compliance - Wallet Type' is invalid. attribute=compliance_wallet_type category= code=4000001 severity=ERROR
-	// 3:00AM WRN The provided value for 'Item Type Keyword' is invalid. attribute=item_type_keyword category= code=4000001 severity=ERROR
-	// 3:00AM WRN The provided value for 'Item Display Dimensions' is invalid. attribute=item_display_dimensions category= code=4000001 severity=ERROR
-	// 3:00AM WRN The provided value for 'Leather Type' is invalid. attribute=leather_type category= code=4000001 severity=ERROR
-	// 3:00AM WRN The provided value for 'Title' is invalid. attribute=item_name category= code=4000001 severity=ERROR
-	// 3:00AM WRN The provided value for 'Wallet Compartment Type' is invalid. attribute=wallet_compartment_type category= code=4000001 severity=ERROR
-	// 3:00AM WRN The provided value for 'Number of Compartments' is invalid. attribute=number_of_compartments category= code=4000001 severity=ERROR
-	// 3:00AM WRN The provided value for 'Color' is invalid. attribute=color category= code=4000001 severity=ERROR
-	// 3:00AM WRN The provided value for 'Pocket Description' is invalid. attribute=pocket_description category= code=4000001 severity=ERROR
-	// 3:00AM WRN The provided value for 'Pattern' is invalid. attribute=pattern category= code=4000001 severity=ERROR
-	// 3:00AM WRN The provided value for 'Item Weight' is invalid. attribute=item_weight category= code=4000001 severity=ERROR
-	// 3:00AM WRN The provided value for 'Embellishment Feature' is invalid. attribute=embellishment_feature category= code=4000001 severity=ERROR
-	// NO MATTER WHAT I DO, IT JUST REFUSES TO READ THE ATTRIBUTES, AT ALL.
-	//
-	// i tried using json.RawMessage, json.Marshal(fastjson.MustParseBytes(listings_bytes).GetObject("attributes").MarshalTo(nil))
-	// none of the solutions works
-	// this h-1b abuser slavery mill abomination cant even get a single API endpoint right but they wont hire you if you cant invert binary tree on whiteboard
-	// I AM SO FUCKING TIRED
-	// ITS BEEN THREE HOURS AND IT JUST DOES NOT READ ATTRIBUTES
-	// AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-	// see you tomorrow
 	body.Attributes = listing.Attributes
-
 	params.Body = &body
 
 	result, err := app.Amazon.Client.CreateListing(&params)
@@ -141,7 +98,6 @@ func createListings(cmd *cobra.Command, args []string) {
 			Str("message", *issue.Message).
 			Str("code", *issue.Code).
 			Str("severity", *issue.Severity).
-			Str("category", strings.Join(issue.Categories, ",")).
 			Str("attribute", strings.Join(issue.AttributeNames, ","))
 		if issue.Enforcements != nil && issue.Enforcements.Exemption != nil {
 			ev.Interface("exemption_expiry_date", issue.Enforcements.Exemption.ExpiryDate)

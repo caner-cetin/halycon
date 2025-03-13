@@ -190,7 +190,15 @@ func getProductTypeDefinition(cmd *cobra.Command, args []string) {
 				}
 				fmt.Println()
 			}
-
+			selectors := v.GetArray("selectors")
+			if len(selectors) > 0 {
+				selector_strings := []string{}
+				for _, selector := range selectors {
+					selector_strings = append(selector_strings, string(selector.GetStringBytes()))
+				}
+				fmt.Printf("%sRequired Relectors: %s\n", indent, strings.Join(selector_strings, ","))
+				fmt.Println()
+			}
 			fmt.Println()
 		}
 
