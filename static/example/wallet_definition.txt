@@ -1,4 +1,4 @@
-Product: Wallet  |  Requirements: LISTING  |  Locale: en_US
+Product: Wallet  |  Requirements: LISTING  |  Locale: en_US | Schema: https://selling-partner-definitions-prod-iad.s3.amazonaws.com/schema/WALLET.json/...
 
 Properties:
 ----------------------------------------

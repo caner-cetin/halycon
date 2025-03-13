@@ -96,10 +96,11 @@ func getProductTypeDefinition(cmd *cobra.Command, args []string) {
 
 	detailedMode := getProductTypeDefinitionDetailed
 	displayProductSummary(result.Payload)
-	schema := fetchAndParseSchema(*result.Payload.Schema.Link.Resource)
-	requiredProps := getRequiredProperties(schema)
-
-	displayProperties(schema, requiredProps, detailedMode)
+	if getProductTypeDefinitionDetailed {
+		schema := fetchAndParseSchema(*result.Payload.Schema.Link.Resource)
+		requiredProps := getRequiredProperties(schema)
+		displayProperties(schema, requiredProps, detailedMode)
+	}
 }
 
 func displayProductSummary(payload *models.ProductTypeDefinition) {
@@ -108,10 +109,12 @@ func displayProductSummary(payload *models.ProductTypeDefinition) {
 	yellow := color.New(color.FgYellow).SprintFunc()
 	green := color.New(color.FgGreen).SprintFunc()
 
-	fmt.Printf("%s: %s  |  %s: %s  |  %s: %s\n\n",
+	fmt.Printf("%s: %s  |  %s: %s  |  %s: %s | %s: %s\n\n",
 		bold("Product"), cyan(*payload.DisplayName),
 		bold("Requirements"), yellow(*payload.Requirements),
-		bold("Locale"), green(*payload.Locale))
+		bold("Locale"), green(*payload.Locale),
+		bold("Schema"), cyan(*payload.Schema.Link.Resource),
+	)
 }
 
 func fetchAndParseSchema(schemaURL string) *fastjson.Value {

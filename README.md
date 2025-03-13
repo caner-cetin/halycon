@@ -25,7 +25,6 @@ utilities for Amazon SP API, mostly for my annoyances
     - [Create Listing](#create-listing)
     - [how](#how-5)
   - [halycon?](#halycon-1)
-  - [why?](#why-4)
 
 ## usage
 
@@ -183,38 +182,38 @@ halycon definition search --item "Aneco 6 Pairs Over Knee Thigh Socks Knee-High 
 attributes are required for [`PUT /listings/2021-08-01/items/{sellerId}/{sku}`](https://developer-docs.amazon.com/sp-api/lang-tr_TR/docs/listings-items-api-v2021-08-01-reference#listingsitemputrequest)
 #### how
 ```bash
-halycon definition get --type SOCKS -v --detailed
+halycon definition get --type SOCKS -v --detailed > reference.json
 ```
 example output [can be found here](./static/example/wallet_definition.txt)
 
-save the definition reference somewhere for creating listing later 
-```bash
-halycon definition get --type SOCKS -v --detailed > reference.json
-```
-remember, ctrl+f is your friend.
-
 ### Create Listing
 ### how
-create a JSON file for the listing with the following schema
-```json
-{
-  "productType": "SOCKS",
-  "requirements": "LISTING",
-  "attributes": {}
-  ...
-}
-```
-you can find the requirements from
 ```bash
-halycon definition get --type SOCKS -v
-6:21PM INF basic info display_name=Sock locale=en_US requirements=LISTING
+halycon listings create --input attributes.json --type WALLET --requirements LISTING --fill-marketplace-id --fill-language-tag -v
 ```
-then, with the attributes from same `definition get` command, fill the rest of json.
+create `attributes.json` and fill with taking `halycon definition get` output as your reference OR if you are using VSCode
+
+<details>
+  <summmary>if you are using VSCode</summary>
+
+  > You can refer your JSON Schema in $schema node and get your intellisense in VS Code right away. No need to configure anywhere else.
+
+  `halycon definition get` outputs the required schema https://selling-partner-definitions-prod-iad.s3.amazonaws.com/schema/..., so you can just do
+  ```json
+  {
+    "$schema": "http://json.schemastore.org/coffeelint", // change the schema link here
+  }
+  ```
+  to get the intellisense. If you get Access Denied error from the schema URL (not from browser, from the VSCode), which is, completely normal, host the schema somewhere else like pastebin. 
+
+  if you do not prefer the intellisense, `halycon definition get` output is as detailed as it can get, so it is still a solid reference. your choice.
+
+  if using intellisense and the autofill flags (`--fill-marketplace-id` etc), please ignore the `Missing property "language_tag"` etc.
+
+</details>
+
 ```json
   {
-    "productType": "SOCKS",
-    "requirements": "LISTING",
-    "attributes": {
      "country_of_origin": [{
         "value": "US",
         "marketplace_id": "ATVPDKIKX0DER"
@@ -252,9 +251,7 @@ then, with the attributes from same `definition get` command, fill the rest of j
         },
         ...
       ],
-      ...
-    }
-  },
+  }
 ```
 if you are gigalazy like me, use the `--fill-marketplace-id` flag, this will visit every object and add the `"marketplace_id": ...` for you, which, should save some time.
 
@@ -263,10 +260,7 @@ when using `--fill-marketplace-id`, first marketplace ID from config is used, if
 `--fill-language-tag` also exists, and works with the same logic in `--fill-marketplace-id`. so if you use both, you just have to write
 ```json
   {
-    "productType": "SOCKS",
-    "requirements": "LISTING",
-    "attributes": {
-     "country_of_origin": [{"value": "US"}],
+      "country_of_origin": [{"value": "US"}],
       "item_name": [{"value": "Aneco 6 Pairs Over Knee Thigh Socks Knee-High Warm Stocking Women Boot Sock Leg Warmer High Socks for Daily Wear, Cosplay"}],
       "item_type_keyword": [{"value": "Thigh highs"}],
       "brand": [{"value":"something something"}],
@@ -278,14 +272,13 @@ when using `--fill-marketplace-id`, first marketplace ID from config is used, if
         ...
       ],
       ...
-    }
-  },
+  }
 ```
 and any extra attributes if required. 
 
 for validation, you can hit
 ```bash
-halycon listings create -i thighs.json -v --fill-marketplace-id --fill-language-tag
+halycon listings create
 ```
 whenever you want, there is no need for dry run. on error, operation will fail, and errors will be listed.
 ```bash
@@ -301,7 +294,3 @@ also the documentation is misleading. setting `MODE` to `VALIDATION_PREVIEW` whi
 ## halycon?
 
 one of ma favourite mono song https://www.youtube.com/watch?v=2_OYaI37bi0
-
-## why?
-
-amazon SP-API is, literally, one of the worst API's you can ever work with, especially the Listing side has one of the worst documentation you can ever read. i am doing this to save myself trouble, and possibly saving you some trouble in future. LICENSE is as free as it can get, as long as you do one push up, you can do whatever you want with the code.

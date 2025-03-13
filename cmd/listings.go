@@ -19,14 +19,10 @@ import (
 type CreateListingsConfig struct {
 	IssueLocale           string
 	Input                 string
+	ProductType						string
+	Requirements					string
 	AutofillMarketplaceId bool
 	AutofillLanguageTag   bool
-}
-
-type CreateListingsInput struct {
-	ProductType  string      `json:"productType"`
-	Requirements string      `json:"requirements"`
-	Attributes   interface{} `json:"attributes"`
 }
 
 var (
@@ -47,8 +43,11 @@ var (
 func getListingsCmd() *cobra.Command {
 	createListingsCmd.PersistentFlags().BoolVar(&createListingsCfg.AutofillMarketplaceId, "fill-marketplace-id", false, "adds {\"marketplace_id\": ...} to every json object in attributes")
 	createListingsCmd.PersistentFlags().BoolVar(&createListingsCfg.AutofillLanguageTag, "fill-language-tag", false, "adds {\"language_tag\": ...} to every json object in attributes")
-	createListingsCmd.PersistentFlags().StringVarP(&createListingsCfg.Input, "input", "i", "", "Input JSON file")
+	createListingsCmd.PersistentFlags().StringVarP(&createListingsCfg.Input, "input", "i", "", "Attributes JSON file")
+	createListingsCmd.PersistentFlags().StringVarP(&createListingsCfg.ProductType, "type", "p", "", "Attributes JSON file")
+	createListingsCmd.PersistentFlags().StringVarP(&createListingsCfg.Requirements, "requirements", "r", "", "Attributes JSON file")
 	createListingsCmd.PersistentFlags().StringVar(&createListingsCfg.IssueLocale, "issue-locale", "", "Locale for issue localization. Default: When no locale is provided, the default locale of the first marketplace is used. Localization defaults to en_US when a localized message is not available in the specified locale.")
+
 	listingsCmd.AddCommand(createListingsCmd)
 	listingsCmd.AddCommand(getListingCmd)
 	return listingsCmd
@@ -59,14 +58,6 @@ func createListings(cmd *cobra.Command, args []string) {
 		log.Fatal().Msg("input file not given")
 	}
 	app := GetApp(cmd)
-
-	listing_bytes := internal.ReadFile(createListingsCfg.Input)
-	var listing CreateListingsInput
-	err := json.Unmarshal(listing_bytes, &listing)
-	if err != nil {
-		log.Fatal().Err(err).Send()
-	}
-
 	var params listings.PutListingsItemParams
 	params.MarketplaceIds = viper.GetStringSlice(config.AMAZON_MARKETPLACE_ID.Key)
 	params.SellerID = strings.TrimSpace(viper.GetString(config.AMAZON_MERCHANT_TOKEN.Key))
@@ -78,8 +69,8 @@ func createListings(cmd *cobra.Command, args []string) {
 	}
 
 	var body models.ListingsItemPutRequest
-	body.ProductType = ptr.String(listing.ProductType)
-	body.Requirements = listing.Requirements
+	body.ProductType = ptr.String(createListingsCfg.ProductType)
+	body.Requirements = createListingsCfg.Requirements
 	var marketplace_id *fastjson.Value
 	var language_tag *fastjson.Value
 	if createListingsCfg.AutofillMarketplaceId {
@@ -90,7 +81,8 @@ func createListings(cmd *cobra.Command, args []string) {
 	}
 	var should_fill_marketplace_id = marketplace_id != nil
 	var should_fill_language_tag = language_tag != nil
-	attrs := fastjson.MustParseBytes(listing_bytes).GetObject("attributes")
+	attr_bytes := internal.ReadFile(createListingsCfg.Input)
+	attrs := fastjson.MustParseBytes(attr_bytes).GetObject()
 	attrs.Visit(func(key []byte, v *fastjson.Value) {
 		for _, attr_detail := range v.GetArray() {
 			attr_detail_obj := attr_detail.GetObject()
@@ -111,7 +103,14 @@ func createListings(cmd *cobra.Command, args []string) {
 			}
 		}
 	})
-	body.Attributes = listing.Attributes
+
+	var attr_interface interface{}
+	err := json.Unmarshal(attrs.MarshalTo(nil), &attr_interface)
+	if err != nil {
+		log.Fatal().Err(err).Send()
+	}
+
+	body.Attributes = attr_interface
 	params.Body = &body
 
 	result, err := app.Amazon.Client.CreateListing(&params)
