@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/caner-cetin/halycon/internal/config"
@@ -47,6 +46,7 @@ func init() {
 	rootCmd.AddCommand(getLookupSkuFromAsinCmd())
 	rootCmd.AddCommand(getShipmentCmd())
 	rootCmd.AddCommand(getDefinitionsCmd())
+	rootCmd.AddCommand(getListingsCmd())
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
 	rootCmd.PersistentFlags().CountVarP(&verbosity, "verbose", "v", "verbose output (-v: info, -vv: debug, -vvv: trace)")
@@ -55,6 +55,18 @@ func init() {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	switch verbosity {
+	case 1:
+		zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	case 2:
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+	case 3:
+		zerolog.SetGlobalLevel(zerolog.TraceLevel)
+	default:
+		zerolog.SetGlobalLevel(zerolog.WarnLevel)
+	}
+
 	if cfgFile != "" {
 		// Use config file from the flag.
 		viper.SetConfigFile(cfgFile)
@@ -73,7 +85,11 @@ func initConfig() {
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
-		fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
+		log.Info().Str("path", viper.ConfigFileUsed()).Msg("reading config")
+	}
+
+	if !viper.IsSet(config.AMAZON_MERCHANT_TOKEN.Key) {
+		log.Fatal().Msg("merchant token is not set! https://sellercentral.amazon.com/sw/AccountInfo/MerchantToken")
 	}
 
 	viper.SetDefault(config.AMAZON_AUTH_ENDPOINT.Key, config.AMAZON_AUTH_ENDPOINT.Default)
@@ -81,15 +97,4 @@ func initConfig() {
 	viper.SetDefault(config.AMAZON_MARKETPLACE_ID.Key, []string{config.AMAZON_MARKETPLACE_ID.Default})
 	viper.SetDefault(config.AMAZON_FBA_SHIP_FROM_COUNTRY_CODE.Key, config.AMAZON_FBA_SHIP_FROM_COUNTRY_CODE.Default)
 
-	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
-	switch verbosity {
-	case 1:
-		zerolog.SetGlobalLevel(zerolog.InfoLevel)
-	case 2:
-		zerolog.SetGlobalLevel(zerolog.DebugLevel)
-	case 3:
-		zerolog.SetGlobalLevel(zerolog.TraceLevel)
-	default:
-		zerolog.SetGlobalLevel(zerolog.WarnLevel)
-	}
 }

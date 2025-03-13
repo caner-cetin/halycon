@@ -1,13 +1,20 @@
 package sp_api
 
 import (
+	"fmt"
+	"time"
+
+	osRuntime "runtime"
+
 	"github.com/caner-cetin/halycon/internal/amazon/catalog/client/catalog"
 	"github.com/caner-cetin/halycon/internal/amazon/fba_inbound/client/fba_inbound"
 	"github.com/caner-cetin/halycon/internal/amazon/fba_inventory/client/fba_inventory"
 	"github.com/caner-cetin/halycon/internal/amazon/listings/client/listings"
 	"github.com/caner-cetin/halycon/internal/amazon/product_type_definitions/client/definitions"
+	"github.com/caner-cetin/halycon/internal/config"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
+	"github.com/spf13/viper"
 	"golang.org/x/time/rate"
 )
 
@@ -84,10 +91,15 @@ func (a *Client) GetProductTypeDefinition(params *definitions.GetDefinitionsProd
 	return a.GetProductTypeDefinitionsService().GetDefinitionsProductType(params, a.WithAuth(), a.WithRateLimit(GetProductTypeDefinitionRLKey))
 }
 
+func (a *Client) CreateListing(params *listings.PutListingsItemParams) (*listings.PutListingsItemOK, error) {
+	return a.GetListingsService().PutListingsItem(params, a.WithAuth(), a.WithRateLimit(CreateListingRLKey))
+}
+
 const (
 	SearchCatalogItemsRLKey           = "rate_limiter.catalog.searchItems"
 	GetCatalogItemsRLKey              = "rate_limiter.catalog.getItems"
 	GetListingsItemRLKey              = "rate_limiter.listings.getItem"
+	CreateListingRLKey                = "rate_limiter.listings.createItem"
 	FBAInventorySummariesRLKey        = "rate_limiter.fba.inventorySummaries"
 	CreateInboundPlanRLKey            = "rate_limiter.fba.createInboundPlan"
 	GetInboundOperationStatusRLKey    = "rate_limiter.fba.getInboundOperationStatus"
@@ -105,6 +117,7 @@ func (a *Client) SetRateLimits() {
 		GetInboundOperationStatusRLKey:    rate.NewLimiter(rate.Limit(2), 6),
 		SearchProductTypeDefinitionsRLKey: rate.NewLimiter(rate.Limit(5), 10),
 		GetProductTypeDefinitionRLKey:     rate.NewLimiter(rate.Limit(5), 10),
+		CreateListingRLKey:                rate.NewLimiter(rate.Limit(5), 10),
 	}
 }
 
@@ -115,7 +128,23 @@ func NewAuthorizedClient(token string) *Client {
 			return err
 		}
 		// also doesnt work without x-amz-access-token header
-		return r.SetHeaderParam("x-amz-access-token", token)
+		if err := r.SetHeaderParam("x-amz-access-token", token); err != nil {
+			return err
+		}
+		// also doesnt work without X-Amz-Access-Token header
+		if err := r.SetHeaderParam("X-Amz-Access-Token", token); err != nil {
+			return err
+		}
+		if err := r.SetHeaderParam("host", fmt.Sprintf("https://%s", viper.GetString(config.AMAZON_AUTH_ENDPOINT.Key))); err != nil {
+			return err
+		}
+		if err := r.SetHeaderParam("x-amz-date", time.Now().UTC().Format("20060102T150405Z")); err != nil {
+			return err
+		}
+		if err := r.SetHeaderParam("user-agent", fmt.Sprintf("Halycon/1.0 (Language=Go; Platform=%s)", osRuntime.GOOS)); err != nil {
+			return err
+		}
+		return nil
 	})
 
 	a := &Client{

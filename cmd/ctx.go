@@ -97,3 +97,7 @@ func WrapCommandWithResources(fn func(cmd *cobra.Command, args []string), resour
 		fn(cmd, args)
 	}
 }
+
+func GetApp(cmd *cobra.Command) AppCtx {
+	return cmd.Context().Value(internal.APP_CONTEXT).(AppCtx)
+}

@@ -59,8 +59,7 @@ func getShipmentCmd() *cobra.Command {
 	return shipmentCmd
 }
 func createShipmentPlan(cmd *cobra.Command, args []string) {
-	ctx := cmd.Context()
-	app := ctx.Value(internal.APP_CONTEXT).(AppCtx)
+	app := GetApp(cmd)
 
 	params := fba_inbound.NewCreateInboundPlanParams()
 	params.Body = new(models.CreateInboundPlanRequest)

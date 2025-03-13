@@ -37,5 +37,6 @@ amazon:
       # The state or province code, required, albeit that docs indicate that it is optional.
       # TX, AZ, two-character code.
       state_or_province_code: 
+  merchant_token:
 
 

@@ -3,6 +3,7 @@ package internal
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"runtime"
@@ -22,6 +23,16 @@ func OpenFile(input string) *os.File {
 		ev.Fatal().Msg("unknown error while opening file")
 	}
 	return f
+}
+
+func ReadFile(input string) []byte {
+	file := OpenFile(input)
+	defer file.Close()
+	contents, err := io.ReadAll(file)
+	if err != nil {
+		log.Fatal().Err(err).Send()
+	}
+	return contents
 }
 
 func CleanUPC(input string) string {

@@ -22,7 +22,10 @@ utilities for Amazon SP API, mostly for my annoyances
     - [Get Product Type Definitions](#get-product-type-definitions)
       - [why](#why-3)
       - [how](#how-4)
+    - [Create Listing](#create-listing)
+    - [how](#how-5)
   - [halycon?](#halycon-1)
+  - [why?](#why-4)
 
 ## usage
 
@@ -164,13 +167,15 @@ amazon name (product type) is required for [`PUT /listings/2021-08-01/items/{sel
 ```bash
 #     --item string            The title of the ASIN to get the product type recommendation. Note: Cannot be used with keywords
 #     --keywords stringArray   A comma-delimited list of keywords to search product types. Note: Cannot be used with itemName.
-halycon definition search --keywords wallet
+halycon definition search --keywords SOCKS
+# or
+halycon definition search --item "Aneco 6 Pairs Over Knee Thigh Socks Knee-High Warm Stocking Women Boot Sock Leg Warmer High Socks for Daily Wear, Cosplay"
 ```
 ```
 +--------------+-------------+
 | DISPLAY NAME | AMAZON NAME |
 +--------------+-------------+
-| Wallet       | WALLET      |
+| Sock         | SOCKS       |
 +--------------+-------------+
 ```
 ### Get Product Type Definitions
@@ -178,323 +183,62 @@ halycon definition search --keywords wallet
 attributes are required for [`PUT /listings/2021-08-01/items/{sellerId}/{sku}`](https://developer-docs.amazon.com/sp-api/lang-tr_TR/docs/listings-items-api-v2021-08-01-reference#listingsitemputrequest)
 #### how
 ```bash
-halycon definition get --type WALLET -v
+halycon definition get --type SOCKS -v
+```
+no examples on this, because, `--detailed` output is over 500, compact output is around 150 lines.
+
+if you are on mac, I highly suggest you piping the result to `pbcopy`
+```bash
+halycon definition get --type SOCKS -v | pbcopy
+```
+and paste the output somewhere for easier reading.
+
+### Create Listing
+### how
+create a JSON file for the listing with the following schema
+```json
+{
+  "productType": "SOCKS",
+  "requirements": "LISTING",
+  "attributes": {}
+  ...
+}
+```
+you can find the requirements from
+```bash
+halycon definition get --type SOCKS -v
+6:21PM INF basic info display_name=Sock locale=en_US requirements=LISTING
+```
+then, with the attributes from same `definition get` command, fill the rest of json.
+
+for example, for a wallet:
+```json
+  {
+    "productType": "WALLET",
+    "requirements": "LISTING",
+    "attributes": {
+      "country_of_origin": ["US"],
+      "bullet_point": ["mirror", "mirror", "on the wall", "who is the", "most pretty", "of all"],
+      "wallet_card_slot_count": ["6"],
+      "number_of_compartments": ["6"],
+      "number_of_pockets": ["6"],
+      "number_of_sections": ["2"],
+      "item_display_dimensions": ["3\"D x 1\"W x 4\"H"],
+      "item_weight": ["4 Ounces"],
+      "compliance_wallet_type": "billfold",
+      "leather_type": "Genuine Leather",
+      "care_instructions": ["Wipe Clean", "Avoid Water Exposure"],
+      ...
+    }
+  },
 ```
 
-<details>
-  <summary> Result </summary>
-
-  ```
-    * "brand" - Max. 50 characters
-      * Examples
-        * "Ralph Lauren; North Face; Patagonia"
-      * Type - array
-    * "bullet_point" - Max. 100 characters per line. Use these to highlight some of the product's most important qualities. Each line will be displayed as a separate bullet point above the product description.
-      * Examples
-        * "Delicious honey-apricot glaze"
-      * Type - array
-    * "country_of_origin" - The country in which the product was published.
-      * Examples
-      * Type - array
-      * Enums:
-        * "AF" - "Afghanistan"
-        * "AX" - "Aland Islands"
-        * "AL" - "Albania"
-        * "DZ" - "Algeria"
-        * "AS" - "American Samoa"
-        * "AD" - "Andorra"
-        * "AO" - "Angola"
-        * "AI" - "Anguilla"
-        * "AQ" - "Antarctica"
-        * "AG" - "Antigua and Barbuda"
-        * "AR" - "Argentina"
-        * "AM" - "Armenia"
-        * "AW" - "Aruba"
-        * "AC" - "Ascension Island"
-        * "AU" - "Australia"
-        * "AT" - "Austria"
-        * "AZ" - "Azerbaijan"
-        * "BH" - "Bahrain"
-        * "BD" - "Bangladesh"
-        * "BB" - "Barbados"
-        * "BY" - "Belarus"
-        * "BE" - "Belgium"
-        * "BZ" - "Belize"
-        * "BJ" - "Benin"
-        * "BM" - "Bermuda"
-        * "BT" - "Bhutan"
-        * "BO" - "Bolivia"
-        * "BQ" - "Bonaire, Saint Eustatius and Saba"
-        * "BA" - "Bosnia and Herzegovina"
-        * "BW" - "Botswana"
-        * "BV" - "Bouvet Island"
-        * "BR" - "Brazil"
-        * "IO" - "British Indian Ocean Territory"
-        * "VG" - "British Virgin Islands"
-        * "BN" - "Brunei Darussalam"
-        * "BG" - "Bulgaria"
-        * "BF" - "Burkina Faso"
-        * "BI" - "Burundi"
-        * "KH" - "Cambodia"
-        * "CM" - "Cameroon"
-        * "CA" - "Canada"
-        * "IC" - "Canary Islands"
-        * "CV" - "Cape Verde"
-        * "KY" - "Cayman Islands"
-        * "CF" - "Central African Republic"
-        * "TD" - "Chad"
-        * "CL" - "Chile"
-        * "CN" - "China"
-        * "CX" - "Christmas Island"
-        * "CC" - "Cocos (Keeling) Islands"
-        * "CO" - "Colombia"
-        * "KM" - "Comoros"
-        * "CG" - "Congo"
-        * "CK" - "Cook Islands"
-        * "CR" - "Costa Rica"
-        * "HR" - "Croatia"
-        * "CU" - "Cuba"
-        * "CW" - "Curaçao"
-        * "CY" - "Cyprus"
-        * "CZ" - "Czech Republic"
-        * "KP" - "Democratic People's Republic of Korea"
-        * "DK" - "Denmark"
-        * "DJ" - "Djibouti"
-        * "DM" - "Dominica"
-        * "DO" - "Dominican Republic"
-        * "TP" - "East Timor"
-        * "EC" - "Ecuador"
-        * "EG" - "Egypt"
-        * "SV" - "El Salvador"
-        * "GQ" - "Equatorial Guinea"
-        * "ER" - "Eritrea"
-        * "EE" - "Estonia"
-        * "ET" - "Ethiopia"
-        * "FK" - "Falkland Islands (Malvinas)"
-        * "FO" - "Faroe Islands"
-        * "FM" - "Federated States of Micronesia"
-        * "FJ" - "Fiji"
-        * "FI" - "Finland"
-        * "FR" - "France"
-        * "GF" - "French Guiana"
-        * "PF" - "French Polynesia"
-        * "TF" - "French Southern Territories"
-        * "GA" - "Gabon"
-        * "GE" - "Georgia"
-        * "DE" - "Germany"
-        * "GH" - "Ghana"
-        * "GI" - "Gibraltar"
-        * "GB" - "Great Britain"
-        * "GR" - "Greece"
-        * "GL" - "Greenland"
-        * "GD" - "Grenada"
-        * "GP" - "Guadeloupe"
-        * "GU" - "Guam"
-        * "GT" - "Guatemala"
-        * "GG" - "Guernsey"
-        * "GN" - "Guinea"
-        * "GW" - "Guinea-Bissau"
-        * "GY" - "Guyana"
-        * "HT" - "Haiti"
-        * "HM" - "Heard Island and the McDonald Islands"
-        * "VA" - "Holy See"
-        * "HN" - "Honduras"
-        * "HK" - "Hong Kong"
-        * "HU" - "Hungary"
-        * "IS" - "Iceland"
-        * "IN" - "India"
-        * "ID" - "Indonesia"
-        * "IR" - "Iran"
-        * "IE" - "Ireland"
-        * "IQ" - "Islamic Republic of Iraq"
-        * "IM" - "Isle of Man"
-        * "IL" - "Israel"
-        * "IT" - "Italy"
-        * "CI" - "Ivory Coast"
-        * "JM" - "Jamaica"
-        * "JP" - "Japan"
-        * "JE" - "Jersey"
-        * "JO" - "Jordan"
-        * "KZ" - "Kazakhstan"
-        * "KE" - "Kenya"
-        * "KI" - "Kiribati"
-        * "KW" - "Kuwait"
-        * "KG" - "Kyrgyzstan"
-        * "LA" - "Lao People's Democratic Republic"
-        * "LV" - "Latvia"
-        * "LB" - "Lebanon"
-        * "LS" - "Lesotho"
-        * "LR" - "Liberia"
-        * "LY" - "Libya"
-        * "LI" - "Liechtenstein"
-        * "LT" - "Lithuania"
-        * "LU" - "Luxembourg"
-        * "MO" - "Macao"
-        * "MK" - "Macedonia"
-        * "MG" - "Madagascar"
-        * "MW" - "Malawi"
-        * "MY" - "Malaysia"
-        * "MV" - "Maldives"
-        * "ML" - "Mali"
-        * "MT" - "Malta"
-        * "MH" - "Marshall Islands"
-        * "MQ" - "Martinique"
-        * "MR" - "Mauritania"
-        * "MU" - "Mauritius"
-        * "YT" - "Mayotte"
-        * "MX" - "Mexico"
-        * "MC" - "Monaco"
-        * "MN" - "Mongolia"
-        * "ME" - "Montenegro"
-        * "MS" - "Montserrat"
-        * "MA" - "Morocco"
-        * "MZ" - "Mozambique"
-        * "MM" - "Myanmar"
-        * "NA" - "Namibia"
-        * "NR" - "Nauru"
-        * "NP" - "Nepal"
-        * "NL" - "Netherlands"
-        * "AN" - "Netherlands Antilles"
-        * "NC" - "New Caledonia"
-        * "NZ" - "New Zealand"
-        * "NI" - "Nicaragua"
-        * "NE" - "Niger"
-        * "NG" - "Nigeria"
-        * "NU" - "Niue"
-        * "NF" - "Norfolk Island"
-        * "MP" - "Northern Mariana Islands"
-        * "NO" - "Norway"
-        * "OM" - "Oman"
-        * "PK" - "Pakistan"
-        * "PW" - "Palau"
-        * "PS" - "Palestinian Territories"
-        * "PA" - "Panama"
-        * "PG" - "Papua New Guinea"
-        * "PY" - "Paraguay"
-        * "PE" - "Peru"
-        * "PH" - "Philippines"
-        * "PN" - "Pitcairn"
-        * "PL" - "Poland"
-        * "PT" - "Portugal"
-        * "PR" - "Puerto Rico"
-        * "QA" - "Qatar"
-        * "KR" - "Republic of Korea"
-        * "MD" - "Republic of Moldova"
-        * "RE" - "Reunion"
-        * "RO" - "Romania"
-        * "RU" - "Russian Federation"
-        * "RW" - "Rwanda"
-        * "BL" - "Saint Barthelemy"
-        * "SH" - "Saint Helena, Ascension and Tristan da Cunha"
-        * "KN" - "Saint Kitts and Nevis"
-        * "LC" - "Saint Lucia"
-        * "MF" - "Saint Martin"
-        * "PM" - "Saint Pierre and Miquelon"
-        * "VC" - "Saint Vincent and the Grenadines"
-        * "WS" - "Samoa"
-        * "SM" - "San Marino"
-        * "ST" - "Sao Tome and Principe"
-        * "SA" - "Saudi Arabia"
-        * "SN" - "Senegal"
-        * "RS" - "Serbia"
-        * "CS" - "Serbia and Montenegro"
-        * "SC" - "Seychelles"
-        * "SL" - "Sierra Leone"
-        * "SG" - "Singapore"
-        * "SX" - "Sint Maarten"
-        * "SK" - "Slovakia"
-        * "SI" - "Slovenia"
-        * "SB" - "Solomon Islands"
-        * "SO" - "Somalia"
-        * "ZA" - "South Africa"
-        * "GS" - "South Georgia and the South Sandwich Islands"
-        * "SS" - "South Sudan"
-        * "ES" - "Spain"
-        * "LK" - "Sri Lanka"
-        * "SD" - "Sudan"
-        * "SR" - "Suriname"
-        * "SJ" - "Svalbard and Jan Mayen"
-        * "SZ" - "Swaziland"
-        * "SE" - "Sweden"
-        * "CH" - "Switzerland"
-        * "SY" - "Syria"
-        * "TW" - "Taiwan"
-        * "TJ" - "Tajikistan"
-        * "TH" - "Thailand"
-        * "BS" - "The Bahamas"
-        * "CD" - "The Democratic Republic of the Congo"
-        * "GM" - "The Gambia"
-        * "TL" - "Timor-Leste"
-        * "TG" - "Togo"
-        * "TK" - "Tokelau"
-        * "TO" - "Tonga"
-        * "TT" - "Trinidad and Tobago"
-        * "TA" - "Tristan da Cunha"
-        * "TN" - "Tunisia"
-        * "TR" - "Turkey"
-        * "TM" - "Turkmenistan"
-        * "TC" - "Turks and Caicos Islands"
-        * "TV" - "Tuvalu"
-        * "VI" - "U.S. Virgin Islands"
-        * "UG" - "Uganda"
-        * "UA" - "Ukraine"
-        * "AE" - "United Arab Emirates"
-        * "UK" - "United Kingdom"
-        * "TZ" - "United Republic of Tanzania"
-        * "US" - "United States"
-        * "UM" - "United States Minor Outlying Islands"
-        * "unknown" - "Unknown"
-        * "UY" - "Uruguay"
-        * "UZ" - "Uzbekistan"
-        * "VU" - "Vanuatu"
-        * "VE" - "Venezuela"
-        * "VN" - "Vietnam"
-        * "WF" - "Wallis and Futuna"
-        * "WD" - "WD"
-        * "EH" - "Western Sahara"
-        * "WZ" - "WZ"
-        * "XB" - "XB"
-        * "XC" - "XC"
-        * "XE" - "XE"
-        * "XK" - "XK"
-        * "XM" - "XM"
-        * "XN" - "XN"
-        * "XY" - "XY"
-        * "YE" - "Yemen"
-        * "YU" - "Yugoslavia"
-        * "ZR" - "Zaire"
-        * "ZM" - "Zambia"
-        * "ZW" - "Zimbabwe"
-    * "item_name" - Provide a title for the item that may be customer facing
-      * Examples
-        * "Adidas Blue Sneakers"
-      * Type - array
-    * "item_type_keyword" - Item type keywords are used to place new ASINs in the appropriate place(s) within the graph. Select the most specific accurate term for optimal placement.
-      * Examples
-        * "Carry on luggage"
-      * Type - array
-    * "product_description" - The description you provide should pertain to the product in general, not your particular item. There is a 2,000 character maximum.
-      * Examples
-        * "This ham has been smoked for 12 hours..."
-      * Type - array
-    * "supplier_declared_dg_hz_regulation" - If the product is a Dangerous Good or Hazardous Material, Substance or Waste that is regulated for transportation, storage, and/or waste select from the list of valid values
-      * Examples
-        * "GHS, Storage, Transportation"
-      * Type - array
-      * Enums:
-        * "ghs" - "GHS"
-        * "not_applicable" - "Not Applicable"
-        * "other" - "Other"
-        * "storage" - "Storage"
-        * "transportation" - "Transportation"
-        * "unknown" - "Unknown"
-        * "waste" - "Waste"
-  ```
-
-</details>
-
-
+todo...
 
 ## halycon?
 
 one of ma favourite mono song https://www.youtube.com/watch?v=2_OYaI37bi0
+
+## why?
+
+amazon SP-API is, literally, one of the worst API's you can ever work with, especially the Listing side has one of the worst documentation you can ever read. i am doing this to save myself trouble, and possibly saving you some trouble in future. LICENSE is as free as it can get, as long as you do one push up, you can do whatever you want with the code.

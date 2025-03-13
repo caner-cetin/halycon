@@ -11,7 +11,6 @@ import (
 	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/caner-cetin/halycon/internal"
 	"github.com/caner-cetin/halycon/internal/amazon/fba_inventory/client/fba_inventory"
 	"github.com/caner-cetin/halycon/internal/config"
 	sp_api "github.com/caner-cetin/halycon/internal/sp-api"
@@ -51,8 +50,7 @@ func getLookupSkuFromAsinCmd() *cobra.Command {
 }
 
 func lookupSkuFromAsin(cmd *cobra.Command, args []string) {
-	ctx := cmd.Context()
-	app := ctx.Value(internal.APP_CONTEXT).(AppCtx)
+	app := GetApp(cmd)
 	productMap, err := getAsinToMskuMap(app.Amazon.Client)
 	if err != nil {
 		log.Fatal().Err(err).Send()
@@ -78,7 +76,7 @@ func lookupSkuFromAsin(cmd *cobra.Command, args []string) {
 			asins = append(asins, strings.TrimSpace(scanner.Text()))
 		}
 
-		output_tmp, err := os.CreateTemp(os.TempDir(), "halcyon-asin-to-sku-output-*.csv")
+		output_tmp, err := os.CreateTemp(os.TempDir(), "halycon-asin-to-sku-output-*.csv")
 		if err != nil {
 			log.Fatal().Err(err).Msg("error while creating temporary output file")
 		}

@@ -46,12 +46,7 @@ func getlookupAsinFromUpcCmd() *cobra.Command {
 }
 
 func lookupAsinFromUpc(cmd *cobra.Command, args []string) {
-	if lookupAsinFromUpcConfig.Input == "" {
-		cmd.Help()
-		log.Fatal().Msg("[--input / -i] flag is required")
-	}
-	var ctx = cmd.Context()
-	var app = ctx.Value(internal.APP_CONTEXT).(AppCtx)
+	app := GetApp(cmd)
 
 	var queryIdentifiers []string
 	if lookupAsinFromUpcConfig.Single {
@@ -78,7 +73,7 @@ func lookupAsinFromUpc(cmd *cobra.Command, args []string) {
 	for identifiers := range slices.Chunk(queryIdentifiers, 10) {
 		log.Trace().Interface("identifiers", identifiers).Msg("searching next batch")
 		params := catalog.NewSearchCatalogItemsParams()
-		params.SetContext(ctx)
+		params.SetContext(cmd.Context())
 		params.SetMarketplaceIds(viper.GetStringSlice(config.AMAZON_MARKETPLACE_ID.Key))
 		params.SetIdentifiersType(ptr.String("UPC"))
 		params.SetIdentifiers(identifiers)
@@ -108,7 +103,7 @@ func lookupAsinFromUpc(cmd *cobra.Command, args []string) {
 			Str("ASIN", string(*item.Asin)).
 			Msg("found!")
 	} else {
-		output_tmp, err := os.CreateTemp(os.TempDir(), "halcyon-upc-to-asin-output-*.txt")
+		output_tmp, err := os.CreateTemp(os.TempDir(), "halycon-upc-to-asin-output-*.txt")
 		if err != nil {
 			log.Fatal().Err(err).Msg("error while creating temporary output file")
 		}
