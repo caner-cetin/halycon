@@ -3,6 +3,7 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/aws/smithy-go/ptr"
@@ -25,6 +26,10 @@ type CreateListingsConfig struct {
 	AutofillLanguageTag   bool
 }
 
+type GetListingConfig struct {
+	DisplayAttritubes bool
+}
+
 var (
 	createListingsCmd = &cobra.Command{
 		Use: "create",
@@ -35,7 +40,7 @@ var (
 		Use: "get",
 		Run: WrapCommandWithResources(getListing, ResourceConfig{Resources: []ResourceType{ResourceAmazon}, Services: []ServiceType{ServiceListings}}),
 	}
-	getListingCfg    listings.GetListingsItemParams
+	getListingCfg    GetListingConfig
 	deleteListingCmd = &cobra.Command{
 		Use: "delete",
 		Run: WrapCommandWithResources(deleteListing, ResourceConfig{Resources: []ResourceType{ResourceAmazon}, Services: []ServiceType{ServiceListings}}),
@@ -44,6 +49,7 @@ var (
 	listingsCmd      = &cobra.Command{
 		Use: "listings",
 	}
+	listingOperationSku string
 )
 
 func getListingsCmd() *cobra.Command {
@@ -54,10 +60,8 @@ func getListingsCmd() *cobra.Command {
 	createListingsCmd.PersistentFlags().StringVarP(&createListingsCfg.Requirements, "requirements", "r", "", "Attributes JSON file")
 	createListingsCmd.PersistentFlags().StringVar(&createListingsCfg.IssueLocale, "issue-locale", "", "Locale for issue localization. Default: When no locale is provided, the default locale of the first marketplace is used. Localization defaults to en_US when a localized message is not available in the specified locale.")
 
-	getListingCmd.PersistentFlags().StringVarP(&getListingCfg.Sku, "sku", "s", "", "")
-
-	deleteListingCmd.PersistentFlags().StringVarP(&deleteListingCfg.Sku, "sku", "s", "", "")
-
+	getListingCmd.PersistentFlags().BoolVar(&getListingCfg.DisplayAttritubes, "display-attributes", false, "logs listing attributes line by line if given")
+	listingsCmd.PersistentFlags().StringVarP(&listingOperationSku, "sku", "s", "", "")
 	listingsCmd.AddCommand(createListingsCmd)
 	listingsCmd.AddCommand(getListingCmd)
 	listingsCmd.AddCommand(deleteListingCmd)
@@ -72,7 +76,7 @@ func createListings(cmd *cobra.Command, args []string) {
 	var params listings.PutListingsItemParams
 	params.MarketplaceIds = viper.GetStringSlice(config.AMAZON_MARKETPLACE_ID.Key)
 	params.SellerID = strings.TrimSpace(viper.GetString(config.AMAZON_MERCHANT_TOKEN.Key))
-	params.Sku = "W9-EYD8-3OOO"
+	params.Sku = listingOperationSku
 	params.IncludedData = []string{"issues"}
 
 	if createListingsCfg.IssueLocale != "" {
@@ -142,10 +146,11 @@ func createListings(cmd *cobra.Command, args []string) {
 
 func getListing(cmd *cobra.Command, args []string) {
 	app := GetApp(cmd)
-	var params = getListingCfg
+	var params listings.GetListingsItemParams
 	params.MarketplaceIds = viper.GetStringSlice(config.AMAZON_MARKETPLACE_ID.Key)
 	params.SellerID = viper.GetString(config.AMAZON_MERCHANT_TOKEN.Key)
-	params.IncludedData = []string{"summaries", "issues", "offers"}
+	params.Sku = listingOperationSku
+	params.IncludedData = []string{"summaries", "issues", "offers", "relationships", "attributes"}
 	result, err := app.Amazon.Client.GetListingsItem(&params)
 	if err != nil {
 		log.Fatal().Err(err).Send()
@@ -158,11 +163,71 @@ func getListing(cmd *cobra.Command, args []string) {
 			Str("name", summary.ItemName).
 			Str("status", strings.Join(summary.Status, ",")).Send()
 	}
+	for _, relationship := range result.Payload.Relationships {
+		for i, rls := range relationship.Relationships {
+			ev := log.Info().
+				Str("type", *rls.Type).
+				Str("child_skus", strings.Join(rls.ChildSkus, ",")).
+				Str("parent_skus", strings.Join(rls.ParentSkus, ","))
+			if rls.VariationTheme != nil {
+				ev.Str("theme", *rls.VariationTheme.Theme).
+					Str("theme_attributes", strings.Join(rls.VariationTheme.Attributes, ","))
+			}
+			ev.Msgf("relationship %d", i+1)
+
+		}
+	}
+	if len(result.Payload.Offers) == 0 {
+		log.Warn().Msg("no offers found")
+	} else {
+		for i, offer := range result.Payload.Offers {
+			ev := log.Info().
+				Str("type", *offer.OfferType)
+			if offer.Points != nil {
+				ev.Int64("points", *offer.Points.PointsNumber)
+			}
+			if offer.Audience != nil {
+				ev.Str("audience_name", offer.Audience.DisplayName).
+					Str("audience_value", offer.Audience.Value)
+			}
+			if offer.Price != nil {
+				ev.Str("currency_code", *offer.Price.CurrencyCode).
+					Str("price", string(*offer.Price.Amount))
+			}
+			ev.Msgf("offer %d", i+1)
+		}
+	}
+	if getListingCfg.DisplayAttritubes {
+		attrs_bytes, err := json.Marshal(result.Payload.Attributes)
+		if err != nil {
+			log.Fatal().Err(err).Send()
+		}
+		attrs := fastjson.MustParseBytes(attrs_bytes)
+		attrs.GetObject().Visit(func(key []byte, v *fastjson.Value) {
+			ev := log.Info()
+			for _, obj := range v.GetArray() {
+				obj.GetObject().Visit(func(key []byte, v *fastjson.Value) {
+					if v.Type() == fastjson.TypeString {
+						marshalled, err := strconv.Unquote(string(v.MarshalTo(nil)))
+						if err != nil {
+							log.Fatal().Err(err).Send()
+						}
+						ev.Str(string(key), marshalled)
+					} else {
+						marshalled := v.MarshalTo(nil)
+						ev.Bytes(string(key), marshalled)
+					}
+				})
+			}
+			ev.Msg(string(key))
+		})
+	}
 }
 
 func deleteListing(cmd *cobra.Command, args []string) {
 	app := GetApp(cmd)
 	var params = deleteListingCfg
+	params.Sku = listingOperationSku
 	params.MarketplaceIds = viper.GetStringSlice(config.AMAZON_MARKETPLACE_ID.Key)
 	params.SellerID = viper.GetString(config.AMAZON_MERCHANT_TOKEN.Key)
 	result, err := app.Amazon.Client.DeleteListingsItem(&params)

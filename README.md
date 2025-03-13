@@ -25,6 +25,9 @@ utilities for Amazon SP API, mostly for my annoyances
     - [Create Listing](#create-listing)
       - [how](#how-5)
     - [Delete Listing](#delete-listing)
+      - [how](#how-6)
+    - [Create Child-Parent Listings](#create-child-parent-listings)
+      - [how](#how-7)
   - [halycon?](#halycon-1)
 
 ## usage
@@ -190,11 +193,12 @@ example output [can be found here](./static/example/wallet_definition.txt)
 ### Create Listing
 #### how
 ```bash
-halycon listings create --input attributes.json --type WALLET --requirements LISTING --fill-marketplace-id --fill-language-tag -v
+halycon listings create --input attributes.json --type WALLET --requirements LISTING --sku W9-XXXX-XXXX --fill-marketplace-id --fill-language-tag -v
 ```
-create `attributes.json` and fill with taking `halycon definition get` output as your reference OR if you are using VSCode
+create `attributes.json` and fill with taking `halycon definition get` output as your reference OR 
 
 <details>
+
   <summmary>if you are using VSCode</summary>
 
   > You can refer your JSON Schema in $schema node and get your intellisense in VS Code right away. No need to configure anywhere else.
@@ -233,7 +237,6 @@ create `attributes.json` and fill with taking `halycon definition get` output as
         "language_tag": "en_US",
         "marketplace_id": "ATVPDKIKX0DER"
       }],
-        // random example i just pulled from a wallet
        "bullet_point": [
         {
           "value": "TEAM HERITAGE: Features team design......",
@@ -250,7 +253,6 @@ create `attributes.json` and fill with taking `halycon definition get` output as
           "marketplace_id": "ATVPDKIKX0DER",
           "language_tag": "en_US"
         },
-        ...
       ],
   }
 ```
@@ -265,14 +267,11 @@ when using `--fill-marketplace-id`, first marketplace ID from config is used, if
       "item_name": [{"value": "Aneco 6 Pairs Over Knee Thigh Socks Knee-High Warm Stocking Women Boot Sock Leg Warmer High Socks for Daily Wear, Cosplay"}],
       "item_type_keyword": [{"value": "Thigh highs"}],
       "brand": [{"value":"something something"}],
-        // random example i just pulled from a wallet
        "bullet_point": [
         {"value": "TEAM HERITAGE: Features team design......"},
         {"value": "PREMIUM MATERIAL: Crafted from high-quality black faux leather with durable stitching for long-lasting everyday use"},
         {"value": "PREMIUM MATERIAL: Crafted from high-quality black faux leather with durable stitching for long-lasting everyday use"}
-        ...
-      ],
-      ...
+      ]
   }
 ```
 and any extra attributes if required. 
@@ -293,18 +292,40 @@ also the documentation is misleading. setting `MODE` to `VALIDATION_PREVIEW` whi
 
 if success,
 ```bash
-halycon listings create -i attributes.json --type WALLET --requirements LISTING --fill-marketplace-id --fill-language-tag -v
+halycon listings create -i attributes.json --type WALLET --requirements LISTING --sku W9-XXXX-XXXX --fill-marketplace-id --fill-language-tag -v
 10:47AM INF sku=W9-XXXX-XXXX status=ACCEPTED submission_id=582xxxxxxxxxxxx
 ```
 then you can use the same sku for `Get Listing`
 
 ### Delete Listing
+#### how
 ```bash
-halycon listings delete --sku W9-EYD8-3OOO -v
+halycon listings delete --sku W9-XXXX-XXXX -v
 11:14AM INF sku=W9-XXXX-XXXX status=ACCEPTED submission_id=XXXXXXXXX
 ```
 
-
+### Create Child-Parent Listings
+#### how
+same command as `Create Listing`
+```bash
+halycon listings create -i attributes.json --type WALLET --requirements LISTING --sku W9-XXXX-XXXX --fill-marketplace-id --fill-language-tag -v
+```
+create parent listing with the attributes
+```json
+{
+  "parentage_level": [{ "value": "parent" }],
+  "child_parent_sku_relationship": [{ "child_relationship_type": "variation" }],
+  "variation_theme": [{ "name": "TEAM_NAME" }]
+}
+```
+and then create the child listings with attributes
+```json
+{
+  "parentage_level": [{"value": "children"}],
+  "child_parent_sku_relationship": [{"child_relationship_type": "variation", "parent_sku": "W9-XXXX-XXXX"}],
+  "variation_theme": [{ "name": "TEAM_NAME" }]
+}
+```
 
 ## halycon?
 
