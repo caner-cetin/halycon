@@ -71,6 +71,10 @@ func (a *Client) GetListingsItem(params *listings.GetListingsItemParams) (*listi
 	return a.GetListingsService().GetListingsItem(params, a.WithAuth(), a.WithRateLimit(GetListingsItemRLKey))
 }
 
+func (a *Client) DeleteListingsItem(params *listings.DeleteListingsItemParams) (*listings.DeleteListingsItemOK, error) {
+	return a.GetListingsService().DeleteListingsItem(params, a.WithAuth(), a.WithRateLimit(DeleteListingsItemRLKey))
+}
+
 func (a *Client) GetFBAInventorySummaries(params *fba_inventory.GetInventorySummariesParams) (*fba_inventory.GetInventorySummariesOK, error) {
 	return a.GetFBAInventoryService().GetInventorySummaries(params, a.WithAuth(), a.WithRateLimit(FBAInventorySummariesRLKey))
 }
@@ -99,6 +103,7 @@ const (
 	SearchCatalogItemsRLKey           = "rate_limiter.catalog.searchItems"
 	GetCatalogItemsRLKey              = "rate_limiter.catalog.getItems"
 	GetListingsItemRLKey              = "rate_limiter.listings.getItem"
+	DeleteListingsItemRLKey           = "rate_limiter.listings.deleteListingsItem"
 	CreateListingRLKey                = "rate_limiter.listings.createItem"
 	FBAInventorySummariesRLKey        = "rate_limiter.fba.inventorySummaries"
 	CreateInboundPlanRLKey            = "rate_limiter.fba.createInboundPlan"
@@ -112,6 +117,7 @@ func (a *Client) SetRateLimits() {
 		SearchCatalogItemsRLKey:           rate.NewLimiter(rate.Limit(2), 2),
 		GetCatalogItemsRLKey:              rate.NewLimiter(rate.Limit(2), 2),
 		GetListingsItemRLKey:              rate.NewLimiter(rate.Limit(5), 10),
+		DeleteListingsItemRLKey:           rate.NewLimiter(rate.Limit(5), 10),
 		FBAInventorySummariesRLKey:        rate.NewLimiter(rate.Limit(2), 2),
 		CreateInboundPlanRLKey:            rate.NewLimiter(rate.Limit(2), 2),
 		GetInboundOperationStatusRLKey:    rate.NewLimiter(rate.Limit(2), 6),

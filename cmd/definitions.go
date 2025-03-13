@@ -288,7 +288,7 @@ func displayRequiredKeyDetails(prop *fastjson.Value, required_key, indent string
 		return
 	}
 
-	fmt.Printf("%s%s\n", strings.Repeat(indent, 2), required_key)
+	fmt.Printf("%s%s (%s)\n", strings.Repeat(indent, 2), required_key, string(obj.Get("type").GetStringBytes()))
 	fmt.Printf("%sTitle: %s\n", strings.Repeat(indent, 3), string(obj.Get("title").GetStringBytes()))
 	fmt.Printf("%sDescription: %s\n", strings.Repeat(indent, 3), string(obj.Get("description").GetStringBytes()))
 
@@ -333,9 +333,10 @@ func displayNestedRequiredKeys(prop *fastjson.Value, parent_key string, obj *fas
 }
 
 func displayNestedKeyDetails(prop *fastjson.Value, parent_key, key, indent string, dim, green func(a ...interface{}) string) {
-	fmt.Printf("%s%s\n", strings.Repeat(indent, 4), key)
-
 	obj_detail := prop.GetObject("items", "properties", parent_key, "properties", key)
+
+	fmt.Printf("%s%s (%s)\n", strings.Repeat(indent, 4), key, string(obj_detail.Get("type").GetStringBytes()))
+
 
 	fmt.Printf("%sTitle: %s\n", strings.Repeat(indent, 5), string(obj_detail.Get("title").GetStringBytes()))
 	fmt.Printf("%sDescription: %s\n", strings.Repeat(indent, 5), string(obj_detail.Get("description").GetStringBytes()))

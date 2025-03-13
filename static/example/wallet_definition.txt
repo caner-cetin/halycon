@@ -1,4 +1,4 @@
-Product: Wallet  |  Requirements: LISTING  |  Locale: en_US | Schema: https://selling-partner-definitions-prod-iad.s3.amazonaws.com/schema/WALLET.json/...
+Product: Wallet  |  Requirements: LISTING  |  Locale: en_US | Schema: https://selling-partner-definitions-prod-iad.s3.amazonaws.com/schema/WALLET.json/urkyNNBZi7zL0SoKjqsNXQ%253D%253D?X-Amz-Security-Token=IQoJb3JpZ2luX2VjEIb%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCXVzLWVhc3QtMSJIMEYCIQDCRy2n5j8N5zvgTksLujWy0aoeZFbyOr3sDmN63345OQIhAJQIkk3Ch9rKQR7LQ4YvyLQPp%2Brw7bRiKBkcy30xi3FVKtIECM7%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEQAxoMNTM1Nzg5ODIzODA4Igw8gUab7X8gGNtQlIgqpgRSb9dJd8Yxc33OwgrvJ9A%2FkgZs7GMemGLYoBtHZocDeI2S%2BB%2BVfNtQs5lrWGIHKDQET2s26NxPnUD0YrcKv1Wp2L6N520YmbbXFdyl0SNB0U1%2BT8jP0eVw%2FDZHTRlhUaGjJikIm4ZP9M1QbuzIbk5NftXfeWQ3X6Wvxw2ZS7rJ9tyEkr1uei%2F%2BzHvrvBgV1COowuLzhSptQP9jv9rZYCQlE%2F31qNDS4yasYCcFBAQZ%2FmoBMByQFLpUPhRoxlUyV7htA198%2BQhkJvRsMPvQ0UWHF7oQ0zDL9JPV4xQjkOtbrVyjCXCiOj2yluPOYbs7GdVLEfFEU%2FyffHjTKxFqacRMHyENPryqimMMGYeP7yaowxXsVhBj5Cgi%2FQ33rEjTlbj7C4U9TkeNjKLQ9L1NYWb0cISlSxNagMyEA3A0LDux521x1wmN1OzsbMTqsmelZwS%2BfSRdm%2FtwgGU1RBetf%2FIKd%2FCp6mddu%2FYJJgRywlHaQEeu2F1YXiFKjJCSHvW5iXuopwzPc15faWHM687YU339Paf206mLrA3JqsdBsSSqoDIwceZNbPl1xD5%2BzEoBvfTJOFTZwceF8PHTyVmbk7dHchev%2BHMRB2i5aSNCWCPtdO58QHzodMpR8OWROICDctOUbeXPpy92ZyLd%2BmYtl6h1cVKwd1sJHMMlDYJg5Aw%2F%2BBCpLEJ9CQi7%2B64hSy2DLPmZXU%2B0h6PdlQNdCS28m1dmt6Deu959MLvPyb4GOqYBdSBLkcVPlqcMYrMtNcIvzM5tlGvD3JElpTJftANDxiWbW%2B9RSzcpP4ldWUrRxhXSUt83%2BaMuIod58qcFvCDIJPePYVW%2Bamoy4mVJfgR9XkFoLyLTcOaZ4KCWZyj09zq6VWI%2F84ZRZumPkgOEpjm8CrvQZ2Lgus1SEZua2NIzGo9QQ3CVQ4NF5nCDl8tCWVyhDdAGQ2LisJuvwnir7AssAb0a3gKNFQ%3D%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250313T074328Z&X-Amz-SignedHeaders=host&X-Amz-Credential=ASIAXZP4P45ANTJT45BY%2F20250313%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Expires=604800&X-Amz-Signature=c2796f08165e3d29af5a03cb2ef5ed26d84d053b4e7a2f974e75cc3b433d1973
 
 Properties:
 ----------------------------------------
@@ -7,10 +7,10 @@ Properties:
     Examples: "Adidas Blue Sneakers"  
     Required Selectors: marketplace_id,language_tag
     Required Keys: language_tag,value
-        language_tag
+        language_tag ()
             Title: 
             Description: 
-        value
+        value (string)
             Title: Item Name
             Description: Provide a title for the item that may be customer facing
 
@@ -20,10 +20,10 @@ Properties:
     Examples: "Ralph Lauren; North Face; Patagonia"  
     Required Selectors: marketplace_id,language_tag
     Required Keys: language_tag,value
-        language_tag
+        language_tag ()
             Title: 
             Description: 
-        value
+        value (string)
             Title: Brand Name
             Description: Provide the brand name of the product
 
@@ -33,14 +33,14 @@ Properties:
     Examples: "714532191586"  
     Required Selectors: marketplace_id,type
     Required Keys: type,value
-        type
+        type (string)
             Title: External Product ID Type
             Description: Select the type of external ID (barcode) that is being used to identify this product
             Enums:
                 ean (EAN)
                 gtin (GTIN)
                 upc (UPC)
-        value
+        value (string)
             Title: External Product ID
             Description: Provide the corresponding external product id value based on the type that was selected
 
@@ -50,7 +50,7 @@ Properties:
     Examples: "B007KQBXN0"  
     Required Selectors: marketplace_id,value
     Required Keys: value
-        value
+        value (string)
             Title: Merchant Suggested Asin
             Description: Provide an ASIN for your product if one exists. If a value is not provided, the system will attempt a match based on the External Product ID.
 
@@ -61,7 +61,7 @@ Properties:
     Options: false ("No")  true ("Yes")  
     Required Selectors: marketplace_id
     Required Keys: value
-        value
+        value (boolean)
             Title: Is exempt from supplier declared external product identifier
             Description: Please specify if the product is exempt from supplier declared external product identifiers.
             Enums:
@@ -74,7 +74,7 @@ Properties:
     Examples: "Carry on luggage"  
     Required Selectors: marketplace_id
     Required Keys: value
-        value
+        value (string)
             Title: Item Type Keyword
             Description: Item type keywords are used to place new ASINs in the appropriate place(s) within the graph. Select the most specific accurate term for optimal placement.
 
@@ -84,10 +84,10 @@ Properties:
     Examples: "Men"  
     Required Selectors: marketplace_id,language_tag
     Required Keys: language_tag,value
-        language_tag
+        language_tag ()
             Title: 
             Description: 
-        value
+        value (string)
             Title: Target Audience
             Description: Specify the target audience that the product is intended for
 
@@ -97,7 +97,7 @@ Properties:
     Examples: "C-50"  
     Required Selectors: marketplace_id
     Required Keys: value
-        value
+        value (string)
             Title: Model Number
             Description: Provide the manufacturer 's model number for the item
 
@@ -107,10 +107,10 @@ Properties:
     Examples: "Camedia"  
     Required Selectors: marketplace_id,language_tag
     Required Keys: language_tag,value
-        language_tag
+        language_tag ()
             Title: 
             Description: 
-        value
+        value (string)
             Title: Model Name
             Description: Specify the model name of the product as defined by the manufacturer or brand excluding item type, color, brand or size
 
@@ -120,10 +120,10 @@ Properties:
     Examples: "Sony, Kitchen Aid, Microsoft"  
     Required Selectors: marketplace_id,language_tag
     Required Keys: language_tag,value
-        language_tag
+        language_tag ()
             Title: 
             Description: 
-        value
+        value (string)
             Title: Manufacturer
             Description: Provide the company that manufactures the product.
 
@@ -134,7 +134,7 @@ Properties:
     Options: false ("No")  true ("Yes")  
     Required Selectors: marketplace_id
     Required Keys: value
-        value
+        value (boolean)
             Title: Skip Offer
             Description: Please indicate whether the offer should be skipped and a buyable offer should not be created. A value of "Yes", means no offer will be created.
             Enums:
@@ -146,7 +146,7 @@ Properties:
     Constraints: Min: 1, Max: 1 items
     Required Selectors: fulfillment_channel_code
     Required Keys: fulfillment_channel_code
-        fulfillment_channel_code
+        fulfillment_channel_code (string)
             Title: Fulfillment Channel Code
             Description: For those merchants using Amazon fulfillment services, this designates which fulfillment network will be used. Specifying a value other than DEFAULT will cancel the Merchant-fulfilled offering.
             Enums:
@@ -160,7 +160,7 @@ Properties:
     Options: "policy_1" ("Policy 1")  "policy_10" ("Policy 10")  "policy_11" ("Policy 11")  "policy_2" ("Policy 2")  "policy_3" ("Policy 3")  "policy_4" ("Policy 4")  "policy_5" ("Policy 5")  "policy_6" ("Policy 6")  "policy_7" ("Policy 7")  "policy_8" ("Policy 8")  "policy_9" ("Policy 9")  
     Required Selectors: marketplace_id
     Required Keys: value
-        value
+        value (string)
             Title: Minimum Advertised Price Display
             Description: Select one.
             Enums:
@@ -188,7 +188,7 @@ Properties:
     Options: "club_club" ("Club")  "collectible_acceptable" ("Collectible - Acceptable")  "collectible_good" ("Collectible - Good")  "collectible_like_new" ("Collectible - Like New")  "collectible_very_good" ("Collectible - Very Good")  "new_new" ("New")  "new_oem" ("New - OEM")  "new_open_box" ("New - Open Box")  "refurbished_refurbished" ("Refurbished")  "used_acceptable" ("Used - Acceptable")  "used_good" ("Used - Good")  "used_like_new" ("Used - Like New")  "used_very_good" ("Used - Very Good")  
     Required Selectors: marketplace_id
     Required Keys: value
-        value
+        value (string)
             Title: Offering Condition Type
             Description: Provide the actual condition type of the product
             Enums:
@@ -212,10 +212,10 @@ Properties:
     Examples: "Small dent in left side panel."  
     Required Selectors: marketplace_id,language_tag
     Required Keys: language_tag,value
-        language_tag
+        language_tag ()
             Title: 
             Description: 
-        value
+        value (string)
             Title: Offer Condition Note
             Description: Provide descriptive text explaining the actual condition of the item
 
@@ -225,12 +225,12 @@ Properties:
     Examples: "64 USD, 69 GBP, 98 EUR"  
     Required Selectors: marketplace_id,currency
     Required Keys: currency,value
-        currency
+        currency (string)
             Title: List Price Currency
             Description: Select the corresponding currency
             Enums:
                 USD (USD)
-        value
+        value (number)
             Title: List Price
             Description: Provide the list price for the product not including tax. List Price is the suggested retail price of a product as provided by a manufacturer, supplier, or seller. This is not the offering or cost price. If you are unable to provide a value, enter 0.
 
@@ -240,7 +240,7 @@ Properties:
     Examples: "A_GEN_NOTAX"  
     Required Selectors: marketplace_id
     Required Keys: value
-        value
+        value (string)
             Title: Product Tax Code
             Description: Enter the product tax code supplied to you by Amazon.com
 
@@ -249,7 +249,7 @@ Properties:
     Constraints: Min: 1, Max: 1 items
     Required Selectors: marketplace_id
     Required Keys: value
-        value
+        value (string)
             Title: Merchant Release Date
             Description: Provide the merchant release date using YYYY-MM-DD format
 
@@ -259,7 +259,7 @@ Properties:
     Examples: "\"Heavy Bulky Products\", \"CN ShunFeng Delivery\""  
     Required Selectors: marketplace_id
     Required Keys: value
-        value
+        value (string)
             Title: Merchant Shipping Group
             Description: The ship configuration group for an offer. The ship configuration group is created and managed by the seller through the ship setting UI.
 
@@ -268,7 +268,7 @@ Properties:
     Constraints: Min: 1, Max: 1 items
     Required Selectors: marketplace_id
     Required Keys: value
-        value
+        value (integer)
             Title: Maximum Order Quantity
             Description: Max order quantity.
 
@@ -283,7 +283,7 @@ Properties:
     Examples: "Feed"  
     Required Selectors: marketplace_id
     Required Keys: media_location
-        media_location
+        media_location (string)
             Title: Main Image Location
             Description: The URL where the main offer-specific image of the product is located
 
@@ -293,7 +293,7 @@ Properties:
     Examples: "Feed"  
     Required Selectors: marketplace_id
     Required Keys: media_location
-        media_location
+        media_location (string)
             Title: Other Image Location
             Description: The URL for additional images of your product. These images will be shown on the detail page when the customer clicks through to see other views associated with the product.
 
@@ -303,7 +303,7 @@ Properties:
     Examples: "Feed"  
     Required Selectors: marketplace_id
     Required Keys: media_location
-        media_location
+        media_location (string)
             Title: Other Image Location
             Description: The URL for additional images of your product. These images will be shown on the detail page when the customer clicks through to see other views associated with the product.
 
@@ -313,7 +313,7 @@ Properties:
     Examples: "Feed"  
     Required Selectors: marketplace_id
     Required Keys: media_location
-        media_location
+        media_location (string)
             Title: Other Image Location
             Description: The URL for additional images of your product. These images will be shown on the detail page when the customer clicks through to see other views associated with the product.
 
@@ -323,7 +323,7 @@ Properties:
     Examples: "Feed"  
     Required Selectors: marketplace_id
     Required Keys: media_location
-        media_location
+        media_location (string)
             Title: Other Image Location
             Description: The URL for additional images of your product. These images will be shown on the detail page when the customer clicks through to see other views associated with the product.
 
@@ -333,7 +333,7 @@ Properties:
     Examples: "Feed"  
     Required Selectors: marketplace_id
     Required Keys: media_location
-        media_location
+        media_location (string)
             Title: Other Image Location
             Description: The URL for additional images of your product. These images will be shown on the detail page when the customer clicks through to see other views associated with the product.
 
@@ -344,7 +344,7 @@ Properties:
     Options: "hand_altered" ("Hand-Altered")  "hand_designed" ("Hand-Designed")  "handcrafted" ("Handcrafted")  "repurposed" ("Repurposed")  "upcycled" ("Upcycled")  
     Required Selectors: marketplace_id
     Required Keys: value
-        value
+        value (string)
             Title: Handmade Classification
             Description: Select the value that best describes how the product was produced
             Enums:
@@ -360,10 +360,10 @@ Properties:
     Examples: "This ham has been smoked for 12 hours..."  
     Required Selectors: marketplace_id,language_tag
     Required Keys: language_tag,value
-        language_tag
+        language_tag ()
             Title: 
             Description: 
-        value
+        value (string)
             Title: Product Description
             Description: Provide a text description of the product. This information will appear in paragraph form on the detail page of your product. Include unique product features, product line details, and product specifications. Do not use all caps.
 
@@ -373,10 +373,10 @@ Properties:
     Examples: "Delicious honey-apricot glaze"  
     Required Selectors: marketplace_id,language_tag
     Required Keys: language_tag,value
-        language_tag
+        language_tag ()
             Title: 
             Description: 
-        value
+        value (string)
             Title: Bullet Point
             Description: Brief descriptive text, called out via a bullet point, regarding a specific aspect of the product. These display directly under or next to your product photo, it is useful to put interesting information in these fields. Do NOT use all caps or abbreviations. Please do NOT use for fabric content, care instructions or country as these are populated in different fields.
 
@@ -386,10 +386,10 @@ Properties:
     Examples: "Dark Chocolate, Apples, Cookies"  
     Required Selectors: marketplace_id,language_tag
     Required Keys: language_tag,value
-        language_tag
+        language_tag ()
             Title: 
             Description: 
-        value
+        value (string)
             Title: Generic Keyword
             Description: Provide any terms that may be relevant to customer searches. No repetition, no competitor brand names or ASINs.
 
@@ -399,10 +399,10 @@ Properties:
     Examples: "max number of images 36,  Operating Time 6 hours"  
     Required Selectors: marketplace_id,language_tag
     Required Keys: language_tag,value
-        language_tag
+        language_tag ()
             Title: 
             Description: 
-        value
+        value (string)
             Title: Special Features
             Description: Provide any special features an item has that distinguish it from other, comparable products
 
@@ -412,10 +412,10 @@ Properties:
     Examples: "Mission; Art Deco; Jack Purcell"  
     Required Selectors: marketplace_id,language_tag
     Required Keys: language_tag,value
-        language_tag
+        language_tag ()
             Title: 
             Description: 
-        value
+        value (string)
             Title: Style
             Description: Provide the style of the product. Style refers to the aesthetic choices of a person or a group of people. It describes the distinctive visual representation of a product
 
@@ -425,10 +425,10 @@ Properties:
     Examples: "Womens"  
     Required Selectors: marketplace_id,language_tag
     Required Keys: language_tag,value
-        language_tag
+        language_tag ()
             Title: 
             Description: 
-        value
+        value (string)
             Title: Department Name
             Description: Provide the gender/age for which this item is intended
 
@@ -439,7 +439,7 @@ Properties:
     Options: "female" ("Female")  "male" ("Male")  "unisex" ("Unisex")  
     Required Selectors: marketplace_id
     Required Keys: value
-        value
+        value (string)
             Title: Target Gender
             Description: Provide the target gender for the product
             Enums:
@@ -453,10 +453,10 @@ Properties:
     Examples: "Baby"  
     Required Selectors: marketplace_id,language_tag
     Required Keys: language_tag,value
-        language_tag
+        language_tag ()
             Title: 
             Description: 
-        value
+        value (string)
             Title: Age Range Description
             Description: Specify an appropriate age range description for the item
 
@@ -466,10 +466,10 @@ Properties:
     Examples: "nylon, wood, steel"  
     Required Selectors: marketplace_id,language_tag
     Required Keys: language_tag,value
-        language_tag
+        language_tag ()
             Title: 
             Description: 
-        value
+        value (string)
             Title: Material Type
             Description: Specify the primary materials used for manufacturing the item
 
@@ -478,10 +478,10 @@ Properties:
     Constraints: Min: 1, Max: 1 items
     Required Selectors: marketplace_id,language_tag
     Required Keys: language_tag,value
-        language_tag
+        language_tag ()
             Title: 
             Description: 
-        value
+        value (string)
             Title: Lining Description
             Description: Provide the type of fabric or material used to line the interior of the item.
 
@@ -490,7 +490,7 @@ Properties:
     Constraints: Min: 1, Max: 1 items
     Required Selectors: marketplace_id
     Required Keys: value
-        value
+        value (integer)
             Title: Number of Items
             Description: Provide the total number of identical items in the selling unit to the customer
 
@@ -499,7 +499,7 @@ Properties:
     Constraints: Min: 1, Max: 1 items
     Required Selectors: marketplace_id
     Required Keys: value
-        value
+        value (integer)
             Title: Item Package Quantity
             Description: Provide the number of packages sold as part of a single item. An ASIN selling 5 boxes of paperclips with 100 paperclips per box would have item package quantity = '5'
 
@@ -509,10 +509,10 @@ Properties:
     Examples: "Batman"  
     Required Selectors: marketplace_id,language_tag
     Required Keys: language_tag,value
-        language_tag
+        language_tag ()
             Title: 
             Description: 
-        value
+        value (string)
             Title: Subject Character
             Description: Provide the primary character the item represents
 
@@ -522,10 +522,10 @@ Properties:
     Examples: "Husky, Petite"  
     Required Selectors: marketplace_id,language_tag
     Required Keys: language_tag,value
-        language_tag
+        language_tag ()
             Title: 
             Description: 
-        value
+        value (string)
             Title: Special Size
             Description: Specify the special size type for the item
 
@@ -535,7 +535,7 @@ Properties:
     Examples: "Cranberry"  
     Required Selectors: marketplace_id,language_tag
     Required Keys: language_tag
-        language_tag
+        language_tag ()
             Title: 
             Description: 
 
@@ -545,10 +545,10 @@ Properties:
     Examples: "X-Large"  
     Required Selectors: marketplace_id,language_tag
     Required Keys: language_tag,value
-        language_tag
+        language_tag ()
             Title: 
             Description: 
-        value
+        value (string)
             Title: Size
             Description: Provide the size of the item
 
@@ -558,10 +558,10 @@ Properties:
     Examples: "Bronze"  
     Required Selectors: marketplace_id,language_tag
     Required Keys: language_tag,value
-        language_tag
+        language_tag ()
             Title: 
             Description: 
-        value
+        value (string)
             Title: Metal Type
             Description: Provide the type of metal on the item.
 
@@ -571,7 +571,7 @@ Properties:
     Examples: "LE"  
     Required Selectors: marketplace_id
     Required Keys: value
-        value
+        value (string)
             Title: Part Number
             Description: Provide the part number. For many products, this will be identical to the model number however some manufacturers distinguish part number from model number
 
@@ -581,10 +581,10 @@ Properties:
     Examples: "Round"  
     Required Selectors: marketplace_id,language_tag
     Required Keys: language_tag,value
-        language_tag
+        language_tag ()
             Title: 
             Description: 
-        value
+        value (string)
             Title: Item Shape
             Description: Specify the shape of the item
 
@@ -594,10 +594,10 @@ Properties:
     Examples: "Sports"  
     Required Selectors: marketplace_id,language_tag
     Required Keys: language_tag,value
-        language_tag
+        language_tag ()
             Title: 
             Description: 
-        value
+        value (string)
             Title: Theme
             Description: Provide the primary high-level subject, concept, topic, motif, or idea of an item.
 
@@ -612,10 +612,10 @@ Properties:
     Examples: "Relaxed"  
     Required Selectors: marketplace_id,language_tag
     Required Keys: language_tag,value
-        language_tag
+        language_tag ()
             Title: 
             Description: 
-        value
+        value (string)
             Title: Fit Type
             Description: Specify the item's fit type
 
@@ -625,10 +625,10 @@ Properties:
     Examples: "Basic 5 Pocket"  
     Required Selectors: marketplace_id,language_tag
     Required Keys: language_tag,value
-        language_tag
+        language_tag ()
             Title: 
             Description: 
-        value
+        value (string)
             Title: Pocket Description
             Description: Provide the pocket description
 
@@ -637,10 +637,10 @@ Properties:
     Constraints: Min: 1, Max: 2 items
     Required Selectors: marketplace_id,language_tag
     Required Keys: language_tag,value
-        language_tag
+        language_tag ()
             Title: 
             Description: 
-        value
+        value (string)
             Title: Care Instructions
             Description: Provide instructions related to how to care for the item
 
@@ -650,10 +650,10 @@ Properties:
     Examples: "Teacher's Edition, Unabridged Version"  
     Required Selectors: marketplace_id,language_tag
     Required Keys: language_tag,value
-        language_tag
+        language_tag ()
             Title: 
             Description: 
-        value
+        value (string)
             Title: Edition
             Description: Provide the version or edition of the item
 
@@ -663,10 +663,10 @@ Properties:
     Examples: "AWD Configuration"  
     Required Selectors: marketplace_id,language_tag
     Required Keys: language_tag,value
-        language_tag
+        language_tag ()
             Title: 
             Description: 
-        value
+        value (string)
             Title: Configuration
             Description: Indicate the configuration of the item
 
@@ -676,10 +676,10 @@ Properties:
     Examples: "6 x 5 Millimeters, 8 1/2 x 11 Inches"  
     Required Selectors: marketplace_id,language_tag
     Required Keys: language_tag,value
-        language_tag
+        language_tag ()
             Title: 
             Description: 
-        value
+        value (string)
             Title: Paper Size
             Description: Specify the size of the paper as a numeric value
 
@@ -689,10 +689,10 @@ Properties:
     Examples: "Android, Mac, PC"  
     Required Selectors: marketplace_id,language_tag
     Required Keys: language_tag,value
-        language_tag
+        language_tag ()
             Title: 
             Description: 
-        value
+        value (string)
             Title: Platform for Display
             Description: Provide the platform associated with the product.
 
@@ -703,7 +703,7 @@ Properties:
     Options: false ("No")  true ("Yes")  
     Required Selectors: marketplace_id
     Required Keys: value
-        value
+        value (boolean)
             Title: Is Customizable?
             Description: Specify if this product is customizable.
             Enums:
@@ -726,10 +726,10 @@ Properties:
     Examples: "Double Rich Chocolate, Cherry, Chocolate, Vanilla"  
     Required Selectors: marketplace_id,language_tag
     Required Keys: language_tag,value
-        language_tag
+        language_tag ()
             Title: 
             Description: 
-        value
+        value (string)
             Title: Flavor
             Description: Specify the flavor of the product
 
@@ -739,10 +739,10 @@ Properties:
     Examples: "Box Bed, Bunk, Camp Bed, Loveseat"  
     Required Selectors: marketplace_id,language_tag
     Required Keys: language_tag,value
-        language_tag
+        language_tag ()
             Title: 
             Description: 
-        value
+        value (string)
             Title: Form Factor
             Description: Specify the outward design characteristics of the item
 
@@ -752,10 +752,10 @@ Properties:
     Examples: "example text goes here"  
     Required Selectors: marketplace_id,language_tag
     Required Keys: language_tag,value
-        language_tag
+        language_tag ()
             Title: 
             Description: 
-        value
+        value (string)
             Title: Access Method
             Description: Provide the access method
 
@@ -765,10 +765,10 @@ Properties:
     Examples: "Nubuck, Patent Leather, Suede, Smooth Leather"  
     Required Selectors: marketplace_id,language_tag
     Required Keys: language_tag,value
-        language_tag
+        language_tag ()
             Title: 
             Description: 
-        value
+        value (string)
             Title: Leather Type
             Description: Provide leather type of the product
 
@@ -778,10 +778,10 @@ Properties:
     Examples: "Floral, Geometric, Polka Dot"  
     Required Selectors: marketplace_id,language_tag
     Required Keys: language_tag,value
-        language_tag
+        language_tag ()
             Title: 
             Description: 
-        value
+        value (string)
             Title: Pattern
             Description: Provide the most prominent repeated decorative design of the item
 
@@ -791,7 +791,7 @@ Properties:
     Examples: "72.0 Ounces"  
     Required Selectors: marketplace_id
     Required Keys: value
-        value
+        value (number)
             Title: Unit Count
             Description: For products that are consumed by volume, weight, linear dimension, etc., provide the net quantity that would be shipped to a customer who orders one ASIN (e.g. 12 pack of 6 floz. bottles of water = 72, vs. a single 2 liter bottle = 2). For products consumed as individual units, provide the total number of units (pack of 12 pens = 12). For packed assortments of non-identical items, enter 1
 
@@ -800,7 +800,7 @@ Properties:
     Constraints: Min: 1, Max: 1 items
     Required Selectors: marketplace_id
     Required Keys: value
-        value
+        value (string)
             Title: Product Site Launch Date
             Description: Provide the date the product launches and should first be shown on the Amazon website (YYYY-MM-DD format). PSLD does not impact buyability or pre-order logic, it is used to indicate when a product will be visible and searchable on the Amazon website
 
@@ -810,10 +810,10 @@ Properties:
     Examples: "Camera Body, Battery Pack"  
     Required Selectors: marketplace_id,language_tag
     Required Keys: language_tag,value
-        language_tag
+        language_tag ()
             Title: 
             Description: 
-        value
+        value (string)
             Title: Included Components
             Description: Specify the items that are included with this product
 
@@ -823,10 +823,10 @@ Properties:
     Examples: "NBA"  
     Required Selectors: marketplace_id,language_tag
     Required Keys: language_tag,value
-        language_tag
+        language_tag ()
             Title: 
             Description: 
-        value
+        value (string)
             Title: League Name
             Description: Provide the league name associated with this product
 
@@ -836,10 +836,10 @@ Properties:
     Examples: "Seattle Seahawks, Wisconsin Badgers"  
     Required Selectors: marketplace_id,language_tag
     Required Keys: language_tag,value
-        language_tag
+        language_tag ()
             Title: 
             Description: 
-        value
+        value (string)
             Title: Team Name
             Description: Please enter the team name of this product
 
@@ -850,7 +850,7 @@ Properties:
     Options: false ("No")  true ("Yes")  
     Required Selectors: marketplace_id
     Required Keys: value
-        value
+        value (boolean)
             Title: Is Autographed
             Description: Provide if the product has been autographed by a celebrity or player.
             Enums:
@@ -868,10 +868,10 @@ Properties:
     Examples: "Buckle"  
     Required Selectors: marketplace_id,language_tag
     Required Keys: language_tag,value
-        language_tag
+        language_tag ()
             Title: 
             Description: 
-        value
+        value (string)
             Title: Embellishment Feature
             Description: Description of something extra attached to the item for decorative purposes.
 
@@ -886,10 +886,10 @@ Properties:
     Examples: "24-60\" long"  
     Required Selectors: marketplace_id,language_tag
     Required Keys: language_tag,value
-        language_tag
+        language_tag ()
             Title: 
             Description: 
-        value
+        value (string)
             Title: Length Range
             Description: Length range for blinds
 
@@ -899,10 +899,10 @@ Properties:
     Examples: "24-60\" wide"  
     Required Selectors: marketplace_id,language_tag
     Required Keys: language_tag,value
-        language_tag
+        language_tag ()
             Title: 
             Description: 
-        value
+        value (string)
             Title: Width Range
             Description: Width range for blinds
 
@@ -912,7 +912,7 @@ Properties:
     Examples: "3, 4, 5"  
     Required Selectors: marketplace_id
     Required Keys: value
-        value
+        value (integer)
             Title: Number of Compartments
             Description: Provide the number of compartments that the item has
 
@@ -922,7 +922,7 @@ Properties:
     Examples: "12"  
     Required Selectors: marketplace_id
     Required Keys: value
-        value
+        value (integer)
             Title: Number of Pockets
             Description: Provide the total count of pockets on the product.
 
@@ -932,7 +932,7 @@ Properties:
     Examples: "6"  
     Required Selectors: marketplace_id
     Required Keys: value
-        value
+        value (integer)
             Title: Number of Sections
             Description: Enter the number of sections
 
@@ -947,40 +947,40 @@ Properties:
     Examples: "40 Inches"  
     Required Selectors: marketplace_id
     Required Keys: depth,height,width
-        depth
+        depth (object)
             Title: Item Depth Front to Back
             Description: Provide the depth of the item from front to back when kept horizontal & closed.
             Required Keys: unit,value
-                unit
+                unit (string)
                     Title: Item Depth Unit
                     Description: Select the unit of measure for the item depth.
                     Enums:
                         inches (Inches)
-                value
+                value (number)
                     Title: Item Depth Front to Back
                     Description: Provide the depth of the item from front to back when kept horizontal & closed.
-        height
+        height (object)
             Title: Height Top to Bottom
             Description: Provide the height of the item from top to bottom when kept horizontal & closed.
             Required Keys: unit,value
-                unit
+                unit (string)
                     Title: Item Height Unit
                     Description: Select the unit of measure for the item height.
                     Enums:
                         inches (Inches)
-                value
+                value (number)
                     Title: Height Top to Bottom
                     Description: Provide the height of the item from top to bottom when kept horizontal & closed.
-        width
+        width (object)
             Title: Item Width Side to Side
             Description: Provide the width from side to side of the front of the item when kept horizontal and closed.
             Required Keys: unit,value
-                unit
+                unit (string)
                     Title: Item Width Unit
                     Description: Select the unit of measure for the item width.
                     Enums:
                         inches (Inches)
-                value
+                value (number)
                     Title: Item Width Side to Side
                     Description: Provide the width from side to side of the front of the item when kept horizontal and closed.
 
@@ -991,7 +991,7 @@ Properties:
     Options: "business_card" ("Business Card")  "checkbook" ("Checkbook")  "coin" ("Coin")  "credit_card" ("Credit Card")  "id_card" ("ID Card")  "key" ("Key")  "paper_money" ("Paper Money")  "passport" ("Passport")  "photo" ("Photo")  "sd_card" ("SD Card")  "vaccine_card" ("Vaccine Card")  
     Required Selectors: marketplace_id
     Required Keys: value
-        value
+        value (string)
             Title: Wallet Compartment Type
             Description: Provide the type(s) of compartments that the wallet includes. This indicates which items the wallet is capable of holding.
             Enums:
@@ -1013,7 +1013,7 @@ Properties:
     Examples: "20"  
     Required Selectors: marketplace_id
     Required Keys: value
-        value
+        value (integer)
             Title: Denier
             Description: Provide the denier of the item. Denier measures the density of the fabric of the item which impacts how transparent the item is.
 
@@ -1023,7 +1023,7 @@ Properties:
     Examples: "5"  
     Required Selectors: marketplace_id
     Required Keys: value
-        value
+        value (integer)
             Title: Wallet Card Slot Count
             Description: Provide the number of card slots the wallet contains.
 
@@ -1034,7 +1034,7 @@ Properties:
     Options: "child" ("Child")  "parent" ("Parent")  
     Required Selectors: marketplace_id
     Required Keys: value
-        value
+        value (string)
             Title: Parentage Level
             Description: Specify whether a SKU is a parent or child
             Enums:
@@ -1047,7 +1047,7 @@ Properties:
     Examples: "Accessory"  
     Required Selectors: marketplace_id
     Required Keys: child_relationship_type
-        child_relationship_type
+        child_relationship_type (string)
             Title: Child Relationship Type
             Description: The relationship that the child has to the parent
             Enums:
@@ -1057,7 +1057,7 @@ Properties:
   variation_theme (array) - Specify the variation theme that the product will use. The theme's attributes must be populated for all items in the grouping.
     Examples: "Size/Color"  
     Required Keys: name
-        name
+        name (string)
             Title: Variation Theme Name
             Description: Specify the variation theme that the product will use. The theme's attributes must be populated for all items in the grouping.
             Enums:
@@ -1170,7 +1170,7 @@ Properties:
     Options: "AF" ("Afghanistan")  "AX" ("Aland Islands")  "AL" ("Albania")  "DZ" ("Algeria")  "AS" ("American Samoa")  "AD" ("Andorra")  "AO" ("Angola")  "AI" ("Anguilla")  "AQ" ("Antarctica")  "AG" ("Antigua and Barbuda")  "AR" ("Argentina")  "AM" ("Armenia")  "AW" ("Aruba")  "AC" ("Ascension Island")  "AU" ("Australia")  "AT" ("Austria")  "AZ" ("Azerbaijan")  "BH" ("Bahrain")  "BD" ("Bangladesh")  "BB" ("Barbados")  "BY" ("Belarus")  "BE" ("Belgium")  "BZ" ("Belize")  "BJ" ("Benin")  "BM" ("Bermuda")  "BT" ("Bhutan")  "BO" ("Bolivia")  "BQ" ("Bonaire, Saint Eustatius and Saba")  "BA" ("Bosnia and Herzegovina")  "BW" ("Botswana")  "BV" ("Bouvet Island")  "BR" ("Brazil")  "IO" ("British Indian Ocean Territory")  "VG" ("British Virgin Islands")  "BN" ("Brunei Darussalam")  "BG" ("Bulgaria")  "BF" ("Burkina Faso")  "BI" ("Burundi")  "KH" ("Cambodia")  "CM" ("Cameroon")  "CA" ("Canada")  "IC" ("Canary Islands")  "CV" ("Cape Verde")  "KY" ("Cayman Islands")  "CF" ("Central African Republic")  "TD" ("Chad")  "CL" ("Chile")  "CN" ("China")  "CX" ("Christmas Island")  "CC" ("Cocos (Keeling) Islands")  "CO" ("Colombia")  "KM" ("Comoros")  "CG" ("Congo")  "CK" ("Cook Islands")  "CR" ("Costa Rica")  "HR" ("Croatia")  "CU" ("Cuba")  "CW" ("Curaçao")  "CY" ("Cyprus")  "CZ" ("Czech Republic")  "KP" ("Democratic People's Republic of Korea")  "DK" ("Denmark")  "DJ" ("Djibouti")  "DM" ("Dominica")  "DO" ("Dominican Republic")  "TP" ("East Timor")  "EC" ("Ecuador")  "EG" ("Egypt")  "SV" ("El Salvador")  "GQ" ("Equatorial Guinea")  "ER" ("Eritrea")  "EE" ("Estonia")  "ET" ("Ethiopia")  "FK" ("Falkland Islands (Malvinas)")  "FO" ("Faroe Islands")  "FM" ("Federated States of Micronesia")  "FJ" ("Fiji")  "FI" ("Finland")  "FR" ("France")  "GF" ("French Guiana")  "PF" ("French Polynesia")  "TF" ("French Southern Territories")  "GA" ("Gabon")  "GE" ("Georgia")  "DE" ("Germany")  "GH" ("Ghana")  "GI" ("Gibraltar")  "GB" ("Great Britain")  "GR" ("Greece")  "GL" ("Greenland")  "GD" ("Grenada")  "GP" ("Guadeloupe")  "GU" ("Guam")  "GT" ("Guatemala")  "GG" ("Guernsey")  "GN" ("Guinea")  "GW" ("Guinea-Bissau")  "GY" ("Guyana")  "HT" ("Haiti")  "HM" ("Heard Island and the McDonald Islands")  "VA" ("Holy See")  "HN" ("Honduras")  "HK" ("Hong Kong")  "HU" ("Hungary")  "IS" ("Iceland")  "IN" ("India")  "ID" ("Indonesia")  "IR" ("Iran")  "IE" ("Ireland")  "IQ" ("Islamic Republic of Iraq")  "IM" ("Isle of Man")  "IL" ("Israel")  "IT" ("Italy")  "CI" ("Ivory Coast")  "JM" ("Jamaica")  "JP" ("Japan")  "JE" ("Jersey")  "JO" ("Jordan")  "KZ" ("Kazakhstan")  "KE" ("Kenya")  "KI" ("Kiribati")  "KW" ("Kuwait")  "KG" ("Kyrgyzstan")  "LA" ("Lao People's Democratic Republic")  "LV" ("Latvia")  "LB" ("Lebanon")  "LS" ("Lesotho")  "LR" ("Liberia")  "LY" ("Libya")  "LI" ("Liechtenstein")  "LT" ("Lithuania")  "LU" ("Luxembourg")  "MO" ("Macao")  "MK" ("Macedonia")  "MG" ("Madagascar")  "MW" ("Malawi")  "MY" ("Malaysia")  "MV" ("Maldives")  "ML" ("Mali")  "MT" ("Malta")  "MH" ("Marshall Islands")  "MQ" ("Martinique")  "MR" ("Mauritania")  "MU" ("Mauritius")  "YT" ("Mayotte")  "MX" ("Mexico")  "MC" ("Monaco")  "MN" ("Mongolia")  "ME" ("Montenegro")  "MS" ("Montserrat")  "MA" ("Morocco")  "MZ" ("Mozambique")  "MM" ("Myanmar")  "NA" ("Namibia")  "NR" ("Nauru")  "NP" ("Nepal")  "NL" ("Netherlands")  "AN" ("Netherlands Antilles")  "NC" ("New Caledonia")  "NZ" ("New Zealand")  "NI" ("Nicaragua")  "NE" ("Niger")  "NG" ("Nigeria")  "NU" ("Niue")  "NF" ("Norfolk Island")  "MP" ("Northern Mariana Islands")  "NO" ("Norway")  "OM" ("Oman")  "PK" ("Pakistan")  "PW" ("Palau")  "PS" ("Palestinian Territories")  "PA" ("Panama")  "PG" ("Papua New Guinea")  "PY" ("Paraguay")  "PE" ("Peru")  "PH" ("Philippines")  "PN" ("Pitcairn")  "PL" ("Poland")  "PT" ("Portugal")  "PR" ("Puerto Rico")  "QA" ("Qatar")  "KR" ("Republic of Korea")  "MD" ("Republic of Moldova")  "RE" ("Reunion")  "RO" ("Romania")  "RU" ("Russian Federation")  "RW" ("Rwanda")  "BL" ("Saint Barthelemy")  "SH" ("Saint Helena, Ascension and Tristan da Cunha")  "KN" ("Saint Kitts and Nevis")  "LC" ("Saint Lucia")  "MF" ("Saint Martin")  "PM" ("Saint Pierre and Miquelon")  "VC" ("Saint Vincent and the Grenadines")  "WS" ("Samoa")  "SM" ("San Marino")  "ST" ("Sao Tome and Principe")  "SA" ("Saudi Arabia")  "SN" ("Senegal")  "RS" ("Serbia")  "CS" ("Serbia and Montenegro")  "SC" ("Seychelles")  "SL" ("Sierra Leone")  "SG" ("Singapore")  "SX" ("Sint Maarten")  "SK" ("Slovakia")  "SI" ("Slovenia")  "SB" ("Solomon Islands")  "SO" ("Somalia")  "ZA" ("South Africa")  "GS" ("South Georgia and the South Sandwich Islands")  "SS" ("South Sudan")  "ES" ("Spain")  "LK" ("Sri Lanka")  "SD" ("Sudan")  "SR" ("Suriname")  "SJ" ("Svalbard and Jan Mayen")  "SZ" ("Swaziland")  "SE" ("Sweden")  "CH" ("Switzerland")  "SY" ("Syria")  "TW" ("Taiwan")  "TJ" ("Tajikistan")  "TH" ("Thailand")  "BS" ("The Bahamas")  "CD" ("The Democratic Republic of the Congo")  "GM" ("The Gambia")  "TL" ("Timor-Leste")  "TG" ("Togo")  "TK" ("Tokelau")  "TO" ("Tonga")  "TT" ("Trinidad and Tobago")  "TA" ("Tristan da Cunha")  "TN" ("Tunisia")  "TR" ("Turkey")  "TM" ("Turkmenistan")  "TC" ("Turks and Caicos Islands")  "TV" ("Tuvalu")  "VI" ("U.S. Virgin Islands")  "UG" ("Uganda")  "UA" ("Ukraine")  "AE" ("United Arab Emirates")  "UK" ("United Kingdom")  "TZ" ("United Republic of Tanzania")  "US" ("United States")  "UM" ("United States Minor Outlying Islands")  "unknown" ("Unknown")  "UY" ("Uruguay")  "UZ" ("Uzbekistan")  "VU" ("Vanuatu")  "VE" ("Venezuela")  "VN" ("Vietnam")  "WF" ("Wallis and Futuna")  "WD" ("WD")  "EH" ("Western Sahara")  "WZ" ("WZ")  "XB" ("XB")  "XC" ("XC")  "XE" ("XE")  "XK" ("XK")  "XM" ("XM")  "XN" ("XN")  "XY" ("XY")  "YE" ("Yemen")  "YU" ("Yugoslavia")  "ZR" ("Zaire")  "ZM" ("Zambia")  "ZW" ("Zimbabwe")  
     Required Selectors: marketplace_id
     Required Keys: value
-        value
+        value (string)
             Title: Country of Origin
             Description: Select the product's country of origin
             Enums:
@@ -1449,7 +1449,7 @@ Properties:
     Options: false ("No")  true ("Yes")  
     Required Selectors: marketplace_id
     Required Keys: value
-        value
+        value (boolean)
             Title: Are batteries required?
             Description: Select "yes" if batteries are required to power the item (or if the item is a battery) or "no" if they are not. Please note that an internal rechargeable battery is also considered a battery
             Enums:
@@ -1462,7 +1462,7 @@ Properties:
     Options: false ("No")  true ("Yes")  
     Required Selectors: marketplace_id
     Required Keys: value
-        value
+        value (boolean)
             Title: Are batteries included?
             Description: Select "yes" if batteries are contained in the product (e.g. batteries inside a pair of Bluetooth headphones) and/or included with the product (e.g. batteries packed separately with a camera), otherwise select "no"
             Enums:
@@ -1480,10 +1480,10 @@ Properties:
     Examples: "1 AA, 2 AAA"  
     Required Selectors: marketplace_id,type
     Required Keys: quantity,type
-        quantity
+        quantity (integer)
             Title: Number of Batteries
             Description: Specify the number of batteries needed to power the item.  If batteries are included with the item be sure to account for spare batteries provided
-        type
+        type (string)
             Title: Battery Type
             Description: Provide battery type needed to power the item, including spares if included. Some options may be moved under other attribute eg. IEC code
             Enums:
@@ -1517,7 +1517,7 @@ Properties:
     Examples: "7"  
     Required Selectors: marketplace_id
     Required Keys: value
-        value
+        value (integer)
             Title: Number of Lithium Metal Cells
             Description: Specify the total number of Lithium Metal cells in the product where the cell isn't contained in an encased battery (e.g. coin cells)
 
@@ -1527,7 +1527,7 @@ Properties:
     Examples: "7"  
     Required Selectors: marketplace_id
     Required Keys: value
-        value
+        value (integer)
             Title: Number of Lithium-ion Cells
             Description: Specify the total number of Lithium-ion cells in the product where the cell isn't contained in an encased battery. For example, an AA battery is considered a cell
 
@@ -1543,7 +1543,7 @@ Properties:
     Options: "ghs" ("GHS")  "not_applicable" ("Not Applicable")  "other" ("Other")  "storage" ("Storage")  "transportation" ("Transportation")  "unknown" ("Unknown")  "waste" ("Waste")  
     Required Selectors: marketplace_id
     Required Keys: value
-        value
+        value (string)
             Title: Dangerous Goods Regulations
             Description: If the product is a Dangerous Good or Hazardous Material, Substance or Waste that is regulated for transportation, storage, and/or waste select from the list of valid values
             Enums:
@@ -1566,12 +1566,12 @@ Properties:
     Examples: "UN1993"  
     Required Selectors: marketplace_id,aspect
     Required Keys: aspect,value
-        aspect
+        aspect (string)
             Title: Hazmat Aspect
             Description: Select the aspect or regulatory body used for the hazardous product information
             Enums:
                 united_nations_regulatory_id (UN Regulatory Id)
-        value
+        value (string)
             Title: Hazmat
             Description: Provide hazmat information that is relevant to the product based on the aspect selected
 
@@ -1581,10 +1581,10 @@ Properties:
     Examples: "www.safetysheetsRus.com/hazardous_substance/msds.pdf"  
     Required Selectors: marketplace_id,language_tag
     Required Keys: language_tag,value
-        language_tag
+        language_tag ()
             Title: 
             Description: 
-        value
+        value (string)
             Title: Safety Data Sheet (SDS or MSDS) URL
             Description: Provide the SDS/MSDS URL if any value other than Not Applicable or Unknown is selected in the Dangerous Goods Regulation column.
 
@@ -1594,7 +1594,7 @@ Properties:
     Examples: "30.0 Pounds, 1.5 Kilograms"  
     Required Selectors: marketplace_id
     Required Keys: unit,value
-        unit
+        unit (string)
             Title: Item Weight Unit
             Description: Provide unit for item weight
             Enums:
@@ -1604,7 +1604,7 @@ Properties:
                 ounces (Ounces)
                 pounds (Pounds)
                 tonnes (Tonnes)
-        value
+        value (number)
             Title: Item Weight
             Description: Provide the item weight numeric value (not including the packaging)
 
@@ -1624,7 +1624,7 @@ Properties:
     Examples: "Furniture; Lead"  
     Required Selectors: marketplace_id
     Required Keys: compliance_type
-        compliance_type
+        compliance_type (string)
             Title: California Proposition 65 Warning Type
             Description: Select the warning type applicable to your product, if any. You certify that the warning provided satisfies legal requirements and that you’ll remove a warning previously provided only if it is no longer legally required.
             Enums:
@@ -1646,7 +1646,7 @@ Properties:
     Examples: "EPA Establishment Number"  
     Required Selectors: marketplace_id,marking_type
     Required Keys: marking_type
-        marking_type
+        marking_type (string)
             Title: Pesticide Marking
             Description: Provide any pesticide marking on the item or packaging.
             Enums:
@@ -1658,7 +1658,7 @@ Properties:
     Constraints: Min: 1, Max: 1 items
     Required Selectors: marketplace_id
     Required Keys: registration_status
-        registration_status
+        registration_status (string)
             Title: Radio Frequency Emission & Authorization Status
             Description: Indicate whether this product is capable of emitting radio frequency energy, and if so, what type of FCC RF equipment authorization this product has.
             Enums:
@@ -1673,7 +1673,7 @@ Properties:
     Examples: "FDA 510(k) Number,\r\nF2345G234"  
     Required Selectors: marketplace_id,regulation_type
     Required Keys: regulation_type,value
-        regulation_type
+        regulation_type (string)
             Title: Compliance Regulation Type
             Description: Select applicable regulation type
             Enums:
@@ -1687,7 +1687,7 @@ Properties:
                 tuv_certificate_no (TUV Certificate Number)
                 ul_cetrification_no (UL Certificate Number)
                 wasda_pest_id (WASDA Pest Identification)
-        value
+        value (string)
             Title: Regulatory Identification
             Description: Provide the regulatory identification associated with the regulation type.
 
@@ -1697,7 +1697,7 @@ Properties:
     Examples: "rsp-email@example.com"  
     Required Selectors: marketplace_id
     Required Keys: value
-        value
+        value (string)
             Title: Responsible Person's Email or Electronic Address
             Description: Provide the email address or URL for the EU Responsible Person to comply with the General Product Safety Regulation (GPSR). If you’ve already submitted this Responsible Person’s information in the past, make sure you use the same email or URL.
 
@@ -1707,7 +1707,7 @@ Properties:
     Examples: "Installation Manual"  
     Required Selectors: marketplace_id,content_type,content_language
     Required Keys: content_language,content_type,source_location
-        content_language
+        content_language (string)
             Title: Compliance Media Language
             Description: Provide the language used for the content of the compliance media.
             Enums:
@@ -1835,7 +1835,7 @@ Properties:
                 zh_HK (zh_HK)
                 zh_SG (zh_SG)
                 zh_TW (zh_TW)
-        content_type
+        content_type (string)
             Title: Compliance Media Content Type
             Description: Please enter the content type of the compliance document.
             Enums:
@@ -1856,7 +1856,7 @@ Properties:
                 user_guide (User Guide)
                 user_manual (User Manual)
                 warranty (Warranty)
-        source_location
+        source_location (string)
             Title: Compliance Media Source Location
             Description: Provide the source location of the compliance media.
 
@@ -1867,7 +1867,7 @@ Properties:
     Options: false ("No")  true ("Yes")  
     Required Selectors: marketplace_id
     Required Keys: value
-        value
+        value (boolean)
             Title: GPSR Safety Attestation
             Description: Check “yes” if your product doesn’t have any warning and safety information, as it can be used safely and as intended without it.
             Enums:
@@ -1886,7 +1886,7 @@ Properties:
     Options: false ("No")  true ("Yes")  
     Required Selectors: marketplace_id
     Required Keys: value
-        value
+        value (boolean)
             Title: Ships Globally
             Description: Provide whether the item can be shipped globally by Amazon 
             Enums:
@@ -1900,7 +1900,7 @@ Properties:
     Options: "alligator" ("Alligator")  "buffalo" ("Buffalo")  "calf" ("Calf")  "cattle" ("Cattle")  "crocodile" ("Crocodile")  "goat" ("Goat")  "horse" ("Horse")  "lizard" ("Lizard")  "pig" ("Pig")  "shark" ("Shark")  "sheep" ("Sheep")  "snake" ("Snake")  "stingray" ("Stingray")  
     Required Selectors: marketplace_id
     Required Keys: value
-        value
+        value (string)
             Title: Compliance - Animal Leather
             Description: Provide the type of leather used in the production of the item, for compliance purposes.
             Enums:
@@ -1925,7 +1925,7 @@ Properties:
     Options: "billfold" ("Billfold")  "other" ("Other")  "wallet" ("Wallet")  "wallet_purse" ("Wallet Purse")  
     Required Selectors: marketplace_id
     Required Keys: value
-        value
+        value (string)
             Title: Compliance - Wallet Type
             Description: Provide style of wallet which best fits the item, for compliance purposes.
             Enums:
@@ -1941,7 +1941,7 @@ Properties:
     Options: "other" ("Other")  "reinforced_or_laminate_sheeting" ("Reinforced or Laminate Sheeting")  
     Required Selectors: marketplace_id
     Required Keys: value
-        value
+        value (string)
             Title: Compliance - Plastic Sheeting Type
             Description: Provide, the type of sheeting used in the manufacturing of the item, for compliance purposes.
             Enums:
@@ -1955,7 +1955,7 @@ Properties:
     Options: false ("No")  true ("Yes")  
     Required Selectors: marketplace_id
     Required Keys: value
-        value
+        value (boolean)
             Title: Compliance - Is Handmade
             Description: Provide whether or not the item has been made by hand, for compliance purposes.
             Enums:
@@ -1969,7 +1969,7 @@ Properties:
     Options: "canvas" ("Canvas")  "carbon_fiber" ("Carbon Fiber")  "cotton" ("Cotton")  "denim" ("Denim")  "leather" ("Leather")  "nylon" ("Nylon")  "other" ("Other")  "other_plastics" ("Other Plastics")  "polyester" ("Polyester")  "pvc" ("PVC")  "rubber" ("Rubber")  "silicone" ("Silicone")  "silk" ("Silk")  "suede" ("Suede")  "wool" ("Wool")  
     Required Selectors: marketplace_id
     Required Keys: value
-        value
+        value (string)
             Title: Compliance - Outer Surface Material
             Description: Provide the material composition for the outer surface of the item, for compliance purposes.
             Enums:
@@ -1995,7 +1995,7 @@ Properties:
     Examples: "Feed"  
     Required Selectors: marketplace_id
     Required Keys: media_location
-        media_location
+        media_location (string)
             Title: Main Image URL
             Description: The URL where the main offer-specific image of the product is located.
 
@@ -2005,7 +2005,7 @@ Properties:
     Examples: "Feed"  
     Required Selectors: marketplace_id
     Required Keys: media_location
-        media_location
+        media_location (string)
             Title: Other Image URL
             Description: The URL for additional images of your product. These images will be shown on the detail page when the customer clicks through to see other views associated with the product.
 
@@ -2015,7 +2015,7 @@ Properties:
     Examples: "Feed"  
     Required Selectors: marketplace_id
     Required Keys: media_location
-        media_location
+        media_location (string)
             Title: Other Image URL
             Description: The URL for additional images of your product. These images will be shown on the detail page when the customer clicks through to see other views associated with the product.
 
@@ -2025,7 +2025,7 @@ Properties:
     Examples: "Feed"  
     Required Selectors: marketplace_id
     Required Keys: media_location
-        media_location
+        media_location (string)
             Title: Other Image URL
             Description: The URL for additional images of your product. These images will be shown on the detail page when the customer clicks through to see other views associated with the product.
 
@@ -2035,7 +2035,7 @@ Properties:
     Examples: "Feed"  
     Required Selectors: marketplace_id
     Required Keys: media_location
-        media_location
+        media_location (string)
             Title: Other Image URL
             Description: The URL for additional images of your product. These images will be shown on the detail page when the customer clicks through to see other views associated with the product.
 
@@ -2045,7 +2045,7 @@ Properties:
     Examples: "Feed"  
     Required Selectors: marketplace_id
     Required Keys: media_location
-        media_location
+        media_location (string)
             Title: Other Image URL
             Description: The URL for additional images of your product. These images will be shown on the detail page when the customer clicks through to see other views associated with the product.
 
@@ -2055,7 +2055,7 @@ Properties:
     Examples: "Feed"  
     Required Selectors: marketplace_id
     Required Keys: media_location
-        media_location
+        media_location (string)
             Title: Other Image URL
             Description: The URL for additional images of your product. These images will be shown on the detail page when the customer clicks through to see other views associated with the product.
 
@@ -2065,7 +2065,7 @@ Properties:
     Examples: "Feed"  
     Required Selectors: marketplace_id
     Required Keys: media_location
-        media_location
+        media_location (string)
             Title: Other Image URL
             Description: The URL for additional images of your product. These images will be shown on the detail page when the customer clicks through to see other views associated with the product.
 
@@ -2075,7 +2075,7 @@ Properties:
     Examples: "Feed"  
     Required Selectors: marketplace_id
     Required Keys: media_location
-        media_location
+        media_location (string)
             Title: Other Image URL
             Description: The URL for additional images of your product. These images will be shown on the detail page when the customer clicks through to see other views associated with the product.
 
@@ -2085,7 +2085,7 @@ Properties:
     Examples: "Feed"  
     Required Selectors: marketplace_id
     Required Keys: media_location
-        media_location
+        media_location (string)
             Title: Swatch Image URL
             Description: The URL where an image of a color swatch from the product is located
 
@@ -2095,11 +2095,11 @@ Properties:
     Examples: "10 x 2 x 2.7 inches"  
     Required Selectors: marketplace_id
     Required Keys: height,length,width
-        height
+        height (object)
             Title: Package Height
             Description: Provide the package height
             Required Keys: unit,value
-                unit
+                unit (string)
                     Title: Package Height Unit
                     Description: Select the unit of measure for Package Height. If a value is provided for Package Height, you must also enter the corresponding unit.
                     Enums:
@@ -2109,14 +2109,14 @@ Properties:
                         meters (Meters)
                         millimeters (Millimeters)
                         yards (Yards)
-                value
+                value (number)
                     Title: Item Package Height
                     Description: Provide the package height as a numeric value.
-        length
+        length (object)
             Title: Package Length
             Description: Provide the package length
             Required Keys: unit,value
-                unit
+                unit (string)
                     Title: Package Length Unit
                     Description: Select the unit of measure for Package Length. If a value is provided for Package Length, you must also enter the corresponding unit.
                     Enums:
@@ -2126,14 +2126,14 @@ Properties:
                         meters (Meters)
                         millimeters (Millimeters)
                         yards (Yards)
-                value
+                value (number)
                     Title: Item Package Length
                     Description: Provide the package length as a numeric value.
-        width
+        width (object)
             Title: Package Width
             Description: Provide the package width
             Required Keys: unit,value
-                unit
+                unit (string)
                     Title: Package Width Unit
                     Description: Select the unit of measure for Package Width. If a value is provided for Package Width, you must also enter the corresponding unit.
                     Enums:
@@ -2143,7 +2143,7 @@ Properties:
                         meters (Meters)
                         millimeters (Millimeters)
                         yards (Yards)
-                value
+                value (number)
                     Title: Item Package Width
                     Description: Provide the package width as a numeric value.
 
@@ -2153,7 +2153,7 @@ Properties:
     Examples: "14.89"  
     Required Selectors: marketplace_id
     Required Keys: unit,value
-        unit
+        unit (string)
             Title: Package Weight Unit
             Description: Select the unit of measure for Package Weight. If a value is provided for Package Weight, you must also enter the corresponding unit.
             Enums:
@@ -2163,7 +2163,7 @@ Properties:
                 ounces (Ounces)
                 pounds (Pounds)
                 tonnes (Tonnes)
-        value
+        value (number)
             Title: Package Weight
             Description: This attribute represents the weight of the item plus the packaging. If your item is shipped to the customer in multiple packages, enter the dimensions of the heaviest package
 
@@ -2172,7 +2172,7 @@ Properties:
     Constraints: Min: 1, Max: 1 items
     Required Selectors: marketplace_id
     Required Keys: unit,value
-        unit
+        unit (string)
             Title: Item Display Weight Unit
             Description: Select the corresponding unit
             Enums:
@@ -2182,7 +2182,7 @@ Properties:
                 ounces (Ounces)
                 pounds (Pounds)
                 tonnes (Tonnes)
-        value
+        value (number)
             Title: Item Display Weight
             Description: Provide the item weight (numeric) if the product is a solid
 

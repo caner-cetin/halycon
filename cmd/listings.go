@@ -19,8 +19,8 @@ import (
 type CreateListingsConfig struct {
 	IssueLocale           string
 	Input                 string
-	ProductType						string
-	Requirements					string
+	ProductType           string
+	Requirements          string
 	AutofillMarketplaceId bool
 	AutofillLanguageTag   bool
 }
@@ -30,12 +30,18 @@ var (
 		Use: "create",
 		Run: WrapCommandWithResources(createListings, ResourceConfig{Resources: []ResourceType{ResourceAmazon}, Services: []ServiceType{ServiceListings}}),
 	}
-	getListingCmd = &cobra.Command{
+	createListingsCfg CreateListingsConfig
+	getListingCmd     = &cobra.Command{
 		Use: "get",
 		Run: WrapCommandWithResources(getListing, ResourceConfig{Resources: []ResourceType{ResourceAmazon}, Services: []ServiceType{ServiceListings}}),
 	}
-	createListingsCfg CreateListingsConfig
-	listingsCmd       = &cobra.Command{
+	getListingCfg    listings.GetListingsItemParams
+	deleteListingCmd = &cobra.Command{
+		Use: "delete",
+		Run: WrapCommandWithResources(deleteListing, ResourceConfig{Resources: []ResourceType{ResourceAmazon}, Services: []ServiceType{ServiceListings}}),
+	}
+	deleteListingCfg listings.DeleteListingsItemParams
+	listingsCmd      = &cobra.Command{
 		Use: "listings",
 	}
 )
@@ -48,8 +54,13 @@ func getListingsCmd() *cobra.Command {
 	createListingsCmd.PersistentFlags().StringVarP(&createListingsCfg.Requirements, "requirements", "r", "", "Attributes JSON file")
 	createListingsCmd.PersistentFlags().StringVar(&createListingsCfg.IssueLocale, "issue-locale", "", "Locale for issue localization. Default: When no locale is provided, the default locale of the first marketplace is used. Localization defaults to en_US when a localized message is not available in the specified locale.")
 
+	getListingCmd.PersistentFlags().StringVarP(&getListingCfg.Sku, "sku", "s", "", "")
+
+	deleteListingCmd.PersistentFlags().StringVarP(&deleteListingCfg.Sku, "sku", "s", "", "")
+
 	listingsCmd.AddCommand(createListingsCmd)
 	listingsCmd.AddCommand(getListingCmd)
+	listingsCmd.AddCommand(deleteListingCmd)
 	return listingsCmd
 }
 
@@ -103,6 +114,10 @@ func createListings(cmd *cobra.Command, args []string) {
 			}
 		}
 	})
+	schema := attrs.Get("$schema")
+	if schema != nil {
+		attrs.Del("$schema")
+	}
 
 	var attr_interface interface{}
 	err := json.Unmarshal(attrs.MarshalTo(nil), &attr_interface)
@@ -122,7 +137,48 @@ func createListings(cmd *cobra.Command, args []string) {
 		Str("submission_id", *result.Payload.SubmissionID).
 		Str("sku", *result.Payload.Sku).
 		Send()
-	for _, issue := range result.Payload.Issues {
+	logListingIssues(result.Payload.Issues)
+}
+
+func getListing(cmd *cobra.Command, args []string) {
+	app := GetApp(cmd)
+	var params = getListingCfg
+	params.MarketplaceIds = viper.GetStringSlice(config.AMAZON_MARKETPLACE_ID.Key)
+	params.SellerID = viper.GetString(config.AMAZON_MERCHANT_TOKEN.Key)
+	params.IncludedData = []string{"summaries", "issues", "offers"}
+	result, err := app.Amazon.Client.GetListingsItem(&params)
+	if err != nil {
+		log.Fatal().Err(err).Send()
+	}
+	logListingIssues(result.Payload.Issues)
+	for _, summary := range result.Payload.Summaries {
+		log.Info().
+			Str("asin", summary.Asin).
+			Str("condition", summary.ConditionType).
+			Str("name", summary.ItemName).
+			Str("status", strings.Join(summary.Status, ",")).Send()
+	}
+}
+
+func deleteListing(cmd *cobra.Command, args []string) {
+	app := GetApp(cmd)
+	var params = deleteListingCfg
+	params.MarketplaceIds = viper.GetStringSlice(config.AMAZON_MARKETPLACE_ID.Key)
+	params.SellerID = viper.GetString(config.AMAZON_MERCHANT_TOKEN.Key)
+	result, err := app.Amazon.Client.DeleteListingsItem(&params)
+	if err != nil {
+		log.Fatal().Err(err).Send()
+	}
+	log.Info().
+		Str("status", *result.Payload.Status).
+		Str("sku", *result.Payload.Sku).
+		Str("submission_id", *result.Payload.SubmissionID).
+		Send()
+	logListingIssues(result.Payload.Issues)
+}
+
+func logListingIssues(issues []*models.Issue) {
+	for _, issue := range issues {
 		ev := log.Warn().
 			Str("message", *issue.Message).
 			Str("code", *issue.Code).
@@ -137,17 +193,4 @@ func createListings(cmd *cobra.Command, args []string) {
 		}
 		ev.Send()
 	}
-}
-
-func getListing(cmd *cobra.Command, args []string) {
-	app := GetApp(cmd)
-	var params listings.GetListingsItemParams
-	params.MarketplaceIds = viper.GetStringSlice(config.AMAZON_MARKETPLACE_ID.Key)
-	params.SellerID = viper.GetString(config.AMAZON_MERCHANT_TOKEN.Key)
-	params.Sku = "W9-EYD8-3OGI"
-	result, err := app.Amazon.Client.GetListingsItem(&params)
-	if err != nil {
-		log.Fatal().Err(err).Send()
-	}
-	fmt.Println(result.Payload.Issues)
 }

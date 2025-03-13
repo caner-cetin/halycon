@@ -23,7 +23,8 @@ utilities for Amazon SP API, mostly for my annoyances
       - [why](#why-3)
       - [how](#how-4)
     - [Create Listing](#create-listing)
-    - [how](#how-5)
+      - [how](#how-5)
+    - [Delete Listing](#delete-listing)
   - [halycon?](#halycon-1)
 
 ## usage
@@ -187,7 +188,7 @@ halycon definition get --type SOCKS -v --detailed > reference.json
 example output [can be found here](./static/example/wallet_definition.txt)
 
 ### Create Listing
-### how
+#### how
 ```bash
 halycon listings create --input attributes.json --type WALLET --requirements LISTING --fill-marketplace-id --fill-language-tag -v
 ```
@@ -289,6 +290,20 @@ whenever you want, there is no need for dry run. on error, operation will fail, 
 ...
 ```
 also the documentation is misleading. setting `MODE` to `VALIDATION_PREVIEW` while creating a listing ([as guided here](https://developer-docs.amazon.com/sp-api/docs/listings-items-api-v2021-08-01-use-case-guide#step-1-preview-errors-for-a-listings-item-put-request)) will end up with `Invalid Payload` error. soo. i cant provide you a "dry run" option even if I wanted to, so just, attempt creating listing over and over again.
+
+if success,
+```bash
+halycon listings create -i attributes.json --type WALLET --requirements LISTING --fill-marketplace-id --fill-language-tag -v
+10:47AM INF sku=W9-XXXX-XXXX status=ACCEPTED submission_id=582xxxxxxxxxxxx
+```
+then you can use the same sku for `Get Listing`
+
+### Delete Listing
+```bash
+halycon listings delete --sku W9-EYD8-3OOO -v
+11:14AM INF sku=W9-XXXX-XXXX status=ACCEPTED submission_id=XXXXXXXXX
+```
+
 
 
 ## halycon?
