@@ -1,7 +1,7 @@
 default: build
 
 name := "halycon"
-version := "0.1.0"
+version := "0.2.0"
 
 build_dir := "dist"
 build_flags := "-trimpath -ldflags='-s -w'"

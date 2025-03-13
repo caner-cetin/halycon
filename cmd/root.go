@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/caner-cetin/halycon/internal/config"
+	"github.com/fatih/color"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
@@ -16,6 +17,11 @@ var cfgFile string
 var rootCmd = &cobra.Command{
 	Use:   "halycon",
 	Short: "utility tools for amazon seller API",
+}
+
+var versionCmd = &cobra.Command{
+	Use: "version",
+	Run: displayVersion,
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -47,9 +53,12 @@ func init() {
 	rootCmd.AddCommand(getShipmentCmd())
 	rootCmd.AddCommand(getDefinitionsCmd())
 	rootCmd.AddCommand(getListingsCmd())
+	rootCmd.AddCommand(versionCmd)
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
+
 	rootCmd.PersistentFlags().CountVarP(&verbosity, "verbose", "v", "verbose output (-v: info, -vv: debug, -vvv: trace)")
+	rootCmd.PersistentFlags()
 
 }
 
@@ -97,5 +106,8 @@ func initConfig() {
 	viper.SetDefault(config.AMAZON_MARKETPLACE_ID.Key, []string{config.AMAZON_MARKETPLACE_ID.Default})
 	viper.SetDefault(config.AMAZON_FBA_SHIP_FROM_COUNTRY_CODE.Key, config.AMAZON_FBA_SHIP_FROM_COUNTRY_CODE.Default)
 	viper.SetDefault(config.AMAZON_DEFAULT_LANGUAGE_TAG.Key, config.AMAZON_DEFAULT_LANGUAGE_TAG.Default)
+}
 
+func displayVersion(cmd *cobra.Command, args []string) {
+	color.New(color.Bold).Println("Halycon 0.2.0")
 }
