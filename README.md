@@ -214,7 +214,7 @@ then, with the attributes from same `definition get` command, fill the rest of j
 i am really sorry for the attributes syntax. dont blame me, blame the ones that rejects you over an inverted binary tree but unable to design and document a single API.
 ```json
   {
-    "productType": "WALLET",
+    "productType": "SOCKS",
     "requirements": "LISTING",
     "attributes": {
      "country_of_origin": [{
@@ -222,16 +222,16 @@ i am really sorry for the attributes syntax. dont blame me, blame the ones that 
         "marketplace_id": "ATVPDKIKX0DER"
       }],
       "item_name": [{
-        "value": "San Francisco Football Faux Leather Bi-Fold Wallet, Black,1946 Design with Gift Box",
+        "value": "Aneco 6 Pairs Over Knee Thigh Socks Knee-High Warm Stocking Women Boot Sock Leg Warmer High Socks for Daily Wear, Cosplay",
         "language_tag": "en_US",
         "marketplace_id": "ATVPDKIKX0DER"
       }],
       "item_type_keyword": [{
-        "value": "Bi fold Wallet",
+        "value": "Thigh highs",
         "marketplace_id": "ATVPDKIKX0DER"
       }],
       "brand": [{
-        "value":"VM Sports Shop",
+        "value":"something something",
         "language_tag": "en_US",
         "marketplace_id": "ATVPDKIKX0DER"
       }],
