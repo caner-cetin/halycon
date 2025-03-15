@@ -2,17 +2,24 @@ package internal
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"io"
+	"net/http"
 	"os"
 	"os/exec"
 	"runtime"
+	"strconv"
 	"strings"
 	"unicode"
 
 	"github.com/rs/zerolog/log"
+	"github.com/valyala/fastjson"
 )
 
+// OpenFile opens a file at the specified path and returns a file handle.
+// It logs and exits the program with a fatal error if the file does not exist
+// or if any other error occurs while opening the file.
 func OpenFile(input string) *os.File {
 	f, err := os.Open(input)
 	if err != nil {
@@ -25,17 +32,20 @@ func OpenFile(input string) *os.File {
 	return f
 }
 
-func ReadFile(input string) []byte {
+// ReadFile reads files contents into memory, and returns the data as a byte slice.
+func ReadFile(input string) ([]byte, error) {
 	file := OpenFile(input)
 	defer file.Close()
 	contents, err := io.ReadAll(file)
 	if err != nil {
-		log.Fatal().Err(err).Send()
+		return nil, fmt.Errorf("error reading contents of %s: %w", input, err)
 	}
-	return contents
+	return contents, nil
 }
 
-func CleanUPC(input string) string {
+// RemoveAllNonDigit removes all non-digit characters from the input string and returns
+// the resulting string containing only digits.
+func RemoveAllNonDigit(input string) string {
 	var result strings.Builder
 	for _, char := range input {
 		if unicode.IsDigit(char) {
@@ -45,8 +55,12 @@ func CleanUPC(input string) string {
 	return result.String()
 }
 
+// OpenURL opens the specified URL in the system's default web browser.
+// It supports Windows, macOS (darwin), Linux, and other Unix-like operating systems.
+// For Windows Subsystem for Linux (WSL), it uses the Windows browser through cmd.exe.
+// For other Linux/Unix systems, it uses xdg-open.
+//
 // https://stackoverflow.com/questions/39320371/how-start-web-server-to-open-page-in-browser-in-golang
-// openURL opens the specified URL in the default browser of the user.
 func OpenURL(url string) error {
 	var cmd string
 	var args []string
@@ -74,7 +88,11 @@ func OpenURL(url string) error {
 		// args[0] is used for 'start' command argument, to prevent issues with URLs starting with a quote
 		args = append(args[:1], append([]string{""}, args[1:]...)...)
 	}
-	return exec.Command(cmd, args...).Start()
+	err := exec.Command(cmd, args...).Start()
+	if err != nil {
+		return fmt.Errorf("error executing %s %s: %w", cmd, strings.Join(args, ","), err)
+	}
+	return nil
 }
 
 // isWSL checks if the Go program is running inside Windows Subsystem for Linux
@@ -86,12 +104,63 @@ func isWSL() bool {
 	return strings.Contains(strings.ToLower(string(releaseData)), "microsoft")
 }
 
-func PromptFor(message string) string {
+// PromptFor displays a message to the user and returns the user's input as a string.
+// It reads the input from standard input until a newline character is encountered.
+func PromptFor(message string) (string, error) {
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Print(message)
 	text, err := reader.ReadString('\n')
 	if err != nil {
-		log.Fatal().Err(err).Send()
+		return "", fmt.Errorf("failed to read user input: %w", err)
 	}
-	return text
+	return text, nil
+}
+
+// DisplayInterface logs the contents of an interface{} after marshalling it to JSON.
+// String values are unquoted before logging while other types are logged as raw bytes.
+//
+// Example:
+//
+//	type Person struct {
+//		Name string
+//		Age  int
+//	}
+//
+//	people := []Person{
+//		{Name: "Alice", Age: 30},
+//		{Name: "Bob", Age: 25},
+//	}
+//	DisplayInterface(people)
+//	// This will log each person's details as separate log messages
+func DisplayInterface(i interface{}) {
+	attrs_bytes, err := json.Marshal(i)
+	if err != nil {
+		log.Error().Err(err).Send()
+	}
+	attrs := fastjson.MustParseBytes(attrs_bytes)
+	attrs.GetObject().Visit(func(key []byte, v *fastjson.Value) {
+		ev := log.Info()
+		for _, obj := range v.GetArray() {
+			obj.GetObject().Visit(func(key []byte, v *fastjson.Value) {
+				if v.Type() == fastjson.TypeString {
+					marshalled, err := strconv.Unquote(string(v.MarshalTo(nil)))
+					if err != nil {
+						log.Error().Err(err).Send()
+					}
+					ev.Str(string(key), marshalled)
+				} else {
+					marshalled := v.MarshalTo(nil)
+					ev.Bytes(string(key), marshalled)
+				}
+			})
+		}
+		ev.Msg(string(key))
+	})
+}
+
+// CloseResponseBody safely closes the response body and logs any errors that occur during closing.
+func CloseResponseBody(resp *http.Response) {
+	if cerr := resp.Body.Close(); cerr != nil {
+		log.Error().Err(fmt.Errorf("error closing response body: %w", cerr)).Send()
+	}
 }

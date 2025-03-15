@@ -19,86 +19,123 @@ import (
 )
 
 const (
-	CatalogServiceName                = "services.catalog"
-	ListingsServiceName               = "services.listings"
-	FBAInboundServiceName             = "services.fba.inbound"
-	FBAInventoryServiceName           = "services.fba.inventory"
+	// CatalogServiceName represents the Amazon Selling Partner Catalog API service
+	CatalogServiceName = "services.catalog"
+	// ListingsServiceName represents the Amazon Selling Partner Listings API service
+	ListingsServiceName = "services.listings"
+	// FBAInboundServiceName represents the Amazon Selling Partner FBA Inbound API service
+	FBAInboundServiceName = "services.fba.inbound"
+	// FBAInventoryServiceName represents the Amazon Selling Partner FBA Inventory API service
+	FBAInventoryServiceName = "services.fba.inventory"
+	// ProductTypeDefinitionsServiceName represents the Amazon Selling Partner Product Type Definitions API service
 	ProductTypeDefinitionsServiceName = "services.listings.product_type.definitions"
 )
 
+// Client is responsible for managing the Amazon Selling Partner API services.
+// It maintains a collection of service instances, rate limiters for each service,
+// and authentication information required for API calls.
 type Client struct {
-	services     map[string]interface{}
+	// services holds instances of various SP-API service clients indexed by service name
+	services map[string]interface{}
+
+	// rateLimiters manages the rate limiting for each service to comply with SP-API usage limits
 	rateLimiters map[string]*rate.Limiter
-	authInfo     runtime.ClientAuthInfoWriter
+
+	// authInfo contains the authentication credentials and information required for API calls
+	authInfo runtime.ClientAuthInfoWriter
 }
 
+// AddService adds a service with the given name to the client's services map.
 func (a *Client) AddService(name string, service interface{}) {
 	a.services[name] = service
 }
 
+// GetService returns a service by name from the client's services map.
 func (a *Client) GetService(name string) interface{} {
 	return a.services[name]
 }
 
+// GetCatalogService returns the catalog service implementation from the client's service map.
 func (a *Client) GetCatalogService() catalog.ClientService {
 	return a.services[CatalogServiceName].(catalog.ClientService)
 }
 
+// GetListingsService returns the ListingsService implementation from the client's service map.
 func (a *Client) GetListingsService() listings.ClientService {
 	return a.services[ListingsServiceName].(listings.ClientService)
 }
 
+// GetFBAInboundService returns the FBA inbound client service from the client's service map.
 func (a *Client) GetFBAInboundService() fba_inbound.ClientService {
 	return a.services[FBAInboundServiceName].(fba_inbound.ClientService)
 }
 
+// GetFBAInventoryService returns the FBA Inventory client service from the client's service map.
 func (a *Client) GetFBAInventoryService() fba_inventory.ClientService {
 	return a.services[FBAInventoryServiceName].(fba_inventory.ClientService)
 }
 
+// GetProductTypeDefinitionsService returns the ProductTypeDefinitions service client implementation.
 func (a *Client) GetProductTypeDefinitionsService() definitions.ClientService {
 	return a.services[ProductTypeDefinitionsServiceName].(definitions.ClientService)
 }
+
+// SearchCatalogItems searches for catalog items based on the provided parameters.
 func (a *Client) SearchCatalogItems(params *catalog.SearchCatalogItemsParams) (*catalog.SearchCatalogItemsOK, error) {
 	return a.GetCatalogService().SearchCatalogItems(params, a.WithAuth(), a.WithRateLimit(SearchCatalogItemsRLKey))
 }
 
+// GetCatalogItem retrieves a catalog item using the provided parameters, with authentication and rate limiting.
 func (a *Client) GetCatalogItem(params *catalog.GetCatalogItemParams) (*catalog.GetCatalogItemOK, error) {
 	return a.GetCatalogService().GetCatalogItem(params, a.WithAuth(), a.WithRateLimit(GetCatalogItemsRLKey))
 }
 
+// GetListingsItem retrieves a specific listings item using the provided parameters.
 func (a *Client) GetListingsItem(params *listings.GetListingsItemParams) (*listings.GetListingsItemOK, error) {
 	return a.GetListingsService().GetListingsItem(params, a.WithAuth(), a.WithRateLimit(GetListingsItemRLKey))
 }
 
+// DeleteListingsItem removes a listings item from Amazon's catalog
 func (a *Client) DeleteListingsItem(params *listings.DeleteListingsItemParams) (*listings.DeleteListingsItemOK, error) {
 	return a.GetListingsService().DeleteListingsItem(params, a.WithAuth(), a.WithRateLimit(DeleteListingsItemRLKey))
 }
 
+// GetFBAInventorySummaries retrieves FBA inventory summaries
 func (a *Client) GetFBAInventorySummaries(params *fba_inventory.GetInventorySummariesParams) (*fba_inventory.GetInventorySummariesOK, error) {
 	return a.GetFBAInventoryService().GetInventorySummaries(params, a.WithAuth(), a.WithRateLimit(FBAInventorySummariesRLKey))
 }
 
+// CreateFBAInboundPlan creates an inbound plan for FBA (Fulfillment by Amazon)
 func (a *Client) CreateFBAInboundPlan(params *fba_inbound.CreateInboundPlanParams) (*fba_inbound.CreateInboundPlanAccepted, error) {
 	return a.GetFBAInboundService().CreateInboundPlan(params, a.WithAuth(), a.WithRateLimit(CreateInboundPlanRLKey))
 }
 
+// GetInboundOperationStatus retrieves the status of an inbound operation for a fulfillment by Amazon order.
 func (a *Client) GetInboundOperationStatus(params *fba_inbound.GetInboundOperationStatusParams) (*fba_inbound.GetInboundOperationStatusOK, error) {
 	return a.GetFBAInboundService().GetInboundOperationStatus(params, a.WithAuth(), a.WithRateLimit(GetInboundOperationStatusRLKey))
 }
 
+// SearchProductTypeDefinitions searches for product type definitions based on provided search parameters.
 func (a *Client) SearchProductTypeDefinitions(params *definitions.SearchDefinitionsProductTypesParams) (*definitions.SearchDefinitionsProductTypesOK, error) {
 	return a.GetProductTypeDefinitionsService().SearchDefinitionsProductTypes(params, a.WithAuth(), a.WithRateLimit(SearchProductTypeDefinitionsRLKey))
 }
 
+// GetProductTypeDefinition retrieves the product type definition.
 func (a *Client) GetProductTypeDefinition(params *definitions.GetDefinitionsProductTypeParams) (*definitions.GetDefinitionsProductTypeOK, error) {
 	return a.GetProductTypeDefinitionsService().GetDefinitionsProductType(params, a.WithAuth(), a.WithRateLimit(GetProductTypeDefinitionRLKey))
 }
 
+// CreateListing submits a new product listing under FBM program.
 func (a *Client) CreateListing(params *listings.PutListingsItemParams) (*listings.PutListingsItemOK, error) {
 	return a.GetListingsService().PutListingsItem(params, a.WithAuth(), a.WithRateLimit(CreateListingRLKey))
 }
 
+// GetCatalog retrieves catalog item information.
+func (a *Client) GetCatalog(params *catalog.GetCatalogItemParams) (*catalog.GetCatalogItemOK, error) {
+	return a.GetCatalogService().GetCatalogItem(params, a.WithAuth())
+}
+
+// rate limiter keys for client's rate limiter mapping, each one of them leads to a rate.Limiter instance.
 const (
 	SearchCatalogItemsRLKey           = "rate_limiter.catalog.searchItems"
 	GetCatalogItemsRLKey              = "rate_limiter.catalog.getItems"
@@ -112,6 +149,10 @@ const (
 	GetProductTypeDefinitionRLKey     = "rate_limiter.listings.get_product_type_definitions"
 )
 
+// SetRateLimits populates the rateLimiters map with predefined rate limits
+// Each rate limiter is configured with a specific rate (operations per second) and burst capacity.
+// The rate limiters help ensure API calls comply with Amazon's throttling requirements
+// and prevent exceeding their service quotas.
 func (a *Client) SetRateLimits() {
 	a.rateLimiters = map[string]*rate.Limiter{
 		SearchCatalogItemsRLKey:           rate.NewLimiter(rate.Limit(2), 2),
@@ -127,28 +168,35 @@ func (a *Client) SetRateLimits() {
 	}
 }
 
+// NewAuthorizedClient creates and returns a new authenticated SP-API client with the provided access token.
+// It sets up necessary authentication headers including:
+// - Bearer token authorization
+// - Amazon specific access token headers
+// - Host header
+// - Request timestamp
+// - User agent
 func NewAuthorizedClient(token string) *Client {
 	authInfo := runtime.ClientAuthInfoWriterFunc(func(r runtime.ClientRequest, _ strfmt.Registry) error {
 		// doesnt work without Authorization header
 		if err := r.SetHeaderParam("Authorization", "Bearer "+token); err != nil {
-			return err
+			return fmt.Errorf("failed to set Authorization header: %w", err)
 		}
 		// also doesnt work without x-amz-access-token header
 		if err := r.SetHeaderParam("x-amz-access-token", token); err != nil {
-			return err
+			return fmt.Errorf("failed to set x-amz-access-token header: %w", err)
 		}
 		// also doesnt work without X-Amz-Access-Token header
 		if err := r.SetHeaderParam("X-Amz-Access-Token", token); err != nil {
-			return err
+			return fmt.Errorf("failed to set X-Amz-Access-Token header: %w", err)
 		}
 		if err := r.SetHeaderParam("host", fmt.Sprintf("https://%s", viper.GetString(config.AMAZON_AUTH_ENDPOINT.Key))); err != nil {
-			return err
+			return fmt.Errorf("failed to set host header: %w", err)
 		}
 		if err := r.SetHeaderParam("x-amz-date", time.Now().UTC().Format("20060102T150405Z")); err != nil {
-			return err
+			return fmt.Errorf("failed to set x-amz-date header: %w", err)
 		}
-		if err := r.SetHeaderParam("user-agent", fmt.Sprintf("Halycon/1.0 (Language=Go; Platform=%s)", osRuntime.GOOS)); err != nil {
-			return err
+		if err := r.SetHeaderParam("user-agent", fmt.Sprintf("Halycon/0.2 (Language=Go; Platform=%s)", osRuntime.GOOS)); err != nil {
+			return fmt.Errorf("failed to set user-agent header: %w", err)
 		}
 		return nil
 	})
@@ -161,6 +209,10 @@ func NewAuthorizedClient(token string) *Client {
 	return a
 }
 
+// WithRateLimit returns a function that applies rate limiting to a client operation.
+// It takes a key string that identifies which rate limiter to use from the client's rate limiters map.
+// The returned function, when called with a runtime.ClientOperation, will replace its Client with a
+// rate-limited HTTP client that enforces the rate limits defined for the given key.
 func (a *Client) WithRateLimit(key string) func(op *runtime.ClientOperation) {
 	return func(op *runtime.ClientOperation) {
 		httpClient := NewRateLimitedClient(a.rateLimiters[key])
@@ -168,6 +220,8 @@ func (a *Client) WithRateLimit(key string) func(op *runtime.ClientOperation) {
 	}
 }
 
+// WithAuth returns a function that is used to set the authentication information for a client operation.
+// This is typically used with the client operation configuration to ensure that the request is authenticated.
 func (a *Client) WithAuth() func(op *runtime.ClientOperation) {
 	return func(op *runtime.ClientOperation) {
 		op.AuthInfo = a.authInfo

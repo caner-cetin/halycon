@@ -1,0 +1,118 @@
+linters:
+  enable:
+    - gofmt
+    - govet
+    - errcheck
+    - staticcheck
+    - gosimple
+    - ineffassign
+    - typecheck
+    - gocritic
+    - revive
+    - dupl
+    - goconst
+    - misspell
+    - prealloc
+    - unused
+    - gosec
+    - errorlint
+    - exhaustive
+    - gocheckcompilerdirectives
+    - goprintffuncname
+    - maintidx
+    - nilnil
+    - nolintlint
+    - predeclared
+    - thelper
+    - tparallel
+    - wrapcheck
+
+linters-settings:
+  gocyclo:
+    min-complexity: 15
+  dupl:
+    threshold: 100
+  goconst:
+    min-len: 3
+    min-occurrences: 3
+  revive:
+    rules:
+      - name: exported
+        arguments:
+          - "checkPrivateReceivers"
+          - "disableStutteringCheck"
+  gocognit:
+    min-complexity: 20
+  godot:
+    scope: declarations
+    capital: true
+  maintidx:
+    under: 20
+  nilnil:
+    checked-types:
+      - ptr
+      - func
+      - iface
+      - map
+      - chan
+  wrapcheck:
+    ignoreSigs:
+      - .Errorf(
+      - errors.New(
+      - errors.Unwrap(
+      - .Wrap(
+      - .Wrapf(
+    ignorePackageGlobs:
+      - github.com/caner-cetin/halycon/internal/*
+  errcheck:
+    check-type-assertions: false
+    check-blank: false
+    exclude-functions:
+      - (*os.File).Close
+      - os.Remove
+      - (*github.com/spf13/cobra.Command).MarkFlagRequired
+  gosec:
+    exclude-generated: false
+    severity: low
+    confidence: low
+    excludes:
+      - G306
+      - G104 # already have errcheck
+      - G204
+
+issues:
+  exclude-use-default: false
+  max-issues-per-linter: 0
+  max-same-issues: 0
+
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - dupl
+        - gosec
+        - funlen
+        - gocyclo
+        - gocognit
+        - goconst
+
+    - text: "G304: Potential file inclusion via variable"
+      linters:
+        - gosec
+
+    - linters:
+        - staticcheck
+      text: "SA1019:"
+
+    - linters:
+        - revive
+      text: "package-comments:"
+
+run:
+  timeout: 5m
+
+  allow-parallel-runners: true
+
+  tests: true
+
+  build-tags:
+    - integration

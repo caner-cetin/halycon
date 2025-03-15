@@ -19,7 +19,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-type LookupAsinFromUpcConfig struct {
+type lookupAsinFromUpcConfig struct {
 	// to query a single upc
 	Single bool
 	// may be a single Input string or a path to the text file
@@ -35,13 +35,13 @@ var (
 		Short: "generates ASIN list from list of UPCs or a single upc",
 		Run:   WrapCommandWithResources(lookupAsinFromUpc, ResourceConfig{Resources: []ResourceType{ResourceAmazon}, Services: []ServiceType{ServiceCatalog, ServiceFBAInventory}}),
 	}
-	lookupAsinFromUpcConfig = LookupAsinFromUpcConfig{}
+	lookupAsinFromUpcCfg = lookupAsinFromUpcConfig{}
 )
 
 func getlookupAsinFromUpcCmd() *cobra.Command {
-	lookupAsinFromUpcCmd.PersistentFlags().BoolVarP(&lookupAsinFromUpcConfig.Single, "single", "s", false, "query single UPC, if given, upc flag must be the product upc, not the file")
-	lookupAsinFromUpcCmd.PersistentFlags().StringVarP(&lookupAsinFromUpcConfig.Input, "input", "i", "", "newline delimited (one per line) text file that contains UPCs, or, a single UPC (if so, --single flag must be provided)")
-	lookupAsinFromUpcCmd.PersistentFlags().StringVarP(&lookupAsinFromUpcConfig.Output, "output", "o", "", "output for ASIN list, not required when single UPC is queried")
+	lookupAsinFromUpcCmd.PersistentFlags().BoolVarP(&lookupAsinFromUpcCfg.Single, "single", "s", false, "query single UPC, if given, upc flag must be the product upc, not the file")
+	lookupAsinFromUpcCmd.PersistentFlags().StringVarP(&lookupAsinFromUpcCfg.Input, "input", "i", "", "newline delimited (one per line) text file that contains UPCs, or, a single UPC (if so, --single flag must be provided)")
+	lookupAsinFromUpcCmd.PersistentFlags().StringVarP(&lookupAsinFromUpcCfg.Output, "output", "o", "", "output for ASIN list, not required when single UPC is queried")
 	return lookupAsinFromUpcCmd
 }
 
@@ -49,12 +49,12 @@ func lookupAsinFromUpc(cmd *cobra.Command, args []string) {
 	app := GetApp(cmd)
 
 	var queryIdentifiers []string
-	if lookupAsinFromUpcConfig.Single {
-		queryIdentifiers = append(queryIdentifiers, strings.TrimSpace(lookupAsinFromUpcConfig.Input))
+	if lookupAsinFromUpcCfg.Single {
+		queryIdentifiers = append(queryIdentifiers, strings.TrimSpace(lookupAsinFromUpcCfg.Input))
 	} else {
-		contents, err := os.ReadFile(lookupAsinFromUpcConfig.Input)
+		contents, err := os.ReadFile(lookupAsinFromUpcCfg.Input)
 		if err != nil {
-			ev := log.With().Str("path", lookupAsinFromUpcConfig.Input).Err(err).Logger()
+			ev := log.With().Str("path", lookupAsinFromUpcCfg.Input).Err(err).Logger()
 			if os.IsNotExist(err) {
 				ev.Fatal().Msg("path does not exist")
 			}
@@ -64,12 +64,13 @@ func lookupAsinFromUpc(cmd *cobra.Command, args []string) {
 		scanner.Split(bufio.ScanLines)
 		for scanner.Scan() {
 			line := scanner.Text()
-			cleaned := internal.CleanUPC(line)
+			cleaned := internal.RemoveAllNonDigit(line)
 			log.Trace().Str("original", line).Str("cleaned", cleaned).Msg("reading")
 			queryIdentifiers = append(queryIdentifiers, cleaned)
 		}
 	}
-	var results []*models.ItemSearchResults
+	batchCount := (len(queryIdentifiers) + 9) / 10
+	results := make([]*models.ItemSearchResults, 0, batchCount)
 	for identifiers := range slices.Chunk(queryIdentifiers, 10) {
 		log.Trace().Interface("identifiers", identifiers).Msg("searching next batch")
 		params := catalog.NewSearchCatalogItemsParams()
@@ -80,7 +81,8 @@ func lookupAsinFromUpc(cmd *cobra.Command, args []string) {
 		params.SetIncludedData([]string{"identifiers", "attributes", "summaries"})
 		result, err := app.Amazon.Client.SearchCatalogItems(params)
 		if err != nil {
-			log.Fatal().Err(err).Msg("error while searching catalog items")
+			log.Error().Err(err).Msg("error while searching catalog items")
+			return
 		}
 		if result.Payload == nil || len(result.Payload.Items) == 0 {
 			log.Warn().Interface("batch", identifiers).Msg("no items found for this batch of UPCs")
@@ -88,10 +90,11 @@ func lookupAsinFromUpc(cmd *cobra.Command, args []string) {
 		}
 		results = append(results, result.Payload)
 	}
-	if lookupAsinFromUpcConfig.Single {
+	if lookupAsinFromUpcCfg.Single {
 		item := results[0].Items[0]
 		if err := item.Asin.Validate(strfmt.Default); err != nil {
-			log.Fatal().Err(err).Msg("cannot validate the ASIN string")
+			log.Error().Err(err).Msg("cannot validate the ASIN string")
+			return
 		}
 		ev := log.Info()
 		for _, mplace := range item.Identifiers {
@@ -105,7 +108,8 @@ func lookupAsinFromUpc(cmd *cobra.Command, args []string) {
 	} else {
 		output_tmp, err := os.CreateTemp(os.TempDir(), "halycon-upc-to-asin-output-*.txt")
 		if err != nil {
-			log.Fatal().Err(err).Msg("error while creating temporary output file")
+			log.Error().Err(err).Msg("error while creating temporary output file")
+			return
 		}
 		defer output_tmp.Close()
 		defer os.Remove(output_tmp.Name())
@@ -139,25 +143,35 @@ func lookupAsinFromUpc(cmd *cobra.Command, args []string) {
 		for _, upc := range queryIdentifiers {
 			if asin, found := upcToAsin[upc]; found {
 				log.Trace().Str("upc", upc).Str("asin", asin).Msg("writing matched pair")
-				writer.WriteString(asin + "\n")
+				_, err := writer.WriteString(asin + "\n")
+				if err != nil {
+					log.Err(err).Str("asin", asin).Str("file_path", output_tmp.Name()).Msg("error writing asin")
+					return
+				}
 			} else {
 				log.Warn().Str("upc", upc).Msg("no ASIN found for UPC")
 			}
 		}
-		writer.Flush()
+		err = writer.Flush()
+		if err != nil {
+			log.Error().Err(err).Send()
+		}
 
 		_, err = output_tmp.Seek(0, io.SeekStart)
 		if err != nil {
-			log.Fatal().Err(err).Send()
+			log.Error().Err(err).Send()
+			return
 		}
-		output, err := os.Create(lookupAsinFromUpcConfig.Output)
+		output, err := os.Create(lookupAsinFromUpcCfg.Output)
 		if err != nil {
-			log.Fatal().Err(err).Msg("error while creating output file")
+			log.Error().Err(err).Msg("error while creating output file")
+			return
 		}
 		defer output.Close()
 		_, err = io.Copy(output, output_tmp)
 		if err != nil {
-			log.Fatal().Err(err).Send()
+			log.Error().Err(err).Send()
+			return
 		}
 	}
 }

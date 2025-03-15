@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/aws/smithy-go/ptr"
+	"github.com/caner-cetin/halycon/internal"
 	"github.com/caner-cetin/halycon/internal/amazon/product_type_definitions/client/definitions"
 	"github.com/caner-cetin/halycon/internal/amazon/product_type_definitions/models"
 	"github.com/caner-cetin/halycon/internal/config"
@@ -66,15 +67,18 @@ func searchProductTypeDefinition(cmd *cobra.Command, args []string) {
 	var keywords_set = len(searchProductTypeDefinitionCfg.Keywords) != 0
 	var item_name_set = *searchProductTypeDefinitionCfg.ItemName != ""
 	if keywords_set && item_name_set {
-		log.Fatal().Msg("keywords and item name cannot be used together")
+		log.Error().Msg("keywords and item name cannot be used together")
+		return
 	}
 	if !keywords_set && !item_name_set {
-		log.Fatal().Msg("keywords or item name must be set")
+		log.Error().Msg("keywords or item name must be set")
+		return
 	}
 	searchProductTypeDefinitionCfg.MarketplaceIds = viper.GetStringSlice(config.AMAZON_MARKETPLACE_ID.Key)
 	result, err := app.Amazon.Client.SearchProductTypeDefinitions(&searchProductTypeDefinitionCfg)
 	if err != nil {
-		log.Fatal().Err(err).Send()
+		log.Error().Err(err).Send()
+		return
 	}
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
@@ -91,14 +95,23 @@ func getProductTypeDefinition(cmd *cobra.Command, args []string) {
 
 	result, err := app.Amazon.Client.GetProductTypeDefinition(&getProductTypeDefinitionCfg)
 	if err != nil {
-		log.Fatal().Err(err).Send()
+		log.Error().Err(err).Send()
+		return
 	}
 
 	detailedMode := getProductTypeDefinitionDetailed
 	displayProductSummary(result.Payload)
 	if getProductTypeDefinitionDetailed {
-		schema := fetchAndParseSchema(*result.Payload.Schema.Link.Resource)
-		requiredProps := getRequiredProperties(schema)
+		schema, err := fetchAndParseSchema(*result.Payload.Schema.Link.Resource)
+		if err != nil {
+			log.Error().Err(err).Send()
+			return
+		}
+		requiredProps, err := getRequiredProperties(schema)
+		if err != nil {
+			log.Error().Err(err).Msg("error while looking for required properties")
+			return
+		}
 		displayProperties(schema, requiredProps, detailedMode)
 	}
 }
@@ -117,28 +130,30 @@ func displayProductSummary(payload *models.ProductTypeDefinition) {
 	)
 }
 
-func fetchAndParseSchema(schemaURL string) *fastjson.Value {
+func fetchAndParseSchema(schemaURL string) (*fastjson.Value, error) {
 	resp, err := http.DefaultClient.Get(schemaURL)
 	if err != nil {
-		log.Fatal().Str("url", schemaURL).Err(err).Msg("error while querying schema")
+		return nil, fmt.Errorf("failed to fetch schema from %s: %w", schemaURL, err)
 	}
+	defer internal.CloseResponseBody(resp)
 	schema_bytes, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatal().Str("url", schemaURL).Err(err).Msg("error while reading schema")
+		log.Error().Str("url", schemaURL).Err(err).Msg("error while reading schema")
+		return nil, fmt.Errorf("failed to read schema body: %w", err)
 	}
-	return fastjson.MustParseBytes(schema_bytes)
+	return fastjson.MustParseBytes(schema_bytes), nil
 }
 
-func getRequiredProperties(schema *fastjson.Value) map[string]bool {
+func getRequiredProperties(schema *fastjson.Value) (map[string]bool, error) {
 	requiredProps := make(map[string]bool)
 	for _, prop := range schema.GetArray("required") {
 		prop_name, err := strconv.Unquote(string(prop.MarshalTo(nil)))
 		if err != nil {
-			log.Fatal().Err(err).Send()
+			return nil, fmt.Errorf("failed to unquote property name: %w", err)
 		}
 		requiredProps[prop_name] = true
 	}
-	return requiredProps
+	return requiredProps, nil
 }
 
 func displayProperties(schema *fastjson.Value, requiredProps map[string]bool, detailedMode bool) {
@@ -336,7 +351,6 @@ func displayNestedKeyDetails(prop *fastjson.Value, parent_key, key, indent strin
 	obj_detail := prop.GetObject("items", "properties", parent_key, "properties", key)
 
 	fmt.Printf("%s%s (%s)\n", strings.Repeat(indent, 4), key, string(obj_detail.Get("type").GetStringBytes()))
-
 
 	fmt.Printf("%sTitle: %s\n", strings.Repeat(indent, 5), string(obj_detail.Get("title").GetStringBytes()))
 	fmt.Printf("%sDescription: %s\n", strings.Repeat(indent, 5), string(obj_detail.Get("description").GetStringBytes()))

@@ -53,9 +53,10 @@ func init() {
 	rootCmd.AddCommand(getShipmentCmd())
 	rootCmd.AddCommand(getDefinitionsCmd())
 	rootCmd.AddCommand(getListingsCmd())
+	rootCmd.AddCommand(getCatalogCmd())
 	rootCmd.AddCommand(versionCmd)
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
+	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
 	rootCmd.PersistentFlags().CountVarP(&verbosity, "verbose", "v", "verbose output (-v: info, -vv: debug, -vvv: trace)")
 	rootCmd.PersistentFlags()
@@ -98,7 +99,8 @@ func initConfig() {
 	}
 
 	if !viper.IsSet(config.AMAZON_MERCHANT_TOKEN.Key) {
-		log.Fatal().Msg("merchant token is not set! https://sellercentral.amazon.com/sw/AccountInfo/MerchantToken")
+		log.Error().Msg("merchant token is not set! https://sellercentral.amazon.com/sw/AccountInfo/MerchantToken")
+		return
 	}
 
 	viper.SetDefault(config.AMAZON_AUTH_ENDPOINT.Key, config.AMAZON_AUTH_ENDPOINT.Default)
@@ -109,5 +111,9 @@ func initConfig() {
 }
 
 func displayVersion(cmd *cobra.Command, args []string) {
-	color.New(color.Bold).Println("Halycon 0.2.0")
+	_, err := color.New(color.Bold).Println("Halycon 0.2.0")
+	if err != nil {
+		// how the fuck does this even throw error
+		log.Error().Err(err).Send()
+	}
 }

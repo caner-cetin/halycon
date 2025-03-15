@@ -20,7 +20,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-type CreateShipmentPlanConfig struct {
+type createShipmentPlanConfig struct {
 	Input string
 }
 
@@ -29,7 +29,7 @@ var (
 		Use: "create",
 		Run: WrapCommandWithResources(createShipmentPlan, ResourceConfig{Resources: []ResourceType{ResourceAmazon}, Services: []ServiceType{ServiceFBAInbound}}),
 	}
-	createShipmentPlanCfg = CreateShipmentPlanConfig{}
+	createShipmentPlanCfg = createShipmentPlanConfig{}
 	shipmentCmd           = &cobra.Command{
 		Use: "shipment",
 	}
@@ -65,21 +65,26 @@ func createShipmentPlan(cmd *cobra.Command, args []string) {
 	params.Body = new(models.CreateInboundPlanRequest)
 	params.Body.DestinationMarketplaces = viper.GetStringSlice(config.AMAZON_MARKETPLACE_ID.Key)
 
-	ev := log.Fatal()
+	ev := log.Error()
+	var msg string = ""
 	if !viper.IsSet(config.AMAZON_FBA_SHIP_FROM_ADDRESS_LINE_1.Key) {
-		ev.Msg("shipment address line 1 must be set")
+		msg = "shipment address line 1 must be set"
 	}
 	if !viper.IsSet(config.AMAZON_FBA_SHIP_FROM_CITY.Key) {
-		ev.Msg("shipment city must be set")
+		msg = "shipment city must be set"
 	}
 	if !viper.IsSet(config.AMAZON_FBA_SHIP_FROM_NAME.Key) {
-		ev.Msg("contact name must be set")
+		msg = "contact name must be set"
 	}
 	if !viper.IsSet(config.AMAZON_FBA_SHIP_FROM_PHONE_NUMBER.Key) {
-		ev.Msg("phone number must be set")
+		msg = "phone number must be set"
 	}
 	if !viper.IsSet(config.AMAZON_FBA_SHIP_FROM_POSTAL_CODE.Key) {
-		ev.Msg("postal code must be set")
+		msg = "postal code must be set"
+	}
+	if msg != "" {
+		ev.Msg(msg)
+		return
 	}
 	ev.Discard()
 	params.Body.SourceAddress = &models.AddressInput{
@@ -104,11 +109,15 @@ func createShipmentPlan(cmd *cobra.Command, args []string) {
 	}
 
 	input := internal.OpenFile(createShipmentPlanCfg.Input)
-	reader := csv.NewReader(input)
 	defer input.Close()
+	reader := csv.NewReader(input)
 	products, err := reader.ReadAll()
 	if err != nil {
-		log.Fatal().Err(err).Str("file", input.Name()).Msg("error reading csv")
+		log.Error().
+			Err(err).
+			Str("file", createShipmentPlanCfg.Input).
+			Msg("error reading csv")
+		return
 	}
 
 	// todo: config key
@@ -117,12 +126,13 @@ func createShipmentPlan(cmd *cobra.Command, args []string) {
 
 	prepRequirements := loadPrepRequirements()
 
-	var items []*models.ItemInput
+	items := make([]*models.ItemInput, 0, len(products)-1)
 	for _, product := range products[1:] {
 		sku := product[1]
 		quantity, err := strconv.Atoi(product[3])
 		if err != nil {
-			log.Fatal().Err(err).Str("quantity", product[3]).Msg("error while converting quantity to integer")
+			log.Error().Err(err).Str("quantity", product[3]).Msg("error while converting quantity to integer")
+			return
 		}
 		quantity_64 := int64(quantity)
 
@@ -187,30 +197,44 @@ func createShipmentPlan(cmd *cobra.Command, args []string) {
 
 			result, err = app.Amazon.Client.CreateFBAInboundPlan(params)
 			if err != nil {
-				log.Fatal().Err(err).Msg("error occurred while creating inbound shipment plan after prep update")
+				log.Error().Err(err).Msg("error occurred while creating inbound shipment plan after prep update")
+				return
 			}
 		} else {
-			log.Fatal().Err(err).Msg("error occurred while creating inbound shipment plan")
+			log.Error().Err(err).Msg("error occurred while creating inbound shipment plan")
+			return
 		}
 	}
 
 	log.Info().Str("inbound_plan_id", *result.Payload.InboundPlanID).Str("operation_id", *result.Payload.OperationID).Msg("success!")
-	shouldOpenPlan := internal.PromptFor("Open plan with default browser? [y/N]")
+	shouldOpenPlan, err := internal.PromptFor("Open plan with default browser? [y/N]")
+	if err != nil {
+		log.Error().Err(err).Send()
+		return
+	}
 	if strings.TrimSpace(strings.ToLower(strings.ToLower(shouldOpenPlan))) == "y" {
 		// todo: change .com, I dont know how other marketplaces works.
 		url := fmt.Sprintf("https://sellercentral.amazon.com/fba/sendtoamazon/confirm_content_step?wf=%s", *result.Payload.InboundPlanID)
 		err = internal.OpenURL(url)
 		if err != nil {
-			log.Fatal().Str("url", url).Err(err).Send()
+			log.Error().Str("url", url).Err(err).Send()
+			return
 		}
 	}
 }
 
+// ItemRequirements defines the ownership requirements for item preparation and labeling.
+// It specifies which entities are responsible for preparing and labeling items in a shipment.
 type ItemRequirements struct {
-	PrepOwner  models.PrepOwner  `json:"prep_owner"`
+	// PrepOwner indicates the entity responsible for preparing the item for shipment.
+	PrepOwner models.PrepOwner `json:"prep_owner"`
+
+	// LabelOwner indicates the entity responsible for labeling the item for shipment.
 	LabelOwner models.LabelOwner `json:"label_owner"`
 }
 
+// PrepRequirements is a mapping from preparation ID to the items required for that preparation.
+// It defines the requirements needed for different preparation processes in a shipment.
 type PrepRequirements map[string]ItemRequirements
 
 func extractPrepOwnerErrors(err error) map[string]string {
@@ -281,7 +305,8 @@ func getOperationStatusCmd(cmd *cobra.Command, args []string) {
 	params.OperationID = operationId
 	status, err := app.Amazon.Client.GetInboundOperationStatus(params)
 	if err != nil {
-		log.Fatal().Err(err).Send()
+		log.Error().Err(err).Send()
+		return
 	}
 	logger := log.With().
 		Str("id", *status.Payload.OperationID).

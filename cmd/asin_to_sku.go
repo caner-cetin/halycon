@@ -19,7 +19,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-type LookupSkuFromAsinConfig struct {
+type lookupSkuFromAsinConfig struct {
 	ForceRebuildCache bool
 	Single            bool
 	// may be a single Input string or a path to the text file
@@ -28,6 +28,8 @@ type LookupSkuFromAsinConfig struct {
 	Output string
 }
 
+// FBAProduct represents a product in the Fulfillment by Amazon (FBA) system.
+// It contains the product's unique stock keeping unit (SKU) and name.
 type FBAProduct struct {
 	SKU         string
 	ProductName string
@@ -38,7 +40,7 @@ var (
 		Use: "asin-to-sku",
 		Run: WrapCommandWithResources(lookupSkuFromAsin, ResourceConfig{Resources: []ResourceType{ResourceAmazon}, Services: []ServiceType{ServiceFBAInventory}}),
 	}
-	lookupSkuFromAsinCfg = LookupSkuFromAsinConfig{}
+	lookupSkuFromAsinCfg = lookupSkuFromAsinConfig{}
 )
 
 func getLookupSkuFromAsinCmd() *cobra.Command {
@@ -53,21 +55,25 @@ func lookupSkuFromAsin(cmd *cobra.Command, args []string) {
 	app := GetApp(cmd)
 	productMap, err := getAsinToMskuMap(app.Amazon.Client)
 	if err != nil {
-		log.Fatal().Err(err).Send()
+		log.Error().Err(err).Send()
+		return
 	}
 	if lookupSkuFromAsinCfg.Single {
 		product, ok := productMap[lookupSkuFromAsinCfg.Input]
 		if !ok {
-			log.Fatal().Str("asin", lookupSkuFromAsinCfg.Input).Msg("product not found")
+			log.Error().Str("asin", lookupSkuFromAsinCfg.Input).Msg("product not found")
+			return
 		}
 		log.Info().Str("name", product.ProductName).Str("sku", product.SKU).Msg("found")
 	} else {
 		var input []byte
 		if input, err = os.ReadFile(lookupSkuFromAsinCfg.Input); err != nil {
 			if os.IsNotExist(err) {
-				log.Fatal().Err(err).Msgf("path %s does not exist", lookupAsinFromUpcConfig.Input)
+				log.Error().Err(err).Msgf("path %s does not exist", lookupAsinFromUpcCfg.Input)
+				return
 			}
-			log.Fatal().Err(err).Msg("unknown error while reading contents of text file")
+			log.Error().Err(err).Msg("unknown error while reading contents of text file")
+			return
 		}
 		scanner := bufio.NewScanner(bytes.NewReader(input))
 		scanner.Split(bufio.ScanLines)
@@ -78,33 +84,51 @@ func lookupSkuFromAsin(cmd *cobra.Command, args []string) {
 
 		output_tmp, err := os.CreateTemp(os.TempDir(), "halycon-asin-to-sku-output-*.csv")
 		if err != nil {
-			log.Fatal().Err(err).Msg("error while creating temporary output file")
+			log.Error().Err(err).Msg("error while creating temporary output file")
 		}
 		defer output_tmp.Close()
 		defer os.Remove(output_tmp.Name())
 
 		writer := csv.NewWriter(output_tmp)
-		writer.Write([]string{"ASIN", "SKU", "Product Name", "Quantity"})
+		err = writer.Write([]string{"ASIN", "SKU", "Product Name", "Quantity"})
+		if err != nil {
+			log.Error().
+				Err(err).
+				Msg("error while writing column names")
+			return
+		}
 		for _, asin := range asins {
 			product, ok := productMap[asin]
 			if !ok {
 				log.Warn().Str("asin", asin).Msg("cannot find a product")
 			}
-			writer.Write([]string{asin, product.SKU, product.ProductName, ""})
+			err = writer.Write([]string{asin, product.SKU, product.ProductName, ""})
+			if err != nil {
+				log.Error().
+					Err(err).
+					Str("asin", asin).
+					Str("sku", product.SKU).
+					Str("name", product.ProductName).
+					Msg("error while writing row")
+				return
+			}
 		}
 		writer.Flush()
 
 		output, err := os.Create(lookupSkuFromAsinCfg.Output)
 		if err != nil {
-			log.Fatal().Err(err).Msg("error while creating the output file")
+			log.Error().Err(err).Msg("error while creating the output file")
+			return
 		}
 		_, err = output_tmp.Seek(0, io.SeekStart)
 		if err != nil {
-			log.Fatal().Err(err).Send()
+			log.Error().Err(err).Send()
+			return
 		}
 		_, err = io.Copy(output, output_tmp)
 		if err != nil {
-			log.Fatal().Err(err).Send()
+			log.Error().Err(err).Send()
+			return
 		}
 		log.Info().Str("file", lookupSkuFromAsinCfg.Output).Msg("saved csv")
 	}

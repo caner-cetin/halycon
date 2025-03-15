@@ -17,7 +17,7 @@ import (
 	"github.com/valyala/fastjson"
 )
 
-type CreateListingsConfig struct {
+type createListingsConfig struct {
 	IssueLocale           string
 	Input                 string
 	ProductType           string
@@ -26,7 +26,7 @@ type CreateListingsConfig struct {
 	AutofillLanguageTag   bool
 }
 
-type GetListingConfig struct {
+type getListingConfig struct {
 	DisplayAttritubes bool
 }
 
@@ -35,12 +35,12 @@ var (
 		Use: "create",
 		Run: WrapCommandWithResources(createListings, ResourceConfig{Resources: []ResourceType{ResourceAmazon}, Services: []ServiceType{ServiceListings}}),
 	}
-	createListingsCfg CreateListingsConfig
+	createListingsCfg createListingsConfig
 	getListingCmd     = &cobra.Command{
 		Use: "get",
 		Run: WrapCommandWithResources(getListing, ResourceConfig{Resources: []ResourceType{ResourceAmazon}, Services: []ServiceType{ServiceListings}}),
 	}
-	getListingCfg    GetListingConfig
+	getListingCfg    getListingConfig
 	deleteListingCmd = &cobra.Command{
 		Use: "delete",
 		Run: WrapCommandWithResources(deleteListing, ResourceConfig{Resources: []ResourceType{ResourceAmazon}, Services: []ServiceType{ServiceListings}}),
@@ -56,6 +56,7 @@ func getListingsCmd() *cobra.Command {
 	createListingsCmd.PersistentFlags().BoolVar(&createListingsCfg.AutofillMarketplaceId, "fill-marketplace-id", false, "adds {\"marketplace_id\": ...} to every json object in attributes")
 	createListingsCmd.PersistentFlags().BoolVar(&createListingsCfg.AutofillLanguageTag, "fill-language-tag", false, "adds {\"language_tag\": ...} to every json object in attributes")
 	createListingsCmd.PersistentFlags().StringVarP(&createListingsCfg.Input, "input", "i", "", "Attributes JSON file")
+	createListingsCmd.MarkFlagRequired("input")
 	createListingsCmd.PersistentFlags().StringVarP(&createListingsCfg.ProductType, "type", "p", "", "Attributes JSON file")
 	createListingsCmd.PersistentFlags().StringVarP(&createListingsCfg.Requirements, "requirements", "r", "", "Attributes JSON file")
 	createListingsCmd.PersistentFlags().StringVar(&createListingsCfg.IssueLocale, "issue-locale", "", "Locale for issue localization. Default: When no locale is provided, the default locale of the first marketplace is used. Localization defaults to en_US when a localized message is not available in the specified locale.")
@@ -69,9 +70,6 @@ func getListingsCmd() *cobra.Command {
 }
 
 func createListings(cmd *cobra.Command, args []string) {
-	if createListingsCfg.Input == "" {
-		log.Fatal().Msg("input file not given")
-	}
 	app := GetApp(cmd)
 	var params listings.PutListingsItemParams
 	params.MarketplaceIds = viper.GetStringSlice(config.AMAZON_MARKETPLACE_ID.Key)
@@ -96,7 +94,11 @@ func createListings(cmd *cobra.Command, args []string) {
 	}
 	var should_fill_marketplace_id = marketplace_id != nil
 	var should_fill_language_tag = language_tag != nil
-	attr_bytes := internal.ReadFile(createListingsCfg.Input)
+	attr_bytes, err := internal.ReadFile(createListingsCfg.Input)
+	if err != nil {
+		log.Error().Err(err).Send()
+		return
+	}
 	attrs := fastjson.MustParseBytes(attr_bytes).GetObject()
 	attrs.Visit(func(key []byte, v *fastjson.Value) {
 		for _, attr_detail := range v.GetArray() {
@@ -118,15 +120,24 @@ func createListings(cmd *cobra.Command, args []string) {
 			}
 		}
 	})
+	// sanity check
+	brand_obj := attrs.Get("brand").
+		GetArray()[0].
+		GetObject()
+	brand_bytes := brand_obj.Get("value").GetStringBytes()
+	brand := string(brand_bytes)
+	brand = strings.TrimSpace(brand)
+	brand_obj.Set("value", fastjson.MustParse(fmt.Sprintf(`"%s"`, brand)))
 	schema := attrs.Get("$schema")
 	if schema != nil {
 		attrs.Del("$schema")
 	}
 
 	var attr_interface interface{}
-	err := json.Unmarshal(attrs.MarshalTo(nil), &attr_interface)
+	err = json.Unmarshal(attrs.MarshalTo(nil), &attr_interface)
 	if err != nil {
-		log.Fatal().Err(err).Send()
+		log.Error().Err(err).Send()
+		return
 	}
 
 	body.Attributes = attr_interface
@@ -134,7 +145,8 @@ func createListings(cmd *cobra.Command, args []string) {
 
 	result, err := app.Amazon.Client.CreateListing(&params)
 	if err != nil {
-		log.Fatal().Err(err).Send()
+		log.Error().Err(err).Send()
+		return
 	}
 	log.Info().
 		Str("status", *result.Payload.Status).
@@ -153,7 +165,8 @@ func getListing(cmd *cobra.Command, args []string) {
 	params.IncludedData = []string{"summaries", "issues", "offers", "relationships", "attributes"}
 	result, err := app.Amazon.Client.GetListingsItem(&params)
 	if err != nil {
-		log.Fatal().Err(err).Send()
+		log.Error().Err(err).Send()
+		return
 	}
 	logListingIssues(result.Payload.Issues)
 	for _, summary := range result.Payload.Summaries {
@@ -200,7 +213,8 @@ func getListing(cmd *cobra.Command, args []string) {
 	if getListingCfg.DisplayAttritubes {
 		attrs_bytes, err := json.Marshal(result.Payload.Attributes)
 		if err != nil {
-			log.Fatal().Err(err).Send()
+			log.Error().Err(err).Send()
+			return
 		}
 		attrs := fastjson.MustParseBytes(attrs_bytes)
 		attrs.GetObject().Visit(func(key []byte, v *fastjson.Value) {
@@ -210,7 +224,8 @@ func getListing(cmd *cobra.Command, args []string) {
 					if v.Type() == fastjson.TypeString {
 						marshalled, err := strconv.Unquote(string(v.MarshalTo(nil)))
 						if err != nil {
-							log.Fatal().Err(err).Send()
+							log.Error().Err(err).Send()
+							return
 						}
 						ev.Str(string(key), marshalled)
 					} else {
@@ -232,7 +247,8 @@ func deleteListing(cmd *cobra.Command, args []string) {
 	params.SellerID = viper.GetString(config.AMAZON_MERCHANT_TOKEN.Key)
 	result, err := app.Amazon.Client.DeleteListingsItem(&params)
 	if err != nil {
-		log.Fatal().Err(err).Send()
+		log.Error().Err(err).Send()
+		return
 	}
 	log.Info().
 		Str("status", *result.Payload.Status).
@@ -245,17 +261,18 @@ func deleteListing(cmd *cobra.Command, args []string) {
 func logListingIssues(issues []*models.Issue) {
 	for _, issue := range issues {
 		ev := log.Warn().
-			Str("message", *issue.Message).
 			Str("code", *issue.Code).
 			Str("severity", *issue.Severity).
 			Str("attribute", strings.Join(issue.AttributeNames, ","))
 		if issue.Enforcements != nil && issue.Enforcements.Exemption != nil {
+			ev.Str("exempt", *issue.Enforcements.Exemption.Status)
 			ev.Interface("exemption_expiry_date", issue.Enforcements.Exemption.ExpiryDate)
-			ev.Str("exemption_status", *issue.Enforcements.Exemption.Status)
-			for i, action := range issue.Enforcements.Actions {
-				ev.Str(fmt.Sprintf("action %d", i), *action.Action)
+			var actions []string
+			for _, action := range issue.Enforcements.Actions {
+				actions = append(actions, *action.Action)
 			}
+			ev.Str("actions", strings.Join(actions, ","))
 		}
-		ev.Send()
+		ev.Msg(*issue.Message)
 	}
 }
