@@ -1,6 +1,6 @@
 module github.com/caner-cetin/halycon
 
-go 1.24
+go 1.23
 
 require (
 	github.com/aws/smithy-go v1.22.2
