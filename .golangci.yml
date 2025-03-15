@@ -79,6 +79,8 @@ linters-settings:
       - G306
       - G104 # already have errcheck
       - G204
+      - G304
+
 
 issues:
   exclude-use-default: false
@@ -90,14 +92,8 @@ issues:
       linters:
         - dupl
         - gosec
-        - funlen
-        - gocyclo
         - gocognit
         - goconst
-
-    - text: "G304: Potential file inclusion via variable"
-      linters:
-        - gosec
 
     - linters:
         - staticcheck
@@ -109,10 +105,7 @@ issues:
 
 run:
   timeout: 5m
-
   allow-parallel-runners: true
-
   tests: true
-
   build-tags:
     - integration

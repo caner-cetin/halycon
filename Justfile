@@ -60,12 +60,15 @@ build-current: tidy setup
 package: build
     #!/usr/bin/env sh
     cd {{build_dir}}
-    
+
     tar czf {{name}}-linux-amd64.tar.gz {{name}}-linux-amd64
     tar czf {{name}}-linux-arm64.tar.gz {{name}}-linux-arm64
-    
+
     tar czf {{name}}-darwin-amd64.tar.gz {{name}}-darwin-amd64
     tar czf {{name}}-darwin-arm64.tar.gz {{name}}-darwin-arm64
-    
+
     zip {{name}}-windows-amd64.zip {{name}}-windows-amd64.exe
     zip {{name}}-windows-arm64.zip {{name}}-windows-arm64.exe
+
+lint:
+    golangci-lint run --config .golangci.yml

@@ -1,0 +1,67 @@
+name: Nightly Build
+
+on:
+  schedule:
+    - cron: "0 0 * * *" # Run at midnight UTC every day
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  nightly-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetch all history for tags
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.21"
+          cache: true
+
+      - name: Install just
+        uses: extractions/setup-just@v1
+
+      - name: Install dependencies
+        run: |
+          go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+          go install github.com/go-swagger/go-swagger/cmd/swagger@latest
+
+      - name: Generate code
+        run: just generate
+
+      - name: Linters
+        run: just lint
+
+      - name: Build and package
+        run: just package
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-build
+          path: |
+            dist/*.tar.gz
+            dist/*.zip
+          retention-days: 7
+
+      - name: Create/Update nightly release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Delete existing nightly tag and release if they exist
+          gh release delete nightly --yes || true
+          git tag -d nightly || true
+          git push --delete origin nightly || true
+
+          # Create new nightly tag
+          git tag -a nightly -m "Nightly build $(date +%Y-%m-%d)"
+          git push origin nightly
+
+          # Create new release
+          gh release create nightly \
+            --title "Nightly Build $(date +%Y-%m-%d)" \
+            --notes "Automated nightly build for commit $(git rev-parse --short HEAD)" \
+            --prerelease \
+            dist/*.tar.gz \
+            dist/*.zip
