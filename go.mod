@@ -1,9 +1,8 @@
 module github.com/caner-cetin/halycon
 
-go 1.24.0
+go 1.23.0
 
 require (
-	github.com/aws/aws-sdk-go-v2 v1.36.3
 	github.com/aws/smithy-go v1.22.2
 	github.com/fatih/color v1.18.0
 	github.com/go-openapi/errors v0.22.0

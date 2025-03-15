@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/smithy-go/ptr"
 	"github.com/caner-cetin/halycon/internal/amazon/fba_inventory/client/fba_inventory"
 	"github.com/caner-cetin/halycon/internal/config"
 	sp_api "github.com/caner-cetin/halycon/internal/sp-api"
@@ -156,7 +156,7 @@ func getAsinToMskuMap(amazonClient *sp_api.Client) (map[string]FBAProduct, error
 		params.MarketplaceIds = viper.GetStringSlice(config.AMAZON_MARKETPLACE_ID.Key)
 		params.GranularityType = "Marketplace"
 		params.GranularityID = viper.GetStringSlice(config.AMAZON_MARKETPLACE_ID.Key)[0]
-		params.Details = aws.Bool(true)
+		params.Details = ptr.Bool(true)
 
 		if nextToken != nil {
 			params.NextToken = nextToken
