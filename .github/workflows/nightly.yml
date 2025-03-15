@@ -45,23 +45,42 @@ jobs:
             dist/*.zip
           retention-days: 7
 
-      - name: Create/Update nightly release
+      - name: Delete existing nightly release
+        continue-on-error: true # Don't fail if the release doesn't exist yet
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Delete existing nightly tag and release if they exist
-          gh release delete nightly --yes || true
-          git tag -d nightly || true
-          git push --delete origin nightly || true
+          echo "Attempting to delete existing nightly tag and release..."
+          gh release delete nightly --yes || echo "No existing release found"
+          git tag -d nightly || echo "No local tag found"
+          git push --delete origin nightly || echo "No remote tag found"
 
-          # Create new nightly tag
-          git tag -a nightly -m "Nightly build $(date +%Y-%m-%d)"
+      - name: Create new nightly tag and release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Creating new nightly tag..."
+          BUILD_DATE=$(date +%Y-%m-%d)
+          COMMIT_SHA=$(git rev-parse --short HEAD)
+
+          echo "Tagging commit ${COMMIT_SHA} as nightly..."
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git tag -a nightly -m "Nightly build ${BUILD_DATE}"
+
+          echo "Pushing tag to remote..."
           git push origin nightly
 
-          # Create new release
+          echo "Creating GitHub release..."
           gh release create nightly \
-            --title "Nightly Build $(date +%Y-%m-%d)" \
-            --notes "Automated nightly build for commit $(git rev-parse --short HEAD)" \
+            --title "Nightly Build ${BUILD_DATE}" \
+            --notes "Automated nightly build for commit ${COMMIT_SHA}" \
             --prerelease \
             dist/*.tar.gz \
             dist/*.zip
+
+          echo "Nightly release created successfully!"
+
+permissions:
+  contents: write
+  packages: read
