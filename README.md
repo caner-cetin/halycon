@@ -47,7 +47,6 @@ just build-current
 mv ./dist/halycon /usr/local/bin/halycon
 halycon --help
 ```
-
 ## utilities
 ### UPC to ASIN
 
@@ -63,7 +62,7 @@ On `Send To Amazon` page, while creating shipment plans, you can search by SKU, 
 
 Guess what is missing? UPC!!!!!!!!!!!!
 
-So whenever my brother sends a three page invoice to me like "create shipments for this", I have to do this 
+So whenever my brother sends a three page invoice to me like "create shipments for this", I have to do this
 ```
 switch tab -> fba inventory -> search with upc -> copy asin -> switch tab -> send to amazon -> search with asin -> enter quantity
 ```
@@ -108,7 +107,7 @@ halycon asin-to-sku --single --input B07H2WGKVB -vvv
 ```
 for list of asins
 ```bash
-halycon asin-to-sku -vvv --input out.txt --output out.csv  
+halycon asin-to-sku -vvv --input out.txt --output out.csv
 ```
 where input is list of ASIN's
 ```bash
@@ -163,7 +162,7 @@ halycon shipment operation status -i 0aa45ad9-XXXX-XXX-XXXX-XXXXXXXXXXXX
 ```
 
 ### Search Product Type Definitions
-#### why 
+#### why
 amazon name (product type) is required for [`PUT /listings/2021-08-01/items/{sellerId}/{sku}`](https://developer-docs.amazon.com/sp-api/lang-tr_TR/docs/listings-items-api-v2021-08-01-reference#listingsitemputrequest)
 #### how
 
@@ -195,7 +194,7 @@ example output [can be found here](./static/example/wallet_definition.txt)
 ```bash
 halycon listings create --input attributes.json --type WALLET --requirements LISTING --sku W9-XXXX-XXXX --fill-marketplace-id --fill-language-tag -v
 ```
-create `attributes.json` and fill with taking `halycon definition get` output as your reference OR 
+create `attributes.json` and fill with taking `halycon definition get` output as your reference OR
 
 <details>
 
@@ -209,7 +208,7 @@ create `attributes.json` and fill with taking `halycon definition get` output as
     "$schema": "http://json.schemastore.org/coffeelint", // change the schema link here
   }
   ```
-  to get the intellisense. If you get Access Denied error from the schema URL (not from browser, from the VSCode), which is, completely normal, host the schema somewhere else like pastebin. 
+  to get the intellisense. If you get Access Denied error from the schema URL (not from browser, from the VSCode), which is, completely normal, host the schema somewhere else like pastebin.
 
   if you do not prefer the intellisense, `halycon definition get` output is as detailed as it can get, so it is still a solid reference. your choice.
 
@@ -274,7 +273,7 @@ when using `--fill-marketplace-id`, first marketplace ID from config is used, if
       ]
   }
 ```
-and any extra attributes if required. 
+and any extra attributes if required.
 
 for validation, you can hit
 ```bash

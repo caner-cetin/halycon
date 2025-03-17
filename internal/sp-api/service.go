@@ -14,7 +14,7 @@ import (
 	"github.com/caner-cetin/halycon/internal/config"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
-	"github.com/spf13/viper"
+	"github.com/rs/zerolog/log"
 	"golang.org/x/time/rate"
 )
 
@@ -43,6 +43,12 @@ type Client struct {
 
 	// authInfo contains the authentication credentials and information required for API calls
 	authInfo runtime.ClientAuthInfoWriter
+
+	// Token is the access token used for authentication
+	Token string
+
+	// TokenManager is the token manager used to acquire and refresh access tokens
+	TokenManager *TokenManager
 }
 
 // AddService adds a service with the given name to the client's services map.
@@ -175,7 +181,21 @@ func (a *Client) SetRateLimits() {
 // - Host header
 // - Request timestamp
 // - User agent
-func NewAuthorizedClient(token string) *Client {
+func NewAuthorizedClient() (*Client, error) {
+	client := config.Config.Amazon.Auth.DefaultClient
+	merchant := config.Config.Amazon.Auth.DefaultMerchant
+	var auth = AuthConfig{
+		ClientID:     client.ID,
+		ClientSecret: client.Secret,
+		RefreshToken: merchant.RefreshToken,
+		Endpoint:     client.AuthEndpoint,
+	}
+	var tokenManager = NewTokenManager(auth)
+	token, err := tokenManager.GetAccessToken()
+	if err != nil {
+		return nil, fmt.Errorf("error while acquiring access token: %w", err)
+	}
+	log.Debug().Str("token_prefix", token[:10]+"...").Msg("acquired access token")
 	authInfo := runtime.ClientAuthInfoWriterFunc(func(r runtime.ClientRequest, _ strfmt.Registry) error {
 		// doesnt work without Authorization header
 		if err := r.SetHeaderParam("Authorization", "Bearer "+token); err != nil {
@@ -189,7 +209,7 @@ func NewAuthorizedClient(token string) *Client {
 		if err := r.SetHeaderParam("X-Amz-Access-Token", token); err != nil {
 			return fmt.Errorf("failed to set X-Amz-Access-Token header: %w", err)
 		}
-		if err := r.SetHeaderParam("host", fmt.Sprintf("https://%s", viper.GetString(config.AMAZON_AUTH_ENDPOINT.Key))); err != nil {
+		if err := r.SetHeaderParam("host", fmt.Sprintf("https://%s", client.APIEndpoint)); err != nil {
 			return fmt.Errorf("failed to set host header: %w", err)
 		}
 		if err := r.SetHeaderParam("x-amz-date", time.Now().UTC().Format("20060102T150405Z")); err != nil {
@@ -202,11 +222,13 @@ func NewAuthorizedClient(token string) *Client {
 	})
 
 	a := &Client{
-		services: map[string]interface{}{},
-		authInfo: authInfo,
+		services:     map[string]interface{}{},
+		authInfo:     authInfo,
+		TokenManager: tokenManager,
+		Token:        token,
 	}
 	a.SetRateLimits()
-	return a
+	return a, nil
 }
 
 // WithRateLimit returns a function that applies rate limiting to a client operation.

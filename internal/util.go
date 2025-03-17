@@ -113,7 +113,40 @@ func PromptFor(message string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("failed to read user input: %w", err)
 	}
+	text = strings.TrimSpace(text)
 	return text, nil
+}
+
+// PromptForPickFromSlice prompts the user to select an item from a slice by displaying a message
+// and returning the selected item. It accepts a generic type parameter T.
+//
+// Parameters:
+//   - message: The prompt message to display to the user
+//   - slice: A slice of type T from which the user will select an item
+//
+// Returns:
+//   - T: The selected item from the slice
+//   - int: index of selected item
+//   - error: An error if:
+//   - The user input could not be obtained
+//   - The input is not a valid number
+//   - The selected index is out of bounds
+func PromptForPickFromSlice[T any](message string, slice []T) (T, int, error) {
+	choice_str, err := PromptFor(message)
+	if err != nil {
+		var zero T
+		return zero, 0, fmt.Errorf("failed to prompt user: %s", choice_str)
+	}
+	choice, err := strconv.Atoi(choice_str)
+	if err != nil {
+		var zero T
+		return zero, 0, fmt.Errorf("invalid number input")
+	}
+	if choice >= len(slice) {
+		var zero T
+		return zero, 0, fmt.Errorf("choice is not in list")
+	}
+	return slice[choice], choice, nil
 }
 
 // DisplayInterface logs the contents of an interface{} after marshalling it to JSON.

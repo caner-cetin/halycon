@@ -12,11 +12,9 @@ import (
 
 	"github.com/aws/smithy-go/ptr"
 	"github.com/caner-cetin/halycon/internal/amazon/fba_inventory/client/fba_inventory"
-	"github.com/caner-cetin/halycon/internal/config"
 	sp_api "github.com/caner-cetin/halycon/internal/sp-api"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 type lookupSkuFromAsinConfig struct {
@@ -153,9 +151,9 @@ func getAsinToMskuMap(amazonClient *sp_api.Client) (map[string]FBAProduct, error
 	var i = 0
 	for {
 		params := fba_inventory.GetInventorySummariesParams{}
-		params.MarketplaceIds = viper.GetStringSlice(config.AMAZON_MARKETPLACE_ID.Key)
+		params.MarketplaceIds = cfg.Amazon.Auth.DefaultMerchant.MarketplaceID
 		params.GranularityType = "Marketplace"
-		params.GranularityID = viper.GetStringSlice(config.AMAZON_MARKETPLACE_ID.Key)[0]
+		params.GranularityID = cfg.Amazon.Auth.DefaultMerchant.MarketplaceID[0]
 		params.Details = ptr.Bool(true)
 
 		if nextToken != nil {

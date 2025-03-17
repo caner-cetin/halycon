@@ -10,10 +10,8 @@ import (
 	"github.com/caner-cetin/halycon/internal"
 	"github.com/caner-cetin/halycon/internal/amazon/listings/client/listings"
 	"github.com/caner-cetin/halycon/internal/amazon/listings/models"
-	"github.com/caner-cetin/halycon/internal/config"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"github.com/valyala/fastjson"
 )
 
@@ -72,8 +70,8 @@ func getListingsCmd() *cobra.Command {
 func createListings(cmd *cobra.Command, args []string) {
 	app := GetApp(cmd)
 	var params listings.PutListingsItemParams
-	params.MarketplaceIds = viper.GetStringSlice(config.AMAZON_MARKETPLACE_ID.Key)
-	params.SellerID = strings.TrimSpace(viper.GetString(config.AMAZON_MERCHANT_TOKEN.Key))
+	params.MarketplaceIds = cfg.Amazon.Auth.DefaultMerchant.MarketplaceID
+	params.SellerID = cfg.Amazon.Auth.DefaultMerchant.SellerToken
 	params.Sku = listingOperationSku
 	params.IncludedData = []string{"issues"}
 
@@ -87,10 +85,10 @@ func createListings(cmd *cobra.Command, args []string) {
 	var marketplace_id *fastjson.Value
 	var language_tag *fastjson.Value
 	if createListingsCfg.AutofillMarketplaceId {
-		marketplace_id = fastjson.MustParse(fmt.Sprintf(`"%s"`, viper.GetStringSlice(config.AMAZON_MARKETPLACE_ID.Key)[0]))
+		marketplace_id = fastjson.MustParse(fmt.Sprintf(`"%s"`, cfg.Amazon.Auth.DefaultMerchant.MarketplaceID[0]))
 	}
 	if createListingsCfg.AutofillLanguageTag {
-		language_tag = fastjson.MustParse(fmt.Sprintf(`"%s"`, viper.GetString(config.AMAZON_DEFAULT_LANGUAGE_TAG.Key)))
+		language_tag = fastjson.MustParse(fmt.Sprintf(`"%s"`, cfg.Amazon.DefaultLanguageTag))
 	}
 	var should_fill_marketplace_id = marketplace_id != nil
 	var should_fill_language_tag = language_tag != nil
@@ -159,8 +157,8 @@ func createListings(cmd *cobra.Command, args []string) {
 func getListing(cmd *cobra.Command, args []string) {
 	app := GetApp(cmd)
 	var params listings.GetListingsItemParams
-	params.MarketplaceIds = viper.GetStringSlice(config.AMAZON_MARKETPLACE_ID.Key)
-	params.SellerID = viper.GetString(config.AMAZON_MERCHANT_TOKEN.Key)
+	params.MarketplaceIds = cfg.Amazon.Auth.DefaultMerchant.MarketplaceID
+	params.SellerID = cfg.Amazon.Auth.DefaultMerchant.SellerToken
 	params.Sku = listingOperationSku
 	params.IncludedData = []string{"summaries", "issues", "offers", "relationships", "attributes"}
 	result, err := app.Amazon.Client.GetListingsItem(&params)
@@ -243,8 +241,8 @@ func deleteListing(cmd *cobra.Command, args []string) {
 	app := GetApp(cmd)
 	var params = deleteListingCfg
 	params.Sku = listingOperationSku
-	params.MarketplaceIds = viper.GetStringSlice(config.AMAZON_MARKETPLACE_ID.Key)
-	params.SellerID = viper.GetString(config.AMAZON_MERCHANT_TOKEN.Key)
+	params.MarketplaceIds = cfg.Amazon.Auth.DefaultMerchant.MarketplaceID
+	params.SellerID = cfg.Amazon.Auth.DefaultMerchant.SellerToken
 	result, err := app.Amazon.Client.DeleteListingsItem(&params)
 	if err != nil {
 		log.Error().Err(err).Send()

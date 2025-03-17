@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/viper"
 )
 
+var cfg = &config.Config // i seriously dont want to write config.Config.
 var cfgFile string
 
 // rootCmd represents the base command when called without any subcommands
@@ -96,20 +97,33 @@ func initConfig() {
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
 		log.Info().Str("path", viper.ConfigFileUsed()).Msg("reading config")
-	}
-
-	if !viper.IsSet(config.AMAZON_MERCHANT_TOKEN.Key) {
-		log.Error().Msg("merchant token is not set! https://sellercentral.amazon.com/sw/AccountInfo/MerchantToken")
+	} else {
+		log.Error().Err(err).Msg("failed to read config")
 		return
 	}
 
-	viper.SetDefault(config.AMAZON_AUTH_ENDPOINT.Key, config.AMAZON_AUTH_ENDPOINT.Default)
-	viper.SetDefault(config.AMAZON_AUTH_HOST.Key, config.AMAZON_AUTH_HOST.Default)
-	viper.SetDefault(config.AMAZON_MARKETPLACE_ID.Key, []string{config.AMAZON_MARKETPLACE_ID.Default})
-	viper.SetDefault(config.AMAZON_FBA_SHIP_FROM_COUNTRY_CODE.Key, config.AMAZON_FBA_SHIP_FROM_COUNTRY_CODE.Default)
-	viper.SetDefault(config.AMAZON_DEFAULT_LANGUAGE_TAG.Key, config.AMAZON_DEFAULT_LANGUAGE_TAG.Default)
+	if err := viper.Unmarshal(&config.Config); err != nil {
+		log.Error().Err(err).Msg("error unmarshalling config")
+		return
+	}
+	if err := config.SetDefaultClient(); err != nil {
+		log.Error().Err(err).Msg("failed to set default client")
+		return
+	}
+	if err := config.SetDefaultMerchant(); err != nil {
+		log.Error().Err(err).Msg("failed to set default merchant")
+		return
+	}
+	if err := config.SetDefaultShipFromAddress(); err != nil {
+		log.Error().Err(err).Msg("failed to set default ship from address")
+		return
+	}
+	config.SetOtherDefaults()
+	if err := config.SnapshotToDisk(); err != nil {
+		log.Error().Err(err).Msg("failed to write config to disk")
+		return
+	}
 }
-
 func displayVersion(cmd *cobra.Command, args []string) {
 	_, err := color.New(color.Bold).Println("Halycon 0.2.0")
 	if err != nil {

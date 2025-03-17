@@ -12,11 +12,9 @@ import (
 	"github.com/caner-cetin/halycon/internal"
 	"github.com/caner-cetin/halycon/internal/amazon/catalog/client/catalog"
 	"github.com/caner-cetin/halycon/internal/amazon/catalog/models"
-	"github.com/caner-cetin/halycon/internal/config"
 	"github.com/go-openapi/strfmt"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 type lookupAsinFromUpcConfig struct {
@@ -75,7 +73,7 @@ func lookupAsinFromUpc(cmd *cobra.Command, args []string) {
 		log.Trace().Interface("identifiers", identifiers).Msg("searching next batch")
 		params := catalog.NewSearchCatalogItemsParams()
 		params.SetContext(cmd.Context())
-		params.SetMarketplaceIds(viper.GetStringSlice(config.AMAZON_MARKETPLACE_ID.Key))
+		params.SetMarketplaceIds(cfg.Amazon.Auth.DefaultMerchant.MarketplaceID)
 		params.SetIdentifiersType(ptr.String("UPC"))
 		params.SetIdentifiers(identifiers)
 		params.SetIncludedData([]string{"identifiers", "attributes", "summaries"})

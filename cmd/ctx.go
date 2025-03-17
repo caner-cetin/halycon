@@ -9,11 +9,9 @@ import (
 	"github.com/caner-cetin/halycon/internal/amazon/fba_inventory/client/fba_inventory"
 	"github.com/caner-cetin/halycon/internal/amazon/listings/client/listings"
 	"github.com/caner-cetin/halycon/internal/amazon/product_type_definitions/client/definitions"
-	"github.com/caner-cetin/halycon/internal/config"
 	sp_api "github.com/caner-cetin/halycon/internal/sp-api"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 // ResourceType represents the type of a resource in the system.
@@ -46,15 +44,19 @@ type ResourceConfig struct {
 	Services  []ServiceType
 }
 
+// Amazon represents the Amazon API client configuration.
+// It holds the SP-API client and authentication token for interacting with Amazon's Selling Partner API.
+type Amazon struct {
+	Client *sp_api.Client
+	Token  string
+}
+
 // AppCtx represents the application context structure.
 // It encapsulates all the necessary dependencies and configurations
 // required for the application to function properly.
 // This includes clients for external services such as Amazon's Selling Partner API.
 type AppCtx struct {
-	Amazon struct {
-		Client *sp_api.Client
-		Token  string
-	}
+	Amazon Amazon
 }
 
 // WrapCommandWithResources wraps a Cobra command function with resource initialization logic.
@@ -70,35 +72,15 @@ func WrapCommandWithResources(fn func(cmd *cobra.Command, args []string), resour
 		app := AppCtx{}
 		for _, resource := range resourceConfig.Resources {
 			if resource == ResourceAmazon {
-				if !viper.IsSet(config.AMAZON_AUTH_CLIENT_ID.Key) {
-					log.Error().Msg("amazon client ID is not set")
-					return
-				}
-				if !viper.IsSet(config.AMAZON_AUTH_CLIENT_SECRET.Key) {
-					log.Error().Msg("amazon client secret is not set")
-					return
-				}
-				if !viper.IsSet(config.AMAZON_AUTH_REFRESH_TOKEN.Key) {
-					log.Error().Msg("amazon refresh token is not set")
-					return
-				}
-				var auth = sp_api.AuthConfig{
-					ClientID:     viper.GetString(config.AMAZON_AUTH_CLIENT_ID.Key),
-					ClientSecret: viper.GetString(config.AMAZON_AUTH_CLIENT_SECRET.Key),
-					RefreshToken: viper.GetString(config.AMAZON_AUTH_REFRESH_TOKEN.Key),
-					Endpoint:     viper.GetString(config.AMAZON_AUTH_ENDPOINT.Key),
-				}
-				var tokenManager = sp_api.NewTokenManager(auth)
-				token, err := tokenManager.GetAccessToken()
+				var err error
+				app.Amazon.Client, err = sp_api.NewAuthorizedClient()
 				if err != nil {
-					log.Error().Err(err).Msg("error while acquiring access token")
-					return
+					log.Fatal().Err(err).Msg("failed to create authorized client")
 				}
-				log.Debug().Str("token_prefix", token[:10]+"...").Msg("acquired access token")
-				host := viper.GetString(config.AMAZON_AUTH_HOST.Key)
+				host := cfg.Amazon.Auth.DefaultClient.APIEndpoint
 				basePath := "/"
 				scheme := "https"
-				app.Amazon.Client = sp_api.NewAuthorizedClient(token)
+				token := app.Amazon.Client.Token
 				for _, service := range resourceConfig.Services {
 					switch service {
 					case ServiceCatalog:

@@ -12,12 +12,10 @@ import (
 	"github.com/caner-cetin/halycon/internal"
 	"github.com/caner-cetin/halycon/internal/amazon/product_type_definitions/client/definitions"
 	"github.com/caner-cetin/halycon/internal/amazon/product_type_definitions/models"
-	"github.com/caner-cetin/halycon/internal/config"
 	"github.com/fatih/color"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"github.com/valyala/fastjson"
 )
 
@@ -74,7 +72,7 @@ func searchProductTypeDefinition(cmd *cobra.Command, args []string) {
 		log.Error().Msg("keywords or item name must be set")
 		return
 	}
-	searchProductTypeDefinitionCfg.MarketplaceIds = viper.GetStringSlice(config.AMAZON_MARKETPLACE_ID.Key)
+	searchProductTypeDefinitionCfg.MarketplaceIds = cfg.Amazon.Auth.DefaultMerchant.MarketplaceID
 	result, err := app.Amazon.Client.SearchProductTypeDefinitions(&searchProductTypeDefinitionCfg)
 	if err != nil {
 		log.Error().Err(err).Send()
@@ -91,7 +89,7 @@ func searchProductTypeDefinition(cmd *cobra.Command, args []string) {
 }
 func getProductTypeDefinition(cmd *cobra.Command, args []string) {
 	app := GetApp(cmd)
-	getProductTypeDefinitionCfg.MarketplaceIds = viper.GetStringSlice(config.AMAZON_MARKETPLACE_ID.Key)
+	getProductTypeDefinitionCfg.MarketplaceIds = cfg.Amazon.Auth.DefaultMerchant.MarketplaceID
 
 	result, err := app.Amazon.Client.GetProductTypeDefinition(&getProductTypeDefinitionCfg)
 	if err != nil {

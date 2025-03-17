@@ -10,14 +10,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/aws/smithy-go/ptr"
 	"github.com/caner-cetin/halycon/internal"
 	"github.com/caner-cetin/halycon/internal/amazon/fba_inbound/client/fba_inbound"
 	"github.com/caner-cetin/halycon/internal/amazon/fba_inbound/models"
-	"github.com/caner-cetin/halycon/internal/config"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 type createShipmentPlanConfig struct {
@@ -63,49 +60,34 @@ func createShipmentPlan(cmd *cobra.Command, args []string) {
 
 	params := fba_inbound.NewCreateInboundPlanParams()
 	params.Body = new(models.CreateInboundPlanRequest)
-	params.Body.DestinationMarketplaces = viper.GetStringSlice(config.AMAZON_MARKETPLACE_ID.Key)
+	params.Body.DestinationMarketplaces = cfg.Amazon.Auth.DefaultMerchant.MarketplaceID
 
 	ev := log.Error()
 	var msg string = ""
-	if !viper.IsSet(config.AMAZON_FBA_SHIP_FROM_ADDRESS_LINE_1.Key) {
-		msg = "shipment address line 1 must be set"
-	}
-	if !viper.IsSet(config.AMAZON_FBA_SHIP_FROM_CITY.Key) {
-		msg = "shipment city must be set"
-	}
-	if !viper.IsSet(config.AMAZON_FBA_SHIP_FROM_NAME.Key) {
-		msg = "contact name must be set"
-	}
-	if !viper.IsSet(config.AMAZON_FBA_SHIP_FROM_PHONE_NUMBER.Key) {
-		msg = "phone number must be set"
-	}
-	if !viper.IsSet(config.AMAZON_FBA_SHIP_FROM_POSTAL_CODE.Key) {
-		msg = "postal code must be set"
-	}
 	if msg != "" {
 		ev.Msg(msg)
 		return
 	}
 	ev.Discard()
 	params.Body.SourceAddress = &models.AddressInput{
-		AddressLine1: ptr.String(viper.GetString(config.AMAZON_FBA_SHIP_FROM_ADDRESS_LINE_1.Key)),
-		City:         ptr.String(viper.GetString(config.AMAZON_FBA_SHIP_FROM_CITY.Key)),
-		Name:         ptr.String(viper.GetString(config.AMAZON_FBA_SHIP_FROM_NAME.Key)),
-		PhoneNumber:  ptr.String(viper.GetString(config.AMAZON_FBA_SHIP_FROM_PHONE_NUMBER.Key)),
-		PostalCode:   ptr.String(viper.GetString(config.AMAZON_FBA_SHIP_FROM_POSTAL_CODE.Key)),
-		CountryCode:  ptr.String(viper.GetString(config.AMAZON_FBA_SHIP_FROM_COUNTRY_CODE.Key)),
+		AddressLine1: &cfg.Amazon.FBA.DefaultShipFrom.AddressLine1,
+		City:         &cfg.Amazon.FBA.DefaultShipFrom.City,
+		Name:         &cfg.Amazon.FBA.DefaultShipFrom.Name,
+		PhoneNumber:  &cfg.Amazon.FBA.DefaultShipFrom.PhoneNumber,
+		PostalCode:   &cfg.Amazon.FBA.DefaultShipFrom.PostalCode,
+		CountryCode:  &cfg.Amazon.FBA.DefaultShipFrom.CountryCode,
 	}
-	if viper.IsSet(config.AMAZON_FBA_SHIP_FROM_ADDRESS_LINE_2.Key) {
-		params.Body.SourceAddress.AddressLine2 = viper.GetString(config.AMAZON_FBA_SHIP_FROM_ADDRESS_LINE_2.Key)
+	if cfg.Amazon.FBA.DefaultShipFrom.AddressLine2 != "" {
+		params.Body.SourceAddress.AddressLine2 = cfg.Amazon.FBA.DefaultShipFrom.AddressLine2
 	}
-	if viper.IsSet(config.AMAZON_FBA_SHIP_FROM_COMPANY_NAME.Key) {
-		params.Body.SourceAddress.CompanyName = viper.GetString(config.AMAZON_FBA_SHIP_FROM_COMPANY_NAME.Key)
+	if cfg.Amazon.FBA.DefaultShipFrom.CompanyName != "" {
+		params.Body.SourceAddress.CompanyName = cfg.Amazon.FBA.DefaultShipFrom.CompanyName
 	}
-	if viper.IsSet(config.AMAZON_FBA_SHIP_FROM_STATE_PROVINCE.Key) {
-		params.Body.SourceAddress.StateOrProvinceCode = viper.GetString(config.AMAZON_FBA_SHIP_FROM_STATE_PROVINCE.Key)
+	if cfg.Amazon.FBA.DefaultShipFrom.StateOrProvince != "" {
+		params.Body.SourceAddress.StateOrProvinceCode = cfg.Amazon.FBA.DefaultShipFrom.StateOrProvince
 	}
-	if viper.IsSet(config.AMAZON_FBA_SHIP_FROM_EMAIL.Key) {
-		params.Body.SourceAddress.Email = viper.GetString(config.AMAZON_FBA_SHIP_FROM_EMAIL.Key)
+	if cfg.Amazon.FBA.DefaultShipFrom.Email != "" {
+		params.Body.SourceAddress.Email = cfg.Amazon.FBA.DefaultShipFrom.Email
 	}
 
 	input := internal.OpenFile(createShipmentPlanCfg.Input)

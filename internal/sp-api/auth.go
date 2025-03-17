@@ -12,7 +12,6 @@ import (
 
 	"github.com/caner-cetin/halycon/internal"
 	"github.com/caner-cetin/halycon/internal/config"
-	"github.com/spf13/viper"
 )
 
 // AuthConfig represents the authentication configuration for the Amazon SP-API.
@@ -132,12 +131,8 @@ func (tm *TokenManager) refreshToken() (string, error) {
 	tm.expiresAt = time.Now().Add(time.Duration(tokenResp.ExpiresIn-300) * time.Second)
 	if tokenResp.RefreshToken != "" {
 		tm.config.RefreshToken = tokenResp.RefreshToken
-		if viper.IsSet(config.AMAZON_AUTH_REFRESH_TOKEN.Key) {
-			viper.Set(config.AMAZON_AUTH_REFRESH_TOKEN.Key, tokenResp.RefreshToken)
-			err := viper.WriteConfig()
-			if err != nil {
-				return "", fmt.Errorf("error writing refresh token to config: %w", err)
-			}
+		if err := config.SnapshotToDisk(); err != nil {
+			return "", fmt.Errorf("error saving refresh token: %w", err)
 		}
 	}
 

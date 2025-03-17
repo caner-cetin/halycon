@@ -2,42 +2,65 @@
 amazon:
   # required for all operations
   auth:
-    # client ID and secret of application
-    client:
-      id: 
-      secret:
-    # refresh token, acquired from self-authorizing the application
-    refresh_token:
-    endpoint: https://api.amazon.com/auth/o2/token
-    # host for bearer token
-    host: sellingpartnerapi-na.amazon.com
-  # marketplace ids for all kinds of operations, US will be registered by default
-  marketplace_id: 
-    - ATVPDKIKX0DER
+    # client ID and secret of applications
+    clients:
+        # get id and secretwhen you register your application.
+        # refer to https://developer-docs.amazon.com/sp-api/docs/viewing-your-application-information-and-credentials
+      - id:
+        # name of client, not used for anything Amazon related, only for referencing the client throughout the code.
+        # if not specified, client will be referenced by its id.
+        name: Halycon
+        secret:
+        auth_endpoint: https://api.amazon.com/auth/o2/token
+        # SP-API endpoint, see https://developer-docs.amazon.com/sp-api/docs/sp-api-endpoints
+        # omit the scheme
+        api_endpoint: sellingpartnerapi-na.amazon.com
+        # default client for operations
+        default: false
+      - id:
+        secret:
+        auth_endpoint: https://api.amazon.com/auth/o2/token
+        api_endpoint: sellingpartnerapi-na.amazon.com
+        default: true
+    # merchant configurations, acquire from self-authorizing the application
+    merchants:
+      - refresh_token:
+        seller_token:
+        default: true
+        # marketplace ids for all kinds of operations, US will be registered by default
+        marketplace_id:
+          - ATVPDKIKX0DER
+        # name of merchant, not used for anything Amazon related, only for referencing the client throughout the code.
+        # if not specified, merchant will be referenced by its seller token.
+        name:
   fba:
+    # if false, ship_from and other fba related configs will not be validated (and fba operations will fail to run)
+    enable: true
     # required for creating FBA inbound shipment plans
     #
     # https://developer-docs.amazon.com/sp-api/lang-tr_TR/docs/fulfillment-inbound-api-v2024-03-20-reference#addressinput
     ship_from:
-      # Street address information.
-      address_line_1: 
-      # Additional street address information, optional.
-      address_line_2:
-      city:
-      # The name of the business, optional.
-      company_name:
-      # The country code in two-character ISO 3166-1 alpha-2 format, required, set to US by default.
-      country_code: US
-      # Optional.
-      email:
-      # The name of the individual who is the primary contact.
-      name:
-      phone_number: 
-      postal_code:
-      # The state or province code, required, albeit that docs indicate that it is optional.
-      # TX, AZ, two-character code.
-      state_or_province_code: 
-  merchant_token:
+      - # Street address information.
+        address_line_1:
+        # Additional street address information, optional.
+        address_line_2:
+        city:
+        # The name of the business, optional.
+        company_name:
+        # The country code in two-character ISO 3166-1 alpha-2 format, required, set to US by default.
+        country_code: US
+        # Optional.
+        email:
+        # The name of the individual who is the primary contact.
+        name:
+        phone_number:
+        postal_code:
+        # The state or province code, required, albeit that docs indicate that it is optional.
+        # TX, AZ, two-character code.
+        state_or_province_code:
+        default: true
+      - #
+        address_line_1:
+        # ...
+        default: false
   default_language_tag: en_US
-
-

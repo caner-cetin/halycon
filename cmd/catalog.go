@@ -5,10 +5,8 @@ import (
 
 	"github.com/caner-cetin/halycon/internal"
 	"github.com/caner-cetin/halycon/internal/amazon/catalog/client/catalog"
-	"github.com/caner-cetin/halycon/internal/config"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 type getCatalogItemConfig struct {
@@ -42,7 +40,7 @@ func getCatalogItem(cmd *cobra.Command, args []string) {
 	var params catalog.GetCatalogItemParams
 	params.Asin = getCatalogItemCfg.Asin
 	params.Locale = &getCatalogItemCfg.Locale
-	params.MarketplaceIds = viper.GetStringSlice(config.AMAZON_MARKETPLACE_ID.Key)
+	params.MarketplaceIds = cfg.Amazon.Auth.DefaultMerchant.MarketplaceID
 	params.IncludedData = []string{"attributes", "relationships", "summaries"}
 	result, err := app.Amazon.Client.GetCatalogItem(&params)
 	if err != nil {
