@@ -6,7 +6,6 @@ import (
 
 	"github.com/caner-cetin/halycon/internal"
 	"github.com/rs/zerolog/log"
-	"github.com/spf13/viper"
 )
 
 // SetDefaultMerchant sets the default merchant for Amazon API operations
@@ -61,10 +60,6 @@ func SetDefaultMerchant() error {
 
 // SetDefaultShipFromAddress sets the default ship-from address for Amazon FBA operations
 func SetDefaultShipFromAddress() error {
-	if !viper.IsSet("amazon.fba.enabled") {
-		Config.Amazon.FBA.Enabled = true
-		viper.Set("amazon.fba.enabled", true)
-	}
 	if Config.Amazon.FBA.Enabled {
 		if len(Config.Amazon.FBA.ShipFrom) == 0 {
 			return fmt.Errorf("no ship-from addresses configured")

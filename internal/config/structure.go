@@ -6,6 +6,8 @@ package config
 // Cfg represents the root configuration structure for the application
 type Cfg struct {
 	Amazon AmazonConfig `mapstructure:"amazon"`
+	// Path is the path to the configuration yaml file
+	Path string `yaml:"-"`
 }
 
 // AmazonConfig holds the configuration for Amazon-specific settings

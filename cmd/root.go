@@ -2,13 +2,14 @@ package cmd
 
 import (
 	"os"
+	"path/filepath"
 
 	"github.com/caner-cetin/halycon/internal/config"
 	"github.com/fatih/color"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
+	yaml "gopkg.in/yaml.v3"
 )
 
 var cfg = &config.Config // i seriously dont want to write config.Config.
@@ -78,31 +79,26 @@ func initConfig() {
 		zerolog.SetGlobalLevel(zerolog.WarnLevel)
 	}
 
+	var configPath string
 	if cfgFile != "" {
-		// Use config file from the flag.
-		viper.SetConfigFile(cfgFile)
+		configPath = cfgFile
 	} else {
-		// Find home directory.
 		home, err := os.UserHomeDir()
-		cobra.CheckErr(err)
-
-		// Search config in home directory with name ".halycon" (without extension).
-		viper.AddConfigPath(home)
-		viper.SetConfigType("yaml")
-		viper.SetConfigName(".halycon")
+		if err != nil {
+			log.Error().Err(err).Msg("failed to get user home directory")
+			return
+		}
+		configPath = filepath.Join(home, ".halycon.yaml")
 	}
+	cfg.Path = configPath
 
-	viper.AutomaticEnv() // read in environment variables that match
-
-	// If a config file is found, read it in.
-	if err := viper.ReadInConfig(); err == nil {
-		log.Info().Str("path", viper.ConfigFileUsed()).Msg("reading config")
-	} else {
+	data, err := os.ReadFile(configPath)
+	if err != nil {
 		log.Error().Err(err).Msg("failed to read config")
 		return
 	}
 
-	if err := viper.Unmarshal(&config.Config); err != nil {
+	if err := yaml.Unmarshal(data, &config.Config); err != nil {
 		log.Error().Err(err).Msg("error unmarshalling config")
 		return
 	}
