@@ -93,52 +93,52 @@ func (a *Client) GetProductTypeDefinitionsService() *product_type_definitions.Cl
 
 // SearchCatalogItems searches for catalog items
 func (a *Client) SearchCatalogItems(ctx context.Context, params *catalog.SearchCatalogItemsParams) (*catalog.SearchCatalogItemsResp, error) {
-	return a.GetCatalogService().SearchCatalogItemsWithResponse(ctx, params, a.WithAuth(), a.WithRateLimit(SearchCatalogItemsRLKey))
+	return recordError(a.GetCatalogService().SearchCatalogItemsWithResponse(ctx, params, a.WithAuth(), a.WithRateLimit(SearchCatalogItemsRLKey))) //nolint:typecheck
 }
 
 // GetCatalogItem retrieves a catalog item
 func (a *Client) GetCatalogItem(ctx context.Context, asin string, params *catalog.GetCatalogItemParams) (*catalog.GetCatalogItemResp, error) {
-	return a.GetCatalogService().GetCatalogItemWithResponse(ctx, asin, params, a.WithAuth(), a.WithRateLimit(GetCatalogItemsRLKey))
+	return recordError(a.GetCatalogService().GetCatalogItemWithResponse(ctx, asin, params, a.WithAuth(), a.WithRateLimit(GetCatalogItemsRLKey))) //nolint:typecheck
 }
 
 // GetListingsItem retrieves a specific listings item.
 func (a *Client) GetListingsItem(ctx context.Context, params *listings.GetListingsItemParams, sellerId string, sku string) (*listings.GetListingsItemResp, error) {
-	return a.GetListingsService().GetListingsItemWithResponse(ctx, sellerId, sku, params, a.WithAuth(), a.WithRateLimit(GetListingsItemRLKey))
+	return recordError(a.GetListingsService().GetListingsItemWithResponse(ctx, sellerId, sku, params, a.WithAuth(), a.WithRateLimit(GetListingsItemRLKey))) //nolint:typecheck
 }
 
 // DeleteListingsItem removes a listings item from Amazon's catalog
 func (a *Client) DeleteListingsItem(ctx context.Context, params *listings.DeleteListingsItemParams, sellerId string, sku string) (*listings.DeleteListingsItemResp, error) {
-	return a.GetListingsService().DeleteListingsItemWithResponse(ctx, sellerId, sku, params, a.WithAuth(), a.WithRateLimit(DeleteListingsItemRLKey))
+	return recordError(a.GetListingsService().DeleteListingsItemWithResponse(ctx, sellerId, sku, params, a.WithAuth(), a.WithRateLimit(DeleteListingsItemRLKey))) //nolint:typecheck
 }
 
 // GetFBAInventorySummaries retrieves FBA inventory summaries
 func (a *Client) GetFBAInventorySummaries(ctx context.Context, params *fba_inventory.GetInventorySummariesParams) (*fba_inventory.GetInventorySummariesResp, error) {
-	return a.GetFBAInventoryService().GetInventorySummariesWithResponse(ctx, params, a.WithAuth(), a.WithRateLimit(FBAInventorySummariesRLKey))
+	return recordError(a.GetFBAInventoryService().GetInventorySummariesWithResponse(ctx, params, a.WithAuth(), a.WithRateLimit(FBAInventorySummariesRLKey))) //nolint:typecheck
 }
 
 // CreateFBAInboundPlan creates an inbound plan for FBA (Fulfillment by Amazon)
 func (a *Client) CreateFBAInboundPlan(ctx context.Context, params fba_inbound.CreateInboundPlanJSONRequestBody) (*fba_inbound.CreateInboundPlanResp, error) {
-	return a.GetFBAInboundService().CreateInboundPlanWithResponse(ctx, params, a.WithAuth(), a.WithRateLimit(CreateInboundPlanRLKey))
+	return recordError(a.GetFBAInboundService().CreateInboundPlanWithResponse(ctx, params, a.WithAuth(), a.WithRateLimit(CreateInboundPlanRLKey))) //nolint:typecheck
 }
 
 // GetInboundOperationStatus retrieves the status of an inbound operation
 func (a *Client) GetInboundOperationStatus(ctx context.Context, operation_id string) (*fba_inbound.GetInboundOperationStatusResp, error) {
-	return a.GetFBAInboundService().GetInboundOperationStatusWithResponse(ctx, operation_id, a.WithAuth(), a.WithRateLimit(GetInboundOperationStatusRLKey))
+	return recordError(a.GetFBAInboundService().GetInboundOperationStatusWithResponse(ctx, operation_id, a.WithAuth(), a.WithRateLimit(GetInboundOperationStatusRLKey))) //nolint:typecheck
 }
 
 // SearchProductTypeDefinitions searches for product type definitions
 func (a *Client) SearchProductTypeDefinitions(ctx context.Context, params *product_type_definitions.SearchDefinitionsProductTypesParams) (*product_type_definitions.SearchDefinitionsProductTypesResp, error) {
-	return a.GetProductTypeDefinitionsService().SearchDefinitionsProductTypesWithResponse(ctx, params, a.WithAuth(), a.WithRateLimit(SearchProductTypeDefinitionsRLKey))
+	return recordError(a.GetProductTypeDefinitionsService().SearchDefinitionsProductTypesWithResponse(ctx, params, a.WithAuth(), a.WithRateLimit(SearchProductTypeDefinitionsRLKey))) //nolint:typecheck
 }
 
 // GetProductTypeDefinition retrieves a product type definition
 func (a *Client) GetProductTypeDefinition(ctx context.Context, productType string, params *product_type_definitions.GetDefinitionsProductTypeParams) (*product_type_definitions.GetDefinitionsProductTypeResp, error) {
-	return a.GetProductTypeDefinitionsService().GetDefinitionsProductTypeWithResponse(ctx, productType, params, a.WithAuth(), a.WithRateLimit(GetProductTypeDefinitionRLKey))
+	return recordError(a.GetProductTypeDefinitionsService().GetDefinitionsProductTypeWithResponse(ctx, productType, params, a.WithAuth(), a.WithRateLimit(GetProductTypeDefinitionRLKey))) //nolint:typecheck
 }
 
 // PutListingsItem creates or updates a listing item
 func (a *Client) PutListingsItem(ctx context.Context, sellerId string, sku string, params *listings.PutListingsItemParams, body listings.PutListingsItemJSONRequestBody) (*listings.PutListingsItemResp, error) {
-	return a.GetListingsService().PutListingsItemWithResponse(ctx, sellerId, sku, params, body, a.WithAuth(), a.WithRateLimit(CreateListingRLKey))
+	return recordError(a.GetListingsService().PutListingsItemWithResponse(ctx, sellerId, sku, params, body, a.WithAuth(), a.WithRateLimit(CreateListingRLKey))) //nolint:typecheck
 }
 
 // rate limiter keys for client's rate limiter mapping, each one of them leads to a rate.Limiter instance.

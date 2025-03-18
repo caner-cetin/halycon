@@ -15,7 +15,7 @@ import (
 	"github.com/valyala/fastjson"
 )
 
-type GetProductTypeDefinitionConfig struct {
+type getProductTypeDefinitionConfig struct {
 	Params      product_type_definitions.GetDefinitionsProductTypeParams
 	ProductType string
 }
@@ -31,7 +31,7 @@ var (
 		Use: "get",
 		Run: WrapCommandWithResources(getProductTypeDefinition, ResourceConfig{Resources: []ResourceType{ResourceAmazon}, Services: []ServiceType{ServiceProductTypeDefinitions}}),
 	}
-	getProductTypeDefinitionCfg GetProductTypeDefinitionConfig
+	getProductTypeDefinitionCfg getProductTypeDefinitionConfig
 
 	definitionCmd = &cobra.Command{
 		Use: "definition",

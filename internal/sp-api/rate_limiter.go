@@ -27,7 +27,7 @@ func NewRateLimiterManager(limiters map[string]*rate.Limiter) *RateLimiterManage
 // GetLimiter returns a rate limiter for the given key, creating one if it doesn't exist
 func (m *RateLimiterManager) GetLimiter(key string) *rate.Limiter {
 	m.mu.RLock()
-	limiter, _ := m.limiters[key]
+	limiter := m.limiters[key]
 	m.mu.RUnlock()
 	return limiter
 }

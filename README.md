@@ -29,7 +29,6 @@ utilities for Amazon SP API, mostly for my annoyances
     - [Create Child-Parent Listings](#create-child-parent-listings)
       - [how](#how-7)
   - [halycon?](#halycon-1)
-  - [big todos](#big-todos)
 
 ## usage
 
@@ -331,8 +330,3 @@ and then create the child listings with attributes
 ## halycon?
 
 one of ma favourite mono song https://www.youtube.com/watch?v=2_OYaI37bi0
-
-## big todos
-- lots of places without status code checks and nil checks
-- configuration management commands
-- ???

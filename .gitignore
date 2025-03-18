@@ -4,5 +4,5 @@ dist
 internal/amazon
 .DS_Store
 models
-temp_tools
 temp_*
+temp

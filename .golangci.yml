@@ -22,7 +22,6 @@ linters:
     - goprintffuncname
     - maintidx
     - nilnil
-    - nolintlint
     - predeclared
     - thelper
     - tparallel

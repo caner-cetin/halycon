@@ -198,6 +198,12 @@ func CloseResponseBody(resp *http.Response) {
 	}
 }
 
+// Ptr returns a pointer to the provided value of type T, useful for one liners
+//
+// Example:
+//
+//	str := "hello"
+//	strPtr := Ptr("hello") // returns *string
 func Ptr[T any](v T) *T {
 	return &v
 }
