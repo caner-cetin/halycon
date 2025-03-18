@@ -1,6 +1,8 @@
 .halycon.yaml
 private
 dist
-models
 internal/amazon
 .DS_Store
+models
+temp_tools
+temp_*

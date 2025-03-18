@@ -2,13 +2,14 @@ package cmd
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/caner-cetin/halycon/internal"
-	"github.com/caner-cetin/halycon/internal/amazon/catalog/client/catalog"
-	"github.com/caner-cetin/halycon/internal/amazon/fba_inbound/client/fba_inbound"
-	"github.com/caner-cetin/halycon/internal/amazon/fba_inventory/client/fba_inventory"
-	"github.com/caner-cetin/halycon/internal/amazon/listings/client/listings"
-	"github.com/caner-cetin/halycon/internal/amazon/product_type_definitions/client/definitions"
+	"github.com/caner-cetin/halycon/internal/amazon/catalog"
+	"github.com/caner-cetin/halycon/internal/amazon/fba_inbound"
+	"github.com/caner-cetin/halycon/internal/amazon/fba_inventory"
+	"github.com/caner-cetin/halycon/internal/amazon/listings"
+	"github.com/caner-cetin/halycon/internal/amazon/product_type_definitions"
 	sp_api "github.com/caner-cetin/halycon/internal/sp-api"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
@@ -75,27 +76,52 @@ func WrapCommandWithResources(fn func(cmd *cobra.Command, args []string), resour
 				var err error
 				app.Amazon.Client, err = sp_api.NewAuthorizedClient()
 				if err != nil {
-					log.Fatal().Err(err).Msg("failed to create authorized client")
+					log.Error().Err(err).Msg("failed to create authorized client")
+					return
 				}
 				host := cfg.Amazon.Auth.DefaultClient.APIEndpoint
 				basePath := "/"
 				scheme := "https"
-				token := app.Amazon.Client.Token
+				server := fmt.Sprintf("%s://%s%s", scheme, host, basePath)
 				for _, service := range resourceConfig.Services {
 					switch service {
 					case ServiceCatalog:
-						app.Amazon.Client.AddService(sp_api.CatalogServiceName, catalog.NewClientWithBearerToken(host, basePath, scheme, token))
+						client, err := catalog.NewClientWithResponses(server)
+						if err != nil {
+							log.Error().Err(err).Msg("failed to create catalog client")
+							return
+						}
+						app.Amazon.Client.AddService(sp_api.CatalogServiceName, client)
 					case ServiceListings:
-						app.Amazon.Client.AddService(sp_api.ListingsServiceName, listings.NewClientWithBearerToken(host, basePath, scheme, token))
+						client, err := listings.NewClientWithResponses(server)
+						if err != nil {
+							log.Error().Err(err).Msg("failed to create listings client")
+							return
+						}
+						app.Amazon.Client.AddService(sp_api.ListingsServiceName, client)
 					case ServiceFBAInbound:
-						app.Amazon.Client.AddService(sp_api.FBAInboundServiceName, fba_inbound.NewClientWithBearerToken(host, basePath, scheme, token))
+						client, err := fba_inbound.NewClientWithResponses(server)
+						if err != nil {
+							log.Error().Err(err).Msg("failed to create fba inbound client")
+							return
+						}
+						app.Amazon.Client.AddService(sp_api.FBAInboundServiceName, client)
 					case ServiceFBAInventory:
-						app.Amazon.Client.AddService(sp_api.FBAInventoryServiceName, fba_inventory.NewClientWithBearerToken(host, basePath, scheme, token))
+						client, err := fba_inventory.NewClientWithResponses(server)
+						if err != nil {
+							log.Error().Err(err).Msg("failed to create fba inventory client")
+							return
+						}
+						app.Amazon.Client.AddService(sp_api.FBAInventoryServiceName, client)
 					case ServiceProductTypeDefinitions:
-						app.Amazon.Client.AddService(sp_api.ProductTypeDefinitionsServiceName, definitions.NewClientWithBearerToken(host, basePath, scheme, token))
+						client, err := product_type_definitions.NewClientWithResponses(server)
+						if err != nil {
+							log.Error().Err(err).Msg("failed to create product type definitions client")
+							return
+						}
+						app.Amazon.Client.AddService(sp_api.ProductTypeDefinitionsServiceName, client)
 					}
 				}
-				app.Amazon.Token = token
 
 			}
 		}

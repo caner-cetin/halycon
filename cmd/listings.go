@@ -6,10 +6,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/aws/smithy-go/ptr"
 	"github.com/caner-cetin/halycon/internal"
-	"github.com/caner-cetin/halycon/internal/amazon/listings/client/listings"
-	"github.com/caner-cetin/halycon/internal/amazon/listings/models"
+	"github.com/caner-cetin/halycon/internal/amazon/listings"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"github.com/valyala/fastjson"
@@ -55,8 +53,8 @@ func getListingsCmd() *cobra.Command {
 	createListingsCmd.PersistentFlags().BoolVar(&createListingsCfg.AutofillLanguageTag, "fill-language-tag", false, "adds {\"language_tag\": ...} to every json object in attributes")
 	createListingsCmd.PersistentFlags().StringVarP(&createListingsCfg.Input, "input", "i", "", "Attributes JSON file")
 	createListingsCmd.MarkFlagRequired("input")
-	createListingsCmd.PersistentFlags().StringVarP(&createListingsCfg.ProductType, "type", "p", "", "Attributes JSON file")
-	createListingsCmd.PersistentFlags().StringVarP(&createListingsCfg.Requirements, "requirements", "r", "", "Attributes JSON file")
+	createListingsCmd.PersistentFlags().StringVarP(&createListingsCfg.ProductType, "type", "p", "", "product type")
+	createListingsCmd.PersistentFlags().StringVarP(&createListingsCfg.Requirements, "requirements", "r", "", "")
 	createListingsCmd.PersistentFlags().StringVar(&createListingsCfg.IssueLocale, "issue-locale", "", "Locale for issue localization. Default: When no locale is provided, the default locale of the first marketplace is used. Localization defaults to en_US when a localized message is not available in the specified locale.")
 
 	getListingCmd.PersistentFlags().BoolVar(&getListingCfg.DisplayAttritubes, "display-attributes", false, "logs listing attributes line by line if given")
@@ -71,17 +69,15 @@ func createListings(cmd *cobra.Command, args []string) {
 	app := GetApp(cmd)
 	var params listings.PutListingsItemParams
 	params.MarketplaceIds = cfg.Amazon.Auth.DefaultMerchant.MarketplaceID
-	params.SellerID = cfg.Amazon.Auth.DefaultMerchant.SellerToken
-	params.Sku = listingOperationSku
-	params.IncludedData = []string{"issues"}
+	params.IncludedData = internal.Ptr([]listings.PutListingsItemParamsIncludedData{"issues"})
 
 	if createListingsCfg.IssueLocale != "" {
 		params.IssueLocale = &createListingsCfg.IssueLocale
 	}
 
-	var body models.ListingsItemPutRequest
-	body.ProductType = ptr.String(createListingsCfg.ProductType)
-	body.Requirements = createListingsCfg.Requirements
+	var body listings.ListingsItemPutRequest
+	body.ProductType = createListingsCfg.ProductType
+	body.Requirements = internal.Ptr(listings.ListingsItemPutRequestRequirements(createListingsCfg.Requirements))
 	var marketplace_id *fastjson.Value
 	var language_tag *fastjson.Value
 	if createListingsCfg.AutofillMarketplaceId {
@@ -131,7 +127,7 @@ func createListings(cmd *cobra.Command, args []string) {
 		attrs.Del("$schema")
 	}
 
-	var attr_interface interface{}
+	var attr_interface map[string]interface{}
 	err = json.Unmarshal(attrs.MarshalTo(nil), &attr_interface)
 	if err != nil {
 		log.Error().Err(err).Send()
@@ -139,77 +135,93 @@ func createListings(cmd *cobra.Command, args []string) {
 	}
 
 	body.Attributes = attr_interface
-	params.Body = &body
 
-	result, err := app.Amazon.Client.CreateListing(&params)
+	status, err := app.Amazon.Client.PutListingsItem(cmd.Context(), cfg.Amazon.Auth.DefaultMerchant.SellerToken, listingOperationSku, &params, body)
 	if err != nil {
 		log.Error().Err(err).Send()
 		return
 	}
+	result := status.JSON200
 	log.Info().
-		Str("status", *result.Payload.Status).
-		Str("submission_id", *result.Payload.SubmissionID).
-		Str("sku", *result.Payload.Sku).
+		Str("status", string(result.Status)).
+		Str("submission_id", result.SubmissionId).
+		Str("sku", result.Sku).
 		Send()
-	logListingIssues(result.Payload.Issues)
+	logListingIssues(*result.Issues)
 }
 
 func getListing(cmd *cobra.Command, args []string) {
 	app := GetApp(cmd)
 	var params listings.GetListingsItemParams
 	params.MarketplaceIds = cfg.Amazon.Auth.DefaultMerchant.MarketplaceID
-	params.SellerID = cfg.Amazon.Auth.DefaultMerchant.SellerToken
-	params.Sku = listingOperationSku
-	params.IncludedData = []string{"summaries", "issues", "offers", "relationships", "attributes"}
-	result, err := app.Amazon.Client.GetListingsItem(&params)
+	params.IncludedData = &[]listings.GetListingsItemParamsIncludedData{"summaries", "issues", "offers", "relationships", "attributes"}
+	status, err := app.Amazon.Client.GetListingsItem(cmd.Context(), &params, cfg.Amazon.Auth.DefaultMerchant.SellerToken, listingOperationSku)
 	if err != nil {
 		log.Error().Err(err).Send()
 		return
 	}
-	logListingIssues(result.Payload.Issues)
-	for _, summary := range result.Payload.Summaries {
-		log.Info().
-			Str("asin", summary.Asin).
-			Str("condition", summary.ConditionType).
-			Str("name", summary.ItemName).
-			Str("status", strings.Join(summary.Status, ",")).Send()
+	result := status.JSON200
+	logListingIssues(*result.Issues)
+	for _, summary := range *result.Summaries {
+		ev := log.Info()
+		if summary.Asin != nil {
+			ev.Str("asin", *summary.Asin)
+		}
+		if summary.ConditionType != nil {
+			ev.Str("condition", string(*summary.ConditionType))
+		}
+		if summary.ItemName != nil {
+			ev.Str("name", *summary.ItemName)
+		}
+		if summary.Status != nil {
+			var sts strings.Builder
+			for i, st := range summary.Status {
+				if i > 0 {
+					sts.WriteString(",")
+				}
+				sts.WriteString(string(st))
+			}
+			ev.Str("status", sts.String())
+		}
+		ev.Send()
+
 	}
-	for _, relationship := range result.Payload.Relationships {
+	for _, relationship := range *result.Relationships {
 		for i, rls := range relationship.Relationships {
 			ev := log.Info().
-				Str("type", *rls.Type).
-				Str("child_skus", strings.Join(rls.ChildSkus, ",")).
-				Str("parent_skus", strings.Join(rls.ParentSkus, ","))
+				Str("type", string(rls.Type))
+			if rls.ChildSkus != nil {
+				ev.Str("child_skus", strings.Join(*rls.ChildSkus, ","))
+			}
+			if rls.ParentSkus != nil {
+				ev.Str("parent_skus", strings.Join(*rls.ParentSkus, ","))
+			}
 			if rls.VariationTheme != nil {
-				ev.Str("theme", *rls.VariationTheme.Theme).
+				ev.Str("theme", rls.VariationTheme.Theme).
 					Str("theme_attributes", strings.Join(rls.VariationTheme.Attributes, ","))
 			}
 			ev.Msgf("relationship %d", i+1)
 
 		}
 	}
-	if len(result.Payload.Offers) == 0 {
+	if len(*result.Offers) == 0 {
 		log.Warn().Msg("no offers found")
 	} else {
-		for i, offer := range result.Payload.Offers {
+		for i, offer := range *result.Offers {
 			ev := log.Info().
-				Str("type", *offer.OfferType)
-			if offer.Points != nil {
-				ev.Int64("points", *offer.Points.PointsNumber)
-			}
+				Str("type", string(offer.OfferType)).
+				Int("points", offer.Points.PointsNumber).
+				Str("currency_code", offer.Price.CurrencyCode).
+				Str("price", string(offer.Price.Amount))
 			if offer.Audience != nil {
-				ev.Str("audience_name", offer.Audience.DisplayName).
-					Str("audience_value", offer.Audience.Value)
-			}
-			if offer.Price != nil {
-				ev.Str("currency_code", *offer.Price.CurrencyCode).
-					Str("price", string(*offer.Price.Amount))
+				ev.Str("audience_name", *offer.Audience.DisplayName).
+					Str("audience_value", *offer.Audience.Value)
 			}
 			ev.Msgf("offer %d", i+1)
 		}
 	}
 	if getListingCfg.DisplayAttritubes {
-		attrs_bytes, err := json.Marshal(result.Payload.Attributes)
+		attrs_bytes, err := json.Marshal(result.Attributes)
 		if err != nil {
 			log.Error().Err(err).Send()
 			return
@@ -240,37 +252,38 @@ func getListing(cmd *cobra.Command, args []string) {
 func deleteListing(cmd *cobra.Command, args []string) {
 	app := GetApp(cmd)
 	var params = deleteListingCfg
-	params.Sku = listingOperationSku
 	params.MarketplaceIds = cfg.Amazon.Auth.DefaultMerchant.MarketplaceID
-	params.SellerID = cfg.Amazon.Auth.DefaultMerchant.SellerToken
-	result, err := app.Amazon.Client.DeleteListingsItem(&params)
+	status, err := app.Amazon.Client.DeleteListingsItem(cmd.Context(), &params, *getProductTypeDefinitionCfg.Params.SellerId, listingOperationSku)
 	if err != nil {
 		log.Error().Err(err).Send()
 		return
 	}
+	result := status.JSON200
 	log.Info().
-		Str("status", *result.Payload.Status).
-		Str("sku", *result.Payload.Sku).
-		Str("submission_id", *result.Payload.SubmissionID).
+		Str("status", string(result.Status)).
+		Str("sku", result.Sku).
+		Str("submission_id", result.SubmissionId).
 		Send()
-	logListingIssues(result.Payload.Issues)
+	logListingIssues(*result.Issues)
 }
 
-func logListingIssues(issues []*models.Issue) {
+func logListingIssues(issues []listings.Issue) {
 	for _, issue := range issues {
 		ev := log.Warn().
-			Str("code", *issue.Code).
-			Str("severity", *issue.Severity).
-			Str("attribute", strings.Join(issue.AttributeNames, ","))
-		if issue.Enforcements != nil && issue.Enforcements.Exemption != nil {
-			ev.Str("exempt", *issue.Enforcements.Exemption.Status)
+			Str("code", issue.Code).
+			Str("severity", string(issue.Severity))
+		if issue.AttributeNames != nil {
+			ev.Str("attributes", strings.Join(*issue.AttributeNames, ","))
+		}
+		if issue.Enforcements != nil {
+			ev.Str("exempt", string(issue.Enforcements.Exemption.Status))
 			ev.Interface("exemption_expiry_date", issue.Enforcements.Exemption.ExpiryDate)
 			var actions []string
 			for _, action := range issue.Enforcements.Actions {
-				actions = append(actions, *action.Action)
+				actions = append(actions, action.Action)
 			}
 			ev.Str("actions", strings.Join(actions, ","))
 		}
-		ev.Msg(*issue.Message)
+		ev.Msg(issue.Message)
 	}
 }

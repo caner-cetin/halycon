@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/caner-cetin/halycon/internal"
-	"github.com/caner-cetin/halycon/internal/amazon/catalog/client/catalog"
+	"github.com/caner-cetin/halycon/internal/amazon/catalog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
@@ -38,25 +38,29 @@ func getCatalogCmd() *cobra.Command {
 func getCatalogItem(cmd *cobra.Command, args []string) {
 	app := GetApp(cmd)
 	var params catalog.GetCatalogItemParams
-	params.Asin = getCatalogItemCfg.Asin
 	params.Locale = &getCatalogItemCfg.Locale
 	params.MarketplaceIds = cfg.Amazon.Auth.DefaultMerchant.MarketplaceID
-	params.IncludedData = []string{"attributes", "relationships", "summaries"}
-	result, err := app.Amazon.Client.GetCatalogItem(&params)
+	params.IncludedData = &[]catalog.GetCatalogItemParamsIncludedData{"identifiers", "summaries", "attributes", "relationships"}
+	status, err := app.Amazon.Client.GetCatalogItem(cmd.Context(), getCatalogItemCfg.Asin, &params)
 	if err != nil {
 		log.Error().Err(err).Send()
 		return
 	}
-	internal.DisplayInterface(result.Payload.Attributes)
-	for _, relationship := range result.Payload.Relationships {
+	result := status.JSON200
+	internal.DisplayInterface(result.Attributes)
+	for _, relationship := range *result.Relationships {
 		for i, rls := range relationship.Relationships {
 			ev := log.Info().
-				Str("type", *rls.Type).
-				Str("child_asins", strings.Join(rls.ChildAsins, ",")).
-				Str("parent_asins", strings.Join(rls.ParentAsins, ","))
+				Str("type", string(rls.Type))
+			if rls.ChildAsins != nil {
+				ev.Str("child_asins", strings.Join(*rls.ChildAsins, ","))
+			}
+			if rls.ParentAsins != nil {
+				ev.Str("parent_asins", strings.Join(*rls.ParentAsins, ","))
+			}
 			if rls.VariationTheme != nil {
-				ev.Str("theme", rls.VariationTheme.Theme).
-					Str("theme_attributes", strings.Join(rls.VariationTheme.Attributes, ","))
+				ev.Str("theme", *rls.VariationTheme.Theme).
+					Str("theme_attributes", strings.Join(*rls.VariationTheme.Attributes, ","))
 			}
 			ev.Msgf("relationship %d", i+1)
 

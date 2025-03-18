@@ -105,7 +105,7 @@ func (tm *TokenManager) refreshToken() (string, error) {
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
 	client := &http.Client{}
-	resp, err := client.Do(req)
+	resp, err := client.Do(req) //nolint: bodyclose
 	if err != nil {
 		return "", fmt.Errorf("error making request: %w", err)
 	}

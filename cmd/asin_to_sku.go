@@ -3,6 +3,7 @@ package cmd
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"encoding/csv"
 	"encoding/json"
 	"io"
@@ -10,8 +11,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/aws/smithy-go/ptr"
-	"github.com/caner-cetin/halycon/internal/amazon/fba_inventory/client/fba_inventory"
+	"github.com/caner-cetin/halycon/internal"
+	"github.com/caner-cetin/halycon/internal/amazon/fba_inventory"
 	sp_api "github.com/caner-cetin/halycon/internal/sp-api"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
@@ -153,28 +154,29 @@ func getAsinToMskuMap(amazonClient *sp_api.Client) (map[string]FBAProduct, error
 		params := fba_inventory.GetInventorySummariesParams{}
 		params.MarketplaceIds = cfg.Amazon.Auth.DefaultMerchant.MarketplaceID
 		params.GranularityType = "Marketplace"
-		params.GranularityID = cfg.Amazon.Auth.DefaultMerchant.MarketplaceID[0]
-		params.Details = ptr.Bool(true)
+		params.GranularityId = cfg.Amazon.Auth.DefaultMerchant.MarketplaceID[0]
+		params.Details = internal.Ptr(true)
 
 		if nextToken != nil {
 			params.NextToken = nextToken
 		}
 
-		result, err := amazonClient.GetFBAInventorySummaries(&params)
+		status, err := amazonClient.GetFBAInventorySummaries(context.TODO(), &params)
 		if err != nil {
 			return nil, err
 		}
+		result := status.JSON200
 
-		for _, summary := range result.Payload.Payload.InventorySummaries {
-			if summary.Asin != "" {
-				asinSkuMap[summary.Asin] = FBAProduct{SKU: summary.SellerSku, ProductName: summary.ProductName}
+		for _, summary := range result.Payload.InventorySummaries {
+			if summary.Asin != nil && *summary.Asin != "" {
+				asinSkuMap[*summary.Asin] = FBAProduct{SKU: *summary.SellerSku, ProductName: *summary.ProductName}
 			}
 		}
 		log.Trace().Int("page", i).Int("map_length", len(asinSkuMap)).Msg("building map...")
-		if result.Payload == nil || result.Payload.Pagination == nil {
+		if result.Payload == nil || result.Pagination == nil {
 			break
 		}
-		nextToken = &result.Payload.Pagination.NextToken
+		nextToken = result.Pagination.NextToken
 		if *nextToken == "" {
 			break
 		}

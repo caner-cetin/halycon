@@ -1,19 +1,19 @@
 package sp_api
 
 import (
+	"context"
 	"fmt"
+	"net/http"
 	"time"
 
 	osRuntime "runtime"
 
-	"github.com/caner-cetin/halycon/internal/amazon/catalog/client/catalog"
-	"github.com/caner-cetin/halycon/internal/amazon/fba_inbound/client/fba_inbound"
-	"github.com/caner-cetin/halycon/internal/amazon/fba_inventory/client/fba_inventory"
-	"github.com/caner-cetin/halycon/internal/amazon/listings/client/listings"
-	"github.com/caner-cetin/halycon/internal/amazon/product_type_definitions/client/definitions"
+	"github.com/caner-cetin/halycon/internal/amazon/catalog"
+	"github.com/caner-cetin/halycon/internal/amazon/fba_inbound"
+	"github.com/caner-cetin/halycon/internal/amazon/fba_inventory"
+	"github.com/caner-cetin/halycon/internal/amazon/listings"
+	"github.com/caner-cetin/halycon/internal/amazon/product_type_definitions"
 	"github.com/caner-cetin/halycon/internal/config"
-	"github.com/go-openapi/runtime"
-	"github.com/go-openapi/strfmt"
 	"github.com/rs/zerolog/log"
 	"golang.org/x/time/rate"
 )
@@ -41,14 +41,13 @@ type Client struct {
 	// rateLimiters manages the rate limiting for each service to comply with SP-API usage limits
 	rateLimiters map[string]*rate.Limiter
 
-	// authInfo contains the authentication credentials and information required for API calls
-	authInfo runtime.ClientAuthInfoWriter
-
 	// Token is the access token used for authentication
 	Token string
 
 	// TokenManager is the token manager used to acquire and refresh access tokens
 	TokenManager *TokenManager
+
+	rlManager *RateLimiterManager
 }
 
 // AddService adds a service with the given name to the client's services map.
@@ -62,83 +61,84 @@ func (a *Client) GetService(name string) interface{} {
 }
 
 // GetCatalogService returns the catalog service implementation from the client's service map.
-func (a *Client) GetCatalogService() catalog.ClientService {
-	return a.services[CatalogServiceName].(catalog.ClientService)
+func (a *Client) GetCatalogService() *catalog.ClientWithResponses {
+	client, _ := a.services[CatalogServiceName].(catalog.ClientWithResponses)
+	return &client
 }
 
 // GetListingsService returns the ListingsService implementation from the client's service map.
-func (a *Client) GetListingsService() listings.ClientService {
-	return a.services[ListingsServiceName].(listings.ClientService)
+// GetListingsService returns the listings service implementation from the client's service map.
+func (a *Client) GetListingsService() *listings.ClientWithResponses {
+	client, _ := a.services[ListingsServiceName].(listings.ClientWithResponses)
+	return &client
 }
 
-// GetFBAInboundService returns the FBA inbound client service from the client's service map.
-func (a *Client) GetFBAInboundService() fba_inbound.ClientService {
-	return a.services[FBAInboundServiceName].(fba_inbound.ClientService)
+// GetFBAInboundService returns the FBA inbound service implementation from the client's service map.
+func (a *Client) GetFBAInboundService() *fba_inbound.ClientWithResponses {
+	client, _ := a.services[FBAInboundServiceName].(fba_inbound.ClientWithResponses)
+	return &client
 }
 
-// GetFBAInventoryService returns the FBA Inventory client service from the client's service map.
-func (a *Client) GetFBAInventoryService() fba_inventory.ClientService {
-	return a.services[FBAInventoryServiceName].(fba_inventory.ClientService)
+// GetFBAInventoryService returns the FBA Inventory service implementation from the client's service map.
+func (a *Client) GetFBAInventoryService() *fba_inventory.ClientWithResponses {
+	client, _ := a.services[FBAInventoryServiceName].(fba_inventory.ClientWithResponses)
+	return &client
 }
 
-// GetProductTypeDefinitionsService returns the ProductTypeDefinitions service client implementation.
-func (a *Client) GetProductTypeDefinitionsService() definitions.ClientService {
-	return a.services[ProductTypeDefinitionsServiceName].(definitions.ClientService)
+// GetProductTypeDefinitionsService returns the ProductTypeDefinitions service implementation from the client's service map.
+func (a *Client) GetProductTypeDefinitionsService() *product_type_definitions.ClientWithResponses {
+	client, _ := a.services[ProductTypeDefinitionsServiceName].(product_type_definitions.ClientWithResponses)
+	return &client
 }
 
-// SearchCatalogItems searches for catalog items based on the provided parameters.
-func (a *Client) SearchCatalogItems(params *catalog.SearchCatalogItemsParams) (*catalog.SearchCatalogItemsOK, error) {
-	return a.GetCatalogService().SearchCatalogItems(params, a.WithAuth(), a.WithRateLimit(SearchCatalogItemsRLKey))
+// SearchCatalogItems searches for catalog items
+func (a *Client) SearchCatalogItems(ctx context.Context, params *catalog.SearchCatalogItemsParams) (*catalog.SearchCatalogItemsResp, error) {
+	return a.GetCatalogService().SearchCatalogItemsWithResponse(ctx, params, a.WithAuth(), a.WithRateLimit(SearchCatalogItemsRLKey))
 }
 
-// GetCatalogItem retrieves a catalog item using the provided parameters, with authentication and rate limiting.
-func (a *Client) GetCatalogItem(params *catalog.GetCatalogItemParams) (*catalog.GetCatalogItemOK, error) {
-	return a.GetCatalogService().GetCatalogItem(params, a.WithAuth(), a.WithRateLimit(GetCatalogItemsRLKey))
+// GetCatalogItem retrieves a catalog item
+func (a *Client) GetCatalogItem(ctx context.Context, asin string, params *catalog.GetCatalogItemParams) (*catalog.GetCatalogItemResp, error) {
+	return a.GetCatalogService().GetCatalogItemWithResponse(ctx, asin, params, a.WithAuth(), a.WithRateLimit(GetCatalogItemsRLKey))
 }
 
-// GetListingsItem retrieves a specific listings item using the provided parameters.
-func (a *Client) GetListingsItem(params *listings.GetListingsItemParams) (*listings.GetListingsItemOK, error) {
-	return a.GetListingsService().GetListingsItem(params, a.WithAuth(), a.WithRateLimit(GetListingsItemRLKey))
+// GetListingsItem retrieves a specific listings item.
+func (a *Client) GetListingsItem(ctx context.Context, params *listings.GetListingsItemParams, sellerId string, sku string) (*listings.GetListingsItemResp, error) {
+	return a.GetListingsService().GetListingsItemWithResponse(ctx, sellerId, sku, params, a.WithAuth(), a.WithRateLimit(GetListingsItemRLKey))
 }
 
 // DeleteListingsItem removes a listings item from Amazon's catalog
-func (a *Client) DeleteListingsItem(params *listings.DeleteListingsItemParams) (*listings.DeleteListingsItemOK, error) {
-	return a.GetListingsService().DeleteListingsItem(params, a.WithAuth(), a.WithRateLimit(DeleteListingsItemRLKey))
+func (a *Client) DeleteListingsItem(ctx context.Context, params *listings.DeleteListingsItemParams, sellerId string, sku string) (*listings.DeleteListingsItemResp, error) {
+	return a.GetListingsService().DeleteListingsItemWithResponse(ctx, sellerId, sku, params, a.WithAuth(), a.WithRateLimit(DeleteListingsItemRLKey))
 }
 
 // GetFBAInventorySummaries retrieves FBA inventory summaries
-func (a *Client) GetFBAInventorySummaries(params *fba_inventory.GetInventorySummariesParams) (*fba_inventory.GetInventorySummariesOK, error) {
-	return a.GetFBAInventoryService().GetInventorySummaries(params, a.WithAuth(), a.WithRateLimit(FBAInventorySummariesRLKey))
+func (a *Client) GetFBAInventorySummaries(ctx context.Context, params *fba_inventory.GetInventorySummariesParams) (*fba_inventory.GetInventorySummariesResp, error) {
+	return a.GetFBAInventoryService().GetInventorySummariesWithResponse(ctx, params, a.WithAuth(), a.WithRateLimit(FBAInventorySummariesRLKey))
 }
 
 // CreateFBAInboundPlan creates an inbound plan for FBA (Fulfillment by Amazon)
-func (a *Client) CreateFBAInboundPlan(params *fba_inbound.CreateInboundPlanParams) (*fba_inbound.CreateInboundPlanAccepted, error) {
-	return a.GetFBAInboundService().CreateInboundPlan(params, a.WithAuth(), a.WithRateLimit(CreateInboundPlanRLKey))
+func (a *Client) CreateFBAInboundPlan(ctx context.Context, params fba_inbound.CreateInboundPlanJSONRequestBody) (*fba_inbound.CreateInboundPlanResp, error) {
+	return a.GetFBAInboundService().CreateInboundPlanWithResponse(ctx, params, a.WithAuth(), a.WithRateLimit(CreateInboundPlanRLKey))
 }
 
-// GetInboundOperationStatus retrieves the status of an inbound operation for a fulfillment by Amazon order.
-func (a *Client) GetInboundOperationStatus(params *fba_inbound.GetInboundOperationStatusParams) (*fba_inbound.GetInboundOperationStatusOK, error) {
-	return a.GetFBAInboundService().GetInboundOperationStatus(params, a.WithAuth(), a.WithRateLimit(GetInboundOperationStatusRLKey))
+// GetInboundOperationStatus retrieves the status of an inbound operation
+func (a *Client) GetInboundOperationStatus(ctx context.Context, operation_id string) (*fba_inbound.GetInboundOperationStatusResp, error) {
+	return a.GetFBAInboundService().GetInboundOperationStatusWithResponse(ctx, operation_id, a.WithAuth(), a.WithRateLimit(GetInboundOperationStatusRLKey))
 }
 
-// SearchProductTypeDefinitions searches for product type definitions based on provided search parameters.
-func (a *Client) SearchProductTypeDefinitions(params *definitions.SearchDefinitionsProductTypesParams) (*definitions.SearchDefinitionsProductTypesOK, error) {
-	return a.GetProductTypeDefinitionsService().SearchDefinitionsProductTypes(params, a.WithAuth(), a.WithRateLimit(SearchProductTypeDefinitionsRLKey))
+// SearchProductTypeDefinitions searches for product type definitions
+func (a *Client) SearchProductTypeDefinitions(ctx context.Context, params *product_type_definitions.SearchDefinitionsProductTypesParams) (*product_type_definitions.SearchDefinitionsProductTypesResp, error) {
+	return a.GetProductTypeDefinitionsService().SearchDefinitionsProductTypesWithResponse(ctx, params, a.WithAuth(), a.WithRateLimit(SearchProductTypeDefinitionsRLKey))
 }
 
-// GetProductTypeDefinition retrieves the product type definition.
-func (a *Client) GetProductTypeDefinition(params *definitions.GetDefinitionsProductTypeParams) (*definitions.GetDefinitionsProductTypeOK, error) {
-	return a.GetProductTypeDefinitionsService().GetDefinitionsProductType(params, a.WithAuth(), a.WithRateLimit(GetProductTypeDefinitionRLKey))
+// GetProductTypeDefinition retrieves a product type definition
+func (a *Client) GetProductTypeDefinition(ctx context.Context, productType string, params *product_type_definitions.GetDefinitionsProductTypeParams) (*product_type_definitions.GetDefinitionsProductTypeResp, error) {
+	return a.GetProductTypeDefinitionsService().GetDefinitionsProductTypeWithResponse(ctx, productType, params, a.WithAuth(), a.WithRateLimit(GetProductTypeDefinitionRLKey))
 }
 
-// CreateListing submits a new product listing under FBM program.
-func (a *Client) CreateListing(params *listings.PutListingsItemParams) (*listings.PutListingsItemOK, error) {
-	return a.GetListingsService().PutListingsItem(params, a.WithAuth(), a.WithRateLimit(CreateListingRLKey))
-}
-
-// GetCatalog retrieves catalog item information.
-func (a *Client) GetCatalog(params *catalog.GetCatalogItemParams) (*catalog.GetCatalogItemOK, error) {
-	return a.GetCatalogService().GetCatalogItem(params, a.WithAuth())
+// PutListingsItem creates or updates a listing item
+func (a *Client) PutListingsItem(ctx context.Context, sellerId string, sku string, params *listings.PutListingsItemParams, body listings.PutListingsItemJSONRequestBody) (*listings.PutListingsItemResp, error) {
+	return a.GetListingsService().PutListingsItemWithResponse(ctx, sellerId, sku, params, body, a.WithAuth(), a.WithRateLimit(CreateListingRLKey))
 }
 
 // rate limiter keys for client's rate limiter mapping, each one of them leads to a rate.Limiter instance.
@@ -196,38 +196,14 @@ func NewAuthorizedClient() (*Client, error) {
 		return nil, fmt.Errorf("error while acquiring access token: %w", err)
 	}
 	log.Debug().Str("token_prefix", token[:10]+"...").Msg("acquired access token")
-	authInfo := runtime.ClientAuthInfoWriterFunc(func(r runtime.ClientRequest, _ strfmt.Registry) error {
-		// doesnt work without Authorization header
-		if err := r.SetHeaderParam("Authorization", "Bearer "+token); err != nil {
-			return fmt.Errorf("failed to set Authorization header: %w", err)
-		}
-		// also doesnt work without x-amz-access-token header
-		if err := r.SetHeaderParam("x-amz-access-token", token); err != nil {
-			return fmt.Errorf("failed to set x-amz-access-token header: %w", err)
-		}
-		// also doesnt work without X-Amz-Access-Token header
-		if err := r.SetHeaderParam("X-Amz-Access-Token", token); err != nil {
-			return fmt.Errorf("failed to set X-Amz-Access-Token header: %w", err)
-		}
-		if err := r.SetHeaderParam("host", fmt.Sprintf("https://%s", client.APIEndpoint)); err != nil {
-			return fmt.Errorf("failed to set host header: %w", err)
-		}
-		if err := r.SetHeaderParam("x-amz-date", time.Now().UTC().Format("20060102T150405Z")); err != nil {
-			return fmt.Errorf("failed to set x-amz-date header: %w", err)
-		}
-		if err := r.SetHeaderParam("user-agent", fmt.Sprintf("Halycon/0.2 (Language=Go; Platform=%s)", osRuntime.GOOS)); err != nil {
-			return fmt.Errorf("failed to set user-agent header: %w", err)
-		}
-		return nil
-	})
 
 	a := &Client{
 		services:     map[string]interface{}{},
-		authInfo:     authInfo,
 		TokenManager: tokenManager,
 		Token:        token,
 	}
 	a.SetRateLimits()
+	a.rlManager = NewRateLimiterManager(a.rateLimiters)
 	return a, nil
 }
 
@@ -235,17 +211,18 @@ func NewAuthorizedClient() (*Client, error) {
 // It takes a key string that identifies which rate limiter to use from the client's rate limiters map.
 // The returned function, when called with a runtime.ClientOperation, will replace its Client with a
 // rate-limited HTTP client that enforces the rate limits defined for the given key.
-func (a *Client) WithRateLimit(key string) func(op *runtime.ClientOperation) {
-	return func(op *runtime.ClientOperation) {
-		httpClient := NewRateLimitedClient(a.rateLimiters[key])
-		op.Client = httpClient
-	}
+func (a *Client) WithRateLimit(key string) func(ctx context.Context, req *http.Request) error {
+	return a.rlManager.RateLimiterInterceptor(key)
 }
 
 // WithAuth returns a function that is used to set the authentication information for a client operation.
 // This is typically used with the client operation configuration to ensure that the request is authenticated.
-func (a *Client) WithAuth() func(op *runtime.ClientOperation) {
-	return func(op *runtime.ClientOperation) {
-		op.AuthInfo = a.authInfo
+func (a *Client) WithAuth() func(ctx context.Context, req *http.Request) error {
+	return func(ctx context.Context, r *http.Request) error {
+		r.Header.Set("x-amz-access-token", a.Token)
+		r.Header.Set("x-amz-date", time.Now().UTC().Format("20060102T150405Z"))
+		r.Header.Set("user-agent", fmt.Sprintf("Halycon/0.2 (Language=Go; Platform=%s)", osRuntime.GOOS))
+		r.Header.Set("host", fmt.Sprintf("https://%s", config.Config.Amazon.Auth.DefaultClient.APIEndpoint))
+		return nil
 	}
 }

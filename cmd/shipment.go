@@ -11,8 +11,7 @@ import (
 	"strings"
 
 	"github.com/caner-cetin/halycon/internal"
-	"github.com/caner-cetin/halycon/internal/amazon/fba_inbound/client/fba_inbound"
-	"github.com/caner-cetin/halycon/internal/amazon/fba_inbound/models"
+	"github.com/caner-cetin/halycon/internal/amazon/fba_inbound"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
@@ -58,9 +57,8 @@ func getShipmentCmd() *cobra.Command {
 func createShipmentPlan(cmd *cobra.Command, args []string) {
 	app := GetApp(cmd)
 
-	params := fba_inbound.NewCreateInboundPlanParams()
-	params.Body = new(models.CreateInboundPlanRequest)
-	params.Body.DestinationMarketplaces = cfg.Amazon.Auth.DefaultMerchant.MarketplaceID
+	var params fba_inbound.CreateInboundPlanRequest
+	params.DestinationMarketplaces = cfg.Amazon.Auth.DefaultMerchant.MarketplaceID
 
 	ev := log.Error()
 	var msg string = ""
@@ -69,25 +67,25 @@ func createShipmentPlan(cmd *cobra.Command, args []string) {
 		return
 	}
 	ev.Discard()
-	params.Body.SourceAddress = &models.AddressInput{
-		AddressLine1: &cfg.Amazon.FBA.DefaultShipFrom.AddressLine1,
-		City:         &cfg.Amazon.FBA.DefaultShipFrom.City,
-		Name:         &cfg.Amazon.FBA.DefaultShipFrom.Name,
-		PhoneNumber:  &cfg.Amazon.FBA.DefaultShipFrom.PhoneNumber,
-		PostalCode:   &cfg.Amazon.FBA.DefaultShipFrom.PostalCode,
-		CountryCode:  &cfg.Amazon.FBA.DefaultShipFrom.CountryCode,
+	params.SourceAddress = fba_inbound.AddressInput{
+		AddressLine1: cfg.Amazon.FBA.DefaultShipFrom.AddressLine1,
+		City:         cfg.Amazon.FBA.DefaultShipFrom.City,
+		Name:         cfg.Amazon.FBA.DefaultShipFrom.Name,
+		PhoneNumber:  cfg.Amazon.FBA.DefaultShipFrom.PhoneNumber,
+		PostalCode:   cfg.Amazon.FBA.DefaultShipFrom.PostalCode,
+		CountryCode:  cfg.Amazon.FBA.DefaultShipFrom.CountryCode,
 	}
 	if cfg.Amazon.FBA.DefaultShipFrom.AddressLine2 != "" {
-		params.Body.SourceAddress.AddressLine2 = cfg.Amazon.FBA.DefaultShipFrom.AddressLine2
+		params.SourceAddress.AddressLine2 = &cfg.Amazon.FBA.DefaultShipFrom.AddressLine2
 	}
 	if cfg.Amazon.FBA.DefaultShipFrom.CompanyName != "" {
-		params.Body.SourceAddress.CompanyName = cfg.Amazon.FBA.DefaultShipFrom.CompanyName
+		params.SourceAddress.CompanyName = &cfg.Amazon.FBA.DefaultShipFrom.CompanyName
 	}
 	if cfg.Amazon.FBA.DefaultShipFrom.StateOrProvince != "" {
-		params.Body.SourceAddress.StateOrProvinceCode = cfg.Amazon.FBA.DefaultShipFrom.StateOrProvince
+		params.SourceAddress.StateOrProvinceCode = &cfg.Amazon.FBA.DefaultShipFrom.StateOrProvince
 	}
 	if cfg.Amazon.FBA.DefaultShipFrom.Email != "" {
-		params.Body.SourceAddress.Email = cfg.Amazon.FBA.DefaultShipFrom.Email
+		params.SourceAddress.Email = &cfg.Amazon.FBA.DefaultShipFrom.Email
 	}
 
 	input := internal.OpenFile(createShipmentPlanCfg.Input)
@@ -103,12 +101,12 @@ func createShipmentPlan(cmd *cobra.Command, args []string) {
 	}
 
 	// todo: config key
-	defaultPrepOwner := models.PrepOwnerNONE
-	defaultLabelOwner := models.LabelOwnerNONE
+	defaultPrepOwner := fba_inbound.NONE
+	defaultLabelOwner := fba_inbound.LabelOwnerNONE
 
 	prepRequirements := loadPrepRequirements()
 
-	items := make([]*models.ItemInput, 0, len(products)-1)
+	items := make([]fba_inbound.ItemInput, 0, len(products)-1)
 	for _, product := range products[1:] {
 		sku := product[1]
 		quantity, err := strconv.Atoi(product[3])
@@ -116,7 +114,6 @@ func createShipmentPlan(cmd *cobra.Command, args []string) {
 			log.Error().Err(err).Str("quantity", product[3]).Msg("error while converting quantity to integer")
 			return
 		}
-		quantity_64 := int64(quantity)
 
 		prepOwner := defaultPrepOwner
 		labelOwner := defaultLabelOwner
@@ -130,24 +127,24 @@ func createShipmentPlan(cmd *cobra.Command, args []string) {
 			}
 		}
 
-		items = append(items, &models.ItemInput{
-			Msku:       &sku,
-			Quantity:   &quantity_64,
-			PrepOwner:  models.NewPrepOwner(prepOwner),
-			LabelOwner: models.NewLabelOwner(labelOwner),
+		items = append(items, fba_inbound.ItemInput{
+			Msku:       sku,
+			Quantity:   quantity,
+			PrepOwner:  prepOwner,
+			LabelOwner: fba_inbound.LabelOwner(labelOwner),
 		})
 	}
-	params.Body.Items = items
+	params.Items = items
 
-	result, err := app.Amazon.Client.CreateFBAInboundPlan(params)
+	status, err := app.Amazon.Client.CreateFBAInboundPlan(cmd.Context(), params)
 	if err != nil {
 		if prepErrors := extractPrepOwnerErrors(err); len(prepErrors) > 0 {
 			log.Info().Msg("Found SKUs requiring prep, updating and retrying...")
 
 			for sku := range prepErrors {
 				requirements := ItemRequirements{
-					PrepOwner:  models.PrepOwnerNONE,
-					LabelOwner: models.LabelOwnerNONE,
+					PrepOwner:  fba_inbound.NONE,
+					LabelOwner: fba_inbound.LabelOwnerNONE,
 				}
 
 				if existing, exists := prepRequirements[sku]; exists {
@@ -155,10 +152,10 @@ func createShipmentPlan(cmd *cobra.Command, args []string) {
 				}
 
 				if strings.Contains(err.Error(), sku+" requires prepOwner") {
-					requirements.PrepOwner = models.PrepOwnerSELLER
+					requirements.PrepOwner = fba_inbound.SELLER
 				}
 				if strings.Contains(err.Error(), sku+" requires labelOwner") {
-					requirements.LabelOwner = models.LabelOwnerSELLER
+					requirements.LabelOwner = fba_inbound.LabelOwnerSELLER
 				}
 
 				prepRequirements[sku] = requirements
@@ -166,18 +163,18 @@ func createShipmentPlan(cmd *cobra.Command, args []string) {
 
 			savePrepRequirements(prepRequirements)
 			for i, item := range items {
-				if _, exists := prepErrors[*item.Msku]; exists {
-					if strings.Contains(err.Error(), *item.Msku+" requires prepOwner") {
-						items[i].PrepOwner = models.NewPrepOwner(models.PrepOwnerSELLER)
+				if _, exists := prepErrors[item.Msku]; exists {
+					if strings.Contains(err.Error(), item.Msku+" requires prepOwner") {
+						items[i].PrepOwner = fba_inbound.SELLER
 					}
 
-					if strings.Contains(err.Error(), *item.Msku+" requires labelOwner") {
-						items[i].LabelOwner = models.NewLabelOwner(models.LabelOwnerSELLER)
+					if strings.Contains(err.Error(), item.Msku+" requires labelOwner") {
+						items[i].LabelOwner = fba_inbound.LabelOwnerSELLER
 					}
 				}
 			}
 
-			result, err = app.Amazon.Client.CreateFBAInboundPlan(params)
+			status, err = app.Amazon.Client.CreateFBAInboundPlan(cmd.Context(), params)
 			if err != nil {
 				log.Error().Err(err).Msg("error occurred while creating inbound shipment plan after prep update")
 				return
@@ -187,8 +184,8 @@ func createShipmentPlan(cmd *cobra.Command, args []string) {
 			return
 		}
 	}
-
-	log.Info().Str("inbound_plan_id", *result.Payload.InboundPlanID).Str("operation_id", *result.Payload.OperationID).Msg("success!")
+	result := status.JSON202
+	log.Info().Str("inbound_plan_id", result.InboundPlanId).Str("operation_id", result.OperationId).Msg("success!")
 	shouldOpenPlan, err := internal.PromptFor("Open plan with default browser? [y/N]")
 	if err != nil {
 		log.Error().Err(err).Send()
@@ -196,7 +193,7 @@ func createShipmentPlan(cmd *cobra.Command, args []string) {
 	}
 	if strings.TrimSpace(strings.ToLower(strings.ToLower(shouldOpenPlan))) == "y" {
 		// todo: change .com, I dont know how other marketplaces works.
-		url := fmt.Sprintf("https://sellercentral.amazon.com/fba/sendtoamazon/confirm_content_step?wf=%s", *result.Payload.InboundPlanID)
+		url := fmt.Sprintf("https://sellercentral.amazon.com/fba/sendtoamazon/confirm_content_step?wf=%s", result.InboundPlanId)
 		err = internal.OpenURL(url)
 		if err != nil {
 			log.Error().Str("url", url).Err(err).Send()
@@ -209,10 +206,10 @@ func createShipmentPlan(cmd *cobra.Command, args []string) {
 // It specifies which entities are responsible for preparing and labeling items in a shipment.
 type ItemRequirements struct {
 	// PrepOwner indicates the entity responsible for preparing the item for shipment.
-	PrepOwner models.PrepOwner `json:"prep_owner"`
+	PrepOwner fba_inbound.PrepOwner `json:"prep_owner"`
 
 	// LabelOwner indicates the entity responsible for labeling the item for shipment.
-	LabelOwner models.LabelOwner `json:"label_owner"`
+	LabelOwner fba_inbound.LabelOwner `json:"label_owner"`
 }
 
 // PrepRequirements is a mapping from preparation ID to the items required for that preparation.
@@ -231,7 +228,7 @@ func extractPrepOwnerErrors(err error) map[string]string {
 	for _, match := range prepMatches {
 		if len(match) >= 2 {
 			sku := match[1]
-			prepErrors[sku] = string(models.PrepOwnerSELLER)
+			prepErrors[sku] = string(fba_inbound.SELLER)
 		}
 	}
 
@@ -239,7 +236,7 @@ func extractPrepOwnerErrors(err error) map[string]string {
 	for _, match := range labelMatches {
 		if len(match) >= 2 {
 			sku := match[1]
-			prepErrors[sku] = string(models.PrepOwnerSELLER)
+			prepErrors[sku] = string(fba_inbound.LabelOwnerSELLER)
 		}
 	}
 
@@ -283,28 +280,29 @@ func savePrepRequirements(prepRequirements PrepRequirements) {
 func getOperationStatusCmd(cmd *cobra.Command, args []string) {
 	ctx := cmd.Context()
 	app := ctx.Value(internal.APP_CONTEXT).(AppCtx)
-	params := fba_inbound.NewGetInboundOperationStatusParams()
-	params.OperationID = operationId
-	status, err := app.Amazon.Client.GetInboundOperationStatus(params)
+	status, err := app.Amazon.Client.GetInboundOperationStatus(cmd.Context(), operationId)
 	if err != nil {
 		log.Error().Err(err).Send()
 		return
 	}
+	response := status.JSON200
 	logger := log.With().
-		Str("id", *status.Payload.OperationID).
-		Str("status", string(*status.Payload.OperationStatus)).
+		Str("id", response.OperationId).
+		Str("status", string(response.OperationStatus)).
 		Logger()
-	if *status.Payload.OperationStatus == "FAILED" {
+	if response.OperationStatus == fba_inbound.FAILED {
 		logger.Warn().Send()
 	} else {
 		logger.Info().Send()
 	}
-	for i, problem := range status.Payload.OperationProblems {
-		log.Warn().
-			Str("code", *problem.Code).
-			Str("message", *problem.Message).
-			Str("details", *problem.Details).
-			Str("severity", *problem.Severity).
-			Msgf("problem %d", i+1)
+	for i, problem := range response.OperationProblems {
+		ev := log.Warn().
+			Str("code", problem.Code).
+			Str("message", problem.Message).
+			Str("severity", problem.Severity)
+		if problem.Details != nil {
+			ev.Str("details", *problem.Details)
+		}
+		ev.Msgf("problem %d", i+1)
 	}
 }

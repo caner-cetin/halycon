@@ -197,3 +197,7 @@ func CloseResponseBody(resp *http.Response) {
 		log.Error().Err(fmt.Errorf("error closing response body: %w", cerr)).Send()
 	}
 }
+
+func Ptr[T any](v T) *T {
+	return &v
+}

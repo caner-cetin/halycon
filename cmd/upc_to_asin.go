@@ -8,11 +8,8 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/aws/smithy-go/ptr"
 	"github.com/caner-cetin/halycon/internal"
-	"github.com/caner-cetin/halycon/internal/amazon/catalog/client/catalog"
-	"github.com/caner-cetin/halycon/internal/amazon/catalog/models"
-	"github.com/go-openapi/strfmt"
+	"github.com/caner-cetin/halycon/internal/amazon/catalog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
@@ -68,41 +65,44 @@ func lookupAsinFromUpc(cmd *cobra.Command, args []string) {
 		}
 	}
 	batchCount := (len(queryIdentifiers) + 9) / 10
-	results := make([]*models.ItemSearchResults, 0, batchCount)
+	results := make([]catalog.Item, 0, batchCount)
 	for identifiers := range slices.Chunk(queryIdentifiers, 10) {
 		log.Trace().Interface("identifiers", identifiers).Msg("searching next batch")
-		params := catalog.NewSearchCatalogItemsParams()
-		params.SetContext(cmd.Context())
-		params.SetMarketplaceIds(cfg.Amazon.Auth.DefaultMerchant.MarketplaceID)
-		params.SetIdentifiersType(ptr.String("UPC"))
-		params.SetIdentifiers(identifiers)
-		params.SetIncludedData([]string{"identifiers", "attributes", "summaries"})
-		result, err := app.Amazon.Client.SearchCatalogItems(params)
+		var params catalog.SearchCatalogItemsParams
+		params.MarketplaceIds = cfg.Amazon.Auth.DefaultMerchant.MarketplaceID
+		params.IdentifiersType = internal.Ptr(catalog.UPC)
+		params.Identifiers = &identifiers
+		params.IncludedData = &[]catalog.SearchCatalogItemsParamsIncludedData{"identifiers", "attributes", "summaries"}
+		params.IdentifiersType = internal.Ptr(catalog.UPC)
+		params.Identifiers = &identifiers
+		params.IncludedData = &[]catalog.SearchCatalogItemsParamsIncludedData{"identifiers", "attributes", "summaries"}
+		status, err := app.Amazon.Client.SearchCatalogItems(cmd.Context(), &params)
 		if err != nil {
 			log.Error().Err(err).Msg("error while searching catalog items")
 			return
 		}
-		if result.Payload == nil || len(result.Payload.Items) == 0 {
+		result := status.JSON200
+		if result == nil || len(result.Items) == 0 {
 			log.Warn().Interface("batch", identifiers).Msg("no items found for this batch of UPCs")
 			continue
 		}
-		results = append(results, result.Payload)
+		results = append(results, result.Items...)
 	}
 	if lookupAsinFromUpcCfg.Single {
-		item := results[0].Items[0]
-		if err := item.Asin.Validate(strfmt.Default); err != nil {
-			log.Error().Err(err).Msg("cannot validate the ASIN string")
-			return
-		}
+		item := results[0]
 		ev := log.Info()
-		for _, mplace := range item.Identifiers {
-			for _, identifier := range mplace.Identifiers {
-				ev.Str(*identifier.IdentifierType, *identifier.Identifier)
+		if item.Identifiers != nil {
+			for _, mplace := range *item.Identifiers {
+				for _, identifier := range mplace.Identifiers {
+					ev.Str(identifier.IdentifierType, identifier.Identifier)
+				}
 			}
+			ev.
+				Str("ASIN", string(item.Asin)).
+				Msg("found!")
 		}
-		ev.
-			Str("ASIN", string(*item.Asin)).
-			Msg("found!")
+		log.Warn().Msg("no identifiers found")
+		ev.Discard()
 	} else {
 		output_tmp, err := os.CreateTemp(os.TempDir(), "halycon-upc-to-asin-output-*.txt")
 		if err != nil {
@@ -116,23 +116,12 @@ func lookupAsinFromUpc(cmd *cobra.Command, args []string) {
 		upcToAsin := make(map[string]string)
 
 		for _, result := range results {
-			for _, item := range result.Items {
-				ev := log.With().Str("asin", string(*item.Asin)).Logger()
-				if err := item.Asin.Validate(strfmt.Default); err != nil {
-					ev.Fatal().Err(err).Msg("cannot validate the ASIN string")
-				}
-				if err := item.Identifiers.Validate(strfmt.Default); err != nil {
-					ev.Fatal().Err(err).Msg("cannot validate identifiers")
-				}
-				ev.Trace().Msg("writing")
-
-				for _, id := range item.Identifiers {
-					for _, identifier := range id.Identifiers {
-						if *identifier.IdentifierType == "UPC" {
-							upc := *identifier.Identifier
-							upcToAsin[upc] = string(*item.Asin)
-							break
-						}
+			for _, id := range *result.Identifiers {
+				for _, identifier := range id.Identifiers {
+					if identifier.IdentifierType == "UPC" {
+						upc := identifier.Identifier
+						upcToAsin[upc] = string(result.Asin)
+						break
 					}
 				}
 			}

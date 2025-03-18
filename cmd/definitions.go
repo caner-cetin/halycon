@@ -4,33 +4,34 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
 	"strconv"
 	"strings"
 
-	"github.com/aws/smithy-go/ptr"
 	"github.com/caner-cetin/halycon/internal"
-	"github.com/caner-cetin/halycon/internal/amazon/product_type_definitions/client/definitions"
-	"github.com/caner-cetin/halycon/internal/amazon/product_type_definitions/models"
+	"github.com/caner-cetin/halycon/internal/amazon/product_type_definitions"
 	"github.com/fatih/color"
-	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"github.com/valyala/fastjson"
 )
+
+type GetProductTypeDefinitionConfig struct {
+	Params      product_type_definitions.GetDefinitionsProductTypeParams
+	ProductType string
+}
 
 var (
 	searchProductTypeDefinitionCmd = &cobra.Command{
 		Use: "search",
 		Run: WrapCommandWithResources(searchProductTypeDefinition, ResourceConfig{Resources: []ResourceType{ResourceAmazon}, Services: []ServiceType{ServiceProductTypeDefinitions}}),
 	}
-	searchProductTypeDefinitionCfg   definitions.SearchDefinitionsProductTypesParams
+	searchProductTypeDefinitionCfg   product_type_definitions.SearchDefinitionsProductTypesParams
 	getProductTypeDefinitionDetailed bool
 	getProductTypeDefinitionCmd      = &cobra.Command{
 		Use: "get",
 		Run: WrapCommandWithResources(getProductTypeDefinition, ResourceConfig{Resources: []ResourceType{ResourceAmazon}, Services: []ServiceType{ServiceProductTypeDefinitions}}),
 	}
-	getProductTypeDefinitionCfg definitions.GetDefinitionsProductTypeParams
+	getProductTypeDefinitionCfg GetProductTypeDefinitionConfig
 
 	definitionCmd = &cobra.Command{
 		Use: "definition",
@@ -38,9 +39,9 @@ var (
 )
 
 func getDefinitionsCmd() *cobra.Command {
-	searchProductTypeDefinitionCfg.ItemName = ptr.String("")
+	searchProductTypeDefinitionCfg.ItemName = internal.Ptr("")
 	searchProductTypeDefinitionCmd.PersistentFlags().StringArrayVar(
-		&searchProductTypeDefinitionCfg.Keywords,
+		searchProductTypeDefinitionCfg.Keywords,
 		"keywords",
 		[]string{},
 		"A comma-delimited list of keywords to search product types. Note: Cannot be used with itemName.",
@@ -62,7 +63,7 @@ func getDefinitionsCmd() *cobra.Command {
 
 func searchProductTypeDefinition(cmd *cobra.Command, args []string) {
 	app := GetApp(cmd)
-	var keywords_set = len(searchProductTypeDefinitionCfg.Keywords) != 0
+	var keywords_set = len(*searchProductTypeDefinitionCfg.Keywords) != 0
 	var item_name_set = *searchProductTypeDefinitionCfg.ItemName != ""
 	if keywords_set && item_name_set {
 		log.Error().Msg("keywords and item name cannot be used together")
@@ -73,34 +74,33 @@ func searchProductTypeDefinition(cmd *cobra.Command, args []string) {
 		return
 	}
 	searchProductTypeDefinitionCfg.MarketplaceIds = cfg.Amazon.Auth.DefaultMerchant.MarketplaceID
-	result, err := app.Amazon.Client.SearchProductTypeDefinitions(&searchProductTypeDefinitionCfg)
+	status, err := app.Amazon.Client.SearchProductTypeDefinitions(cmd.Context(), &searchProductTypeDefinitionCfg)
 	if err != nil {
 		log.Error().Err(err).Send()
 		return
 	}
-	t := table.NewWriter()
-	t.SetOutputMirror(os.Stdout)
-	t.AppendHeader(table.Row{"Display Name", "Amazon Name"})
-	for _, ptype := range result.Payload.ProductTypes {
-		t.AppendRow(table.Row{*ptype.DisplayName, *ptype.Name})
-		t.AppendSeparator()
+	result := status.JSON200
+	fmt.Printf("%-40s %-40s\n", "Display Name", "Amazon Name")
+	fmt.Println(strings.Repeat("-", 80))
+	for _, ptype := range result.ProductTypes {
+		fmt.Printf("%-40s %-40s\n", ptype.DisplayName, ptype.Name)
+		fmt.Println(strings.Repeat("-", 80))
 	}
-	t.Render()
 }
 func getProductTypeDefinition(cmd *cobra.Command, args []string) {
 	app := GetApp(cmd)
-	getProductTypeDefinitionCfg.MarketplaceIds = cfg.Amazon.Auth.DefaultMerchant.MarketplaceID
-
-	result, err := app.Amazon.Client.GetProductTypeDefinition(&getProductTypeDefinitionCfg)
+	getProductTypeDefinitionCfg.Params.MarketplaceIds = cfg.Amazon.Auth.DefaultMerchant.MarketplaceID
+	status, err := app.Amazon.Client.GetProductTypeDefinition(cmd.Context(), getProductTypeDefinitionCfg.ProductType, &getProductTypeDefinitionCfg.Params)
 	if err != nil {
 		log.Error().Err(err).Send()
 		return
 	}
 
+	result := status.JSON200
 	detailedMode := getProductTypeDefinitionDetailed
-	displayProductSummary(result.Payload)
+	displayProductSummary(result)
 	if getProductTypeDefinitionDetailed {
-		schema, err := fetchAndParseSchema(*result.Payload.Schema.Link.Resource)
+		schema, err := fetchAndParseSchema(result.Schema.Link.Resource)
 		if err != nil {
 			log.Error().Err(err).Send()
 			return
@@ -114,22 +114,22 @@ func getProductTypeDefinition(cmd *cobra.Command, args []string) {
 	}
 }
 
-func displayProductSummary(payload *models.ProductTypeDefinition) {
+func displayProductSummary(payload *product_type_definitions.ProductTypeDefinition) {
 	bold := color.New(color.Bold).SprintFunc()
 	cyan := color.New(color.FgCyan).SprintFunc()
 	yellow := color.New(color.FgYellow).SprintFunc()
 	green := color.New(color.FgGreen).SprintFunc()
 
 	fmt.Printf("%s: %s  |  %s: %s  |  %s: %s | %s: %s\n\n",
-		bold("Product"), cyan(*payload.DisplayName),
-		bold("Requirements"), yellow(*payload.Requirements),
-		bold("Locale"), green(*payload.Locale),
-		bold("Schema"), cyan(*payload.Schema.Link.Resource),
+		bold("Product"), cyan(payload.DisplayName),
+		bold("Requirements"), yellow(payload.Requirements),
+		bold("Locale"), green(payload.Locale),
+		bold("Schema"), cyan(payload.Schema.Link.Resource),
 	)
 }
 
 func fetchAndParseSchema(schemaURL string) (*fastjson.Value, error) {
-	resp, err := http.DefaultClient.Get(schemaURL)
+	resp, err := http.DefaultClient.Get(schemaURL) //nolint:bodyclose
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch schema from %s: %w", schemaURL, err)
 	}
