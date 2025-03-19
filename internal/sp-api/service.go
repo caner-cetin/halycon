@@ -62,33 +62,28 @@ func (a *Client) GetService(name string) interface{} {
 
 // GetCatalogService returns the catalog service implementation from the client's service map.
 func (a *Client) GetCatalogService() *catalog.ClientWithResponses {
-	client, _ := a.services[CatalogServiceName].(catalog.ClientWithResponses)
-	return &client
+	return a.services[CatalogServiceName].(*catalog.ClientWithResponses)
 }
 
 // GetListingsService returns the ListingsService implementation from the client's service map.
 // GetListingsService returns the listings service implementation from the client's service map.
 func (a *Client) GetListingsService() *listings.ClientWithResponses {
-	client, _ := a.services[ListingsServiceName].(listings.ClientWithResponses)
-	return &client
+	return a.services[ListingsServiceName].(*listings.ClientWithResponses)
 }
 
 // GetFBAInboundService returns the FBA inbound service implementation from the client's service map.
 func (a *Client) GetFBAInboundService() *fba_inbound.ClientWithResponses {
-	client, _ := a.services[FBAInboundServiceName].(fba_inbound.ClientWithResponses)
-	return &client
+	return a.services[FBAInboundServiceName].(*fba_inbound.ClientWithResponses)
 }
 
 // GetFBAInventoryService returns the FBA Inventory service implementation from the client's service map.
 func (a *Client) GetFBAInventoryService() *fba_inventory.ClientWithResponses {
-	client, _ := a.services[FBAInventoryServiceName].(fba_inventory.ClientWithResponses)
-	return &client
+	return a.services[FBAInventoryServiceName].(*fba_inventory.ClientWithResponses)
 }
 
 // GetProductTypeDefinitionsService returns the ProductTypeDefinitions service implementation from the client's service map.
 func (a *Client) GetProductTypeDefinitionsService() *product_type_definitions.ClientWithResponses {
-	client, _ := a.services[ProductTypeDefinitionsServiceName].(product_type_definitions.ClientWithResponses)
-	return &client
+	return a.services[ProductTypeDefinitionsServiceName].(*product_type_definitions.ClientWithResponses)
 }
 
 // SearchCatalogItems searches for catalog items
@@ -104,6 +99,11 @@ func (a *Client) GetCatalogItem(ctx context.Context, asin string, params *catalo
 // GetListingsItem retrieves a specific listings item.
 func (a *Client) GetListingsItem(ctx context.Context, params *listings.GetListingsItemParams, sellerId string, sku string) (*listings.GetListingsItemResp, error) {
 	return recordError(a.GetListingsService().GetListingsItemWithResponse(ctx, sellerId, sku, params, a.WithAuth(), a.WithRateLimit(GetListingsItemRLKey))) //nolint:typecheck
+}
+
+// PatchListingsItem updates specific fields of a listings item for the given seller ID and SKU
+func (a *Client) PatchListingsItem(ctx context.Context, params *listings.PatchListingsItemParams, body listings.PatchListingsItemJSONRequestBody, sellerId string, sku string) (*listings.PatchListingsItemResp, error) {
+	return recordError(a.GetListingsService().PatchListingsItemWithResponse(ctx, sellerId, sku, params, body, a.WithAuth(), a.WithRateLimit(PatchListingsItemRLKey))) //nolint:typecheck
 }
 
 // DeleteListingsItem removes a listings item from Amazon's catalog
@@ -146,6 +146,7 @@ const (
 	SearchCatalogItemsRLKey           = "rate_limiter.catalog.searchItems"
 	GetCatalogItemsRLKey              = "rate_limiter.catalog.getItems"
 	GetListingsItemRLKey              = "rate_limiter.listings.getItem"
+	PatchListingsItemRLKey            = "rate_limiter.listings.patchListings"
 	DeleteListingsItemRLKey           = "rate_limiter.listings.deleteListingsItem"
 	CreateListingRLKey                = "rate_limiter.listings.createItem"
 	FBAInventorySummariesRLKey        = "rate_limiter.fba.inventorySummaries"
@@ -164,6 +165,7 @@ func (a *Client) SetRateLimits() {
 		SearchCatalogItemsRLKey:           rate.NewLimiter(rate.Limit(2), 2),
 		GetCatalogItemsRLKey:              rate.NewLimiter(rate.Limit(2), 2),
 		GetListingsItemRLKey:              rate.NewLimiter(rate.Limit(5), 10),
+		PatchListingsItemRLKey:            rate.NewLimiter(rate.Limit(5), 5),
 		DeleteListingsItemRLKey:           rate.NewLimiter(rate.Limit(5), 10),
 		FBAInventorySummariesRLKey:        rate.NewLimiter(rate.Limit(2), 2),
 		CreateInboundPlanRLKey:            rate.NewLimiter(rate.Limit(2), 2),

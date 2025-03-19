@@ -1,2190 +1,2214 @@
-Product: Wallet  |  Requirements: LISTING  |  Locale: en_US | Schema: https://selling-partner-definitions-prod-iad.s3.amazonaws.com/schema/WALLET.json/urkyNNBZi7zL0SoKjqsNXQ%253D%253D?X-Amz-Security-Token=IQoJb3JpZ2luX2VjEIb%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCXVzLWVhc3QtMSJIMEYCIQDCRy2n5j8N5zvgTksLujWy0aoeZFbyOr3sDmN63345OQIhAJQIkk3Ch9rKQR7LQ4YvyLQPp%2Brw7bRiKBkcy30xi3FVKtIECM7%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEQAxoMNTM1Nzg5ODIzODA4Igw8gUab7X8gGNtQlIgqpgRSb9dJd8Yxc33OwgrvJ9A%2FkgZs7GMemGLYoBtHZocDeI2S%2BB%2BVfNtQs5lrWGIHKDQET2s26NxPnUD0YrcKv1Wp2L6N520YmbbXFdyl0SNB0U1%2BT8jP0eVw%2FDZHTRlhUaGjJikIm4ZP9M1QbuzIbk5NftXfeWQ3X6Wvxw2ZS7rJ9tyEkr1uei%2F%2BzHvrvBgV1COowuLzhSptQP9jv9rZYCQlE%2F31qNDS4yasYCcFBAQZ%2FmoBMByQFLpUPhRoxlUyV7htA198%2BQhkJvRsMPvQ0UWHF7oQ0zDL9JPV4xQjkOtbrVyjCXCiOj2yluPOYbs7GdVLEfFEU%2FyffHjTKxFqacRMHyENPryqimMMGYeP7yaowxXsVhBj5Cgi%2FQ33rEjTlbj7C4U9TkeNjKLQ9L1NYWb0cISlSxNagMyEA3A0LDux521x1wmN1OzsbMTqsmelZwS%2BfSRdm%2FtwgGU1RBetf%2FIKd%2FCp6mddu%2FYJJgRywlHaQEeu2F1YXiFKjJCSHvW5iXuopwzPc15faWHM687YU339Paf206mLrA3JqsdBsSSqoDIwceZNbPl1xD5%2BzEoBvfTJOFTZwceF8PHTyVmbk7dHchev%2BHMRB2i5aSNCWCPtdO58QHzodMpR8OWROICDctOUbeXPpy92ZyLd%2BmYtl6h1cVKwd1sJHMMlDYJg5Aw%2F%2BBCpLEJ9CQi7%2B64hSy2DLPmZXU%2B0h6PdlQNdCS28m1dmt6Deu959MLvPyb4GOqYBdSBLkcVPlqcMYrMtNcIvzM5tlGvD3JElpTJftANDxiWbW%2B9RSzcpP4ldWUrRxhXSUt83%2BaMuIod58qcFvCDIJPePYVW%2Bamoy4mVJfgR9XkFoLyLTcOaZ4KCWZyj09zq6VWI%2F84ZRZumPkgOEpjm8CrvQZ2Lgus1SEZua2NIzGo9QQ3CVQ4NF5nCDl8tCWVyhDdAGQ2LisJuvwnir7AssAb0a3gKNFQ%3D%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250313T074328Z&X-Amz-SignedHeaders=host&X-Amz-Credential=ASIAXZP4P45ANTJT45BY%2F20250313%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Expires=604800&X-Amz-Signature=c2796f08165e3d29af5a03cb2ef5ed26d84d053b4e7a2f974e75cc3b433d1973
+Product: Wallet  |  Requirements: LISTING  |  Locale: en_US | Schema: https://selling-partner-definitions-prod-iad.s3.amazonaws.com/schema/WALLET.json/urkyNNBZi7zL0SoKjqsNXQ%253D%253D?X-Amz-Security-Token=IQoJb3JpZ2luX2VjECMaCXVzLWVhc3QtMSJGMEQCIDPdHwPk%2FJngYLBYdYUbvgxhNYNLtuLMFB8g07pTJ00yAiBnEGOKrH7Q%2FK2IcxRCeHTcZXNwhC%2B6SLI%2FWrcGVVeyWyrJBAh7EAMaDDUzNTc4OTgyMzgwOCIMuFiMJMu6hmjHCO6TKqYEyMbYsOXvFoOxYWCB59CvITFuiUKdvrZ8UAjWwgJCEOOad%2FRPpNfoJB7fTCtpAAXPlGdskINS87%2B2buyGFCLyjQYatZOwOb4ZHsQYLDVK%2FU2b88Rb9EirXOyMJ%2FABDNzbdJGgDQRhBel8D4mhxGE3YQZ3FB%2FcIgO%2BC8YiarEzVgAU%2BZS5lrhnuEtX06y19jPatAtSj1xmVYPZMjYAus%2BiOI0zqem0nX6uLCi4yLcbfmES%2F9q4voFg6HFXFiVC6emd%2Fose5MQz3pWuK2I7R09D90u2e0kESciTxMlHKWhgIYk1jY2TRDjI%2FRQWvovzI47H5oeE9dnNOgQk8j3v1TjKpH8%2BYRawOlOMzLBas517d5Pmp8Jm%2FOUriL9IRTu%2B8NNQcRian6aSKdIS8YIae6ZivEVGoIT4HEOPkdEiibtB96vLtukMPqGIhY5VNMSsGvSx5FhAaTDE4cEJN9ZH0FlX1knQfedF%2FKu5o58YmCb3h6jIge3LyZ%2FBqsTc1SV2xlvMmqrFyOfo1i8OzYTapcFlhj1Wv0dJYZ57bPWlCwHOS21rHbGR3OpIgKWJpeqvbpSa2VEAP8AaoJQKN2hhvhsYa353Szr9VdQkC%2Fog%2F3eMM66ovJNZNirA39NCGEMJloYC0HspDeOE9RuG1XgaDp2Dy2cjw0jDrHEbxaLbWiJDrdPhsxRsKJ9vcdEhDg5QqGZA0n5eswYANemz9XC0gGsMaP3lseNnGzDIlOy%2BBjqoAUiOPW4Cfanxip8uyZGqz%2FC8sySEEvvKxgVjF2vUik3TeE8Zf%2B1IKifFBa6R0b3zNM3SZcdZ%2BIWILzaCo80%2FWzKIcN7VGEZruVrtJOJdvpcR8H8kgf3D%2FGpJ%2FapLvIpj6T2CUT7vQU7Wy7d1sFzoGCg7vQmHSTzR41ceAaOJAhm5S2Bp11aO9gKiKJl%2FBBVmE66IrrfRICUJwas436VZvX%2B6xFxE%2Bmykaw%3D%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250319T205419Z&X-Amz-SignedHeaders=host&X-Amz-Credential=ASIAXZP4P45AL222HHXE%2F20250319%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Expires=604800&X-Amz-Signature=b2bf28019c7ca27cba665c1ee60338672e7151630f94622dd015039ba53f5f59
 
+type: "object"
 Properties:
-----------------------------------------
-* item_name (array) - Provide a title for the item that may be customer facing
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Adidas Blue Sneakers"  
-    Required Selectors: marketplace_id,language_tag
-    Required Keys: language_tag,value
-        language_tag ()
-            Title: 
-            Description: 
-        value (string)
-            Title: Item Name
-            Description: Provide a title for the item that may be customer facing
-
-
-* brand (array) - Max. 50 characters
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Ralph Lauren; North Face; Patagonia"  
-    Required Selectors: marketplace_id,language_tag
-    Required Keys: language_tag,value
-        language_tag ()
-            Title: 
-            Description: 
-        value (string)
-            Title: Brand Name
-            Description: Provide the brand name of the product
-
-
-  externally_assigned_product_identifier (array) - Provide the external ID (barcode) type and corresponding value that is being used to identify the product
-    Constraints: Min: 1, Max: 1 items
-    Examples: "714532191586"  
-    Required Selectors: marketplace_id,type
-    Required Keys: type,value
-        type (string)
-            Title: External Product ID Type
-            Description: Select the type of external ID (barcode) that is being used to identify this product
-            Enums:
-                ean (EAN)
-                gtin (GTIN)
-                upc (UPC)
-        value (string)
-            Title: External Product ID
-            Description: Provide the corresponding external product id value based on the type that was selected
-
-
-  merchant_suggested_asin (array) - Provide an ASIN for your product if one exists. If a value is not provided, the system will attempt a match based on the External Product ID.
-    Constraints: Min: 1, Max: 1 items
-    Examples: "B007KQBXN0"  
-    Required Selectors: marketplace_id,value
-    Required Keys: value
-        value (string)
-            Title: Merchant Suggested Asin
-            Description: Provide an ASIN for your product if one exists. If a value is not provided, the system will attempt a match based on the External Product ID.
-
-
-  supplier_declared_has_product_identifier_exemption (array) - Please specify if the product is exempt from supplier declared external product identifiers.
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Y, N"  
-    Options: false ("No")  true ("Yes")  
-    Required Selectors: marketplace_id
-    Required Keys: value
-        value (boolean)
-            Title: Is exempt from supplier declared external product identifier
-            Description: Please specify if the product is exempt from supplier declared external product identifiers.
-            Enums:
-                 (No)
-                 (Yes)
-
-
-* item_type_keyword (array) - Item type keywords are used to place new ASINs in the appropriate place(s) within the graph. Select the most specific accurate term for optimal placement.
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Carry on luggage"  
-    Required Selectors: marketplace_id
-    Required Keys: value
-        value (string)
-            Title: Item Type Keyword
-            Description: Item type keywords are used to place new ASINs in the appropriate place(s) within the graph. Select the most specific accurate term for optimal placement.
-
-
-  target_audience (array) - Specify the target audience that the product is intended for
-    Constraints: Min: 1, Max: 35 items
-    Examples: "Men"  
-    Required Selectors: marketplace_id,language_tag
-    Required Keys: language_tag,value
-        language_tag ()
-            Title: 
-            Description: 
-        value (string)
-            Title: Target Audience
-            Description: Specify the target audience that the product is intended for
-
-
-  model_number (array) - Product code assigned by the manufacturer; can be numbers, letters, or both
-    Constraints: Min: 1, Max: 1 items
-    Examples: "C-50"  
-    Required Selectors: marketplace_id
-    Required Keys: value
-        value (string)
-            Title: Model Number
-            Description: Provide the manufacturer 's model number for the item
-
-
-  model_name (array) - Specify the model name of the product as defined by the manufacturer or brand excluding item type, color, brand or size
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Camedia"  
-    Required Selectors: marketplace_id,language_tag
-    Required Keys: language_tag,value
-        language_tag ()
-            Title: 
-            Description: 
-        value (string)
-            Title: Model Name
-            Description: Specify the model name of the product as defined by the manufacturer or brand excluding item type, color, brand or size
-
-
-  manufacturer (array) - Provide the company that manufactures the product.
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Sony, Kitchen Aid, Microsoft"  
-    Required Selectors: marketplace_id,language_tag
-    Required Keys: language_tag,value
-        language_tag ()
-            Title: 
-            Description: 
-        value (string)
-            Title: Manufacturer
-            Description: Provide the company that manufactures the product.
-
-
-  skip_offer (array) - Please indicate whether the offer should be skipped and a buyable offer should not be created. A value of "Yes", means no offer will be created.
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Yes"  
-    Options: false ("No")  true ("Yes")  
-    Required Selectors: marketplace_id
-    Required Keys: value
-        value (boolean)
-            Title: Skip Offer
-            Description: Please indicate whether the offer should be skipped and a buyable offer should not be created. A value of "Yes", means no offer will be created.
-            Enums:
-                 (No)
-                 (Yes)
-
-
-  fulfillment_availability (array) - For those merchants using Amazon fulfillment services, please provide associated logistical information.
-    Constraints: Min: 1, Max: 1 items
-    Required Selectors: fulfillment_channel_code
-    Required Keys: fulfillment_channel_code
-        fulfillment_channel_code (string)
-            Title: Fulfillment Channel Code
-            Description: For those merchants using Amazon fulfillment services, this designates which fulfillment network will be used. Specifying a value other than DEFAULT will cancel the Merchant-fulfilled offering.
-            Enums:
-                AMAZON_NA (AMAZON_NA)
-                DEFAULT (DEFAULT)
-
-
-  map_policy (array) - Select one.
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Policy 9"  
-    Options: "policy_1" ("Policy 1")  "policy_10" ("Policy 10")  "policy_11" ("Policy 11")  "policy_2" ("Policy 2")  "policy_3" ("Policy 3")  "policy_4" ("Policy 4")  "policy_5" ("Policy 5")  "policy_6" ("Policy 6")  "policy_7" ("Policy 7")  "policy_8" ("Policy 8")  "policy_9" ("Policy 9")  
-    Required Selectors: marketplace_id
-    Required Keys: value
-        value (string)
-            Title: Minimum Advertised Price Display
-            Description: Select one.
-            Enums:
-                policy_1 (Policy 1)
-                policy_10 (Policy 10)
-                policy_11 (Policy 11)
-                policy_2 (Policy 2)
-                policy_3 (Policy 3)
-                policy_4 (Policy 4)
-                policy_5 (Policy 5)
-                policy_6 (Policy 6)
-                policy_7 (Policy 7)
-                policy_8 (Policy 8)
-                policy_9 (Policy 9)
-
-
-  purchasable_offer (array) - The attribute indicates the Purchasable Offer of the product
-    Constraints: Min: 1, Max: 1 items
-    Examples: "EUR"  
-    Required Selectors: marketplace_id,currency,audience
-
-  condition_type (array) - Provide the actual condition type of the product
-    Constraints: Min: 1, Max: 1 items
-    Examples: "New"  
-    Options: "club_club" ("Club")  "collectible_acceptable" ("Collectible - Acceptable")  "collectible_good" ("Collectible - Good")  "collectible_like_new" ("Collectible - Like New")  "collectible_very_good" ("Collectible - Very Good")  "new_new" ("New")  "new_oem" ("New - OEM")  "new_open_box" ("New - Open Box")  "refurbished_refurbished" ("Refurbished")  "used_acceptable" ("Used - Acceptable")  "used_good" ("Used - Good")  "used_like_new" ("Used - Like New")  "used_very_good" ("Used - Very Good")  
-    Required Selectors: marketplace_id
-    Required Keys: value
-        value (string)
-            Title: Offering Condition Type
-            Description: Provide the actual condition type of the product
-            Enums:
-                club_club (Club)
-                collectible_acceptable (Collectible - Acceptable)
-                collectible_good (Collectible - Good)
-                collectible_like_new (Collectible - Like New)
-                collectible_very_good (Collectible - Very Good)
-                new_new (New)
-                new_oem (New - OEM)
-                new_open_box (New - Open Box)
-                refurbished_refurbished (Refurbished)
-                used_acceptable (Used - Acceptable)
-                used_good (Used - Good)
-                used_like_new (Used - Like New)
-                used_very_good (Used - Very Good)
-
-
-  condition_note (array) - Provide descriptive text explaining the actual condition of the item
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Small dent in left side panel."  
-    Required Selectors: marketplace_id,language_tag
-    Required Keys: language_tag,value
-        language_tag ()
-            Title: 
-            Description: 
-        value (string)
-            Title: Offer Condition Note
-            Description: Provide descriptive text explaining the actual condition of the item
-
-
-  list_price (array) - Provide the list price for the product. List Price is the suggested retail price of a product as provided by a manufacturer, supplier, or seller. This is not the offering or cost price.
-    Constraints: Min: 1, Max: 1 items
-    Examples: "64 USD, 69 GBP, 98 EUR"  
-    Required Selectors: marketplace_id,currency
-    Required Keys: currency,value
-        currency (string)
-            Title: List Price Currency
-            Description: Select the corresponding currency
-            Enums:
-                USD (USD)
-        value (number)
-            Title: List Price
-            Description: Provide the list price for the product not including tax. List Price is the suggested retail price of a product as provided by a manufacturer, supplier, or seller. This is not the offering or cost price. If you are unable to provide a value, enter 0.
-
-
-  product_tax_code (array) - Enter the product tax code supplied to you by Amazon.com
-    Constraints: Min: 1, Max: 1 items
-    Examples: "A_GEN_NOTAX"  
-    Required Selectors: marketplace_id
-    Required Keys: value
-        value (string)
-            Title: Product Tax Code
-            Description: Enter the product tax code supplied to you by Amazon.com
-
-
-  merchant_release_date (array) - Provide the merchant release date using YYYY-MM-DD format
-    Constraints: Min: 1, Max: 1 items
-    Required Selectors: marketplace_id
-    Required Keys: value
-        value (string)
-            Title: Merchant Release Date
-            Description: Provide the merchant release date using YYYY-MM-DD format
-
-
-  merchant_shipping_group (array) - The ship configuration group for an offer. The ship configuration group is created and managed by the seller through the ship setting UI.
-    Constraints: Min: 1, Max: 1 items
-    Examples: "\"Heavy Bulky Products\", \"CN ShunFeng Delivery\""  
-    Required Selectors: marketplace_id
-    Required Keys: value
-        value (string)
-            Title: Merchant Shipping Group
-            Description: The ship configuration group for an offer. The ship configuration group is created and managed by the seller through the ship setting UI.
-
-
-  max_order_quantity (array) - Max order quantity.
-    Constraints: Min: 1, Max: 1 items
-    Required Selectors: marketplace_id
-    Required Keys: value
-        value (integer)
-            Title: Maximum Order Quantity
-            Description: Max order quantity.
-
-
-  gift_options (array) - Provide gift card options
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Yes"  
-    Required Selectors: marketplace_id
-
-  main_offer_image_locator (array) - Provide the location of the image
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Feed"  
-    Required Selectors: marketplace_id
-    Required Keys: media_location
-        media_location (string)
-            Title: Main Image Location
-            Description: The URL where the main offer-specific image of the product is located
-
-
-  other_offer_image_locator_1 (array) - Provide the location of the image
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Feed"  
-    Required Selectors: marketplace_id
-    Required Keys: media_location
-        media_location (string)
-            Title: Other Image Location
-            Description: The URL for additional images of your product. These images will be shown on the detail page when the customer clicks through to see other views associated with the product.
-
-
-  other_offer_image_locator_2 (array) - Provide the location of the image
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Feed"  
-    Required Selectors: marketplace_id
-    Required Keys: media_location
-        media_location (string)
-            Title: Other Image Location
-            Description: The URL for additional images of your product. These images will be shown on the detail page when the customer clicks through to see other views associated with the product.
-
-
-  other_offer_image_locator_3 (array) - Provide the location of the image
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Feed"  
-    Required Selectors: marketplace_id
-    Required Keys: media_location
-        media_location (string)
-            Title: Other Image Location
-            Description: The URL for additional images of your product. These images will be shown on the detail page when the customer clicks through to see other views associated with the product.
-
-
-  other_offer_image_locator_4 (array) - Provide the location of the image
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Feed"  
-    Required Selectors: marketplace_id
-    Required Keys: media_location
-        media_location (string)
-            Title: Other Image Location
-            Description: The URL for additional images of your product. These images will be shown on the detail page when the customer clicks through to see other views associated with the product.
-
-
-  other_offer_image_locator_5 (array) - Provide the location and source of the image
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Feed"  
-    Required Selectors: marketplace_id
-    Required Keys: media_location
-        media_location (string)
-            Title: Other Image Location
-            Description: The URL for additional images of your product. These images will be shown on the detail page when the customer clicks through to see other views associated with the product.
-
-
-  handmade_classification (array) - Select the value that best describes how the product was produced
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Hand-Altered"  
-    Options: "hand_altered" ("Hand-Altered")  "hand_designed" ("Hand-Designed")  "handcrafted" ("Handcrafted")  "repurposed" ("Repurposed")  "upcycled" ("Upcycled")  
-    Required Selectors: marketplace_id
-    Required Keys: value
-        value (string)
-            Title: Handmade Classification
-            Description: Select the value that best describes how the product was produced
-            Enums:
-                hand_altered (Hand-Altered)
-                hand_designed (Hand-Designed)
-                handcrafted (Handcrafted)
-                repurposed (Repurposed)
-                upcycled (Upcycled)
-
-
-* product_description (array) - The description you provide should pertain to the product in general, not your particular item. There is a 2,000 character maximum.
-    Constraints: Min: 1, Max: 1 items
-    Examples: "This ham has been smoked for 12 hours..."  
-    Required Selectors: marketplace_id,language_tag
-    Required Keys: language_tag,value
-        language_tag ()
-            Title: 
-            Description: 
-        value (string)
-            Title: Product Description
-            Description: Provide a text description of the product. This information will appear in paragraph form on the detail page of your product. Include unique product features, product line details, and product specifications. Do not use all caps.
-
-
-* bullet_point (array) - Max. 100 characters per line. Use these to highlight some of the product's most important qualities. Each line will be displayed as a separate bullet point above the product description.
-    Constraints: Min: 1, Max: 10 items
-    Examples: "Delicious honey-apricot glaze"  
-    Required Selectors: marketplace_id,language_tag
-    Required Keys: language_tag,value
-        language_tag ()
-            Title: 
-            Description: 
-        value (string)
-            Title: Bullet Point
-            Description: Brief descriptive text, called out via a bullet point, regarding a specific aspect of the product. These display directly under or next to your product photo, it is useful to put interesting information in these fields. Do NOT use all caps or abbreviations. Please do NOT use for fabric content, care instructions or country as these are populated in different fields.
-
-
-  generic_keyword (array) - Provide specific search terms to help customers find your product.
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Dark Chocolate, Apples, Cookies"  
-    Required Selectors: marketplace_id,language_tag
-    Required Keys: language_tag,value
-        language_tag ()
-            Title: 
-            Description: 
-        value (string)
-            Title: Generic Keyword
-            Description: Provide any terms that may be relevant to customer searches. No repetition, no competitor brand names or ASINs.
-
-
-  special_feature (array) - An additional text field where you can indicate any additional relevant product information.
-    Constraints: Min: 1, Max: 14 items
-    Examples: "max number of images 36,  Operating Time 6 hours"  
-    Required Selectors: marketplace_id,language_tag
-    Required Keys: language_tag,value
-        language_tag ()
-            Title: 
-            Description: 
-        value (string)
-            Title: Special Features
-            Description: Provide any special features an item has that distinguish it from other, comparable products
-
-
-  style (array) - The style of the item
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Mission; Art Deco; Jack Purcell"  
-    Required Selectors: marketplace_id,language_tag
-    Required Keys: language_tag,value
-        language_tag ()
-            Title: 
-            Description: 
-        value (string)
-            Title: Style
-            Description: Provide the style of the product. Style refers to the aesthetic choices of a person or a group of people. It describes the distinctive visual representation of a product
-
-
-  department (array) - List the department in which the product is found.
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Womens"  
-    Required Selectors: marketplace_id,language_tag
-    Required Keys: language_tag,value
-        language_tag ()
-            Title: 
-            Description: 
-        value (string)
-            Title: Department Name
-            Description: Provide the gender/age for which this item is intended
-
-
-  target_gender (array) - Provide the target gender for the product
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Female"  
-    Options: "female" ("Female")  "male" ("Male")  "unisex" ("Unisex")  
-    Required Selectors: marketplace_id
-    Required Keys: value
-        value (string)
-            Title: Target Gender
-            Description: Provide the target gender for the product
-            Enums:
-                female (Female)
-                male (Male)
-                unisex (Unisex)
-
-
-  age_range_description (array) - Specify an appropriate age range description for the item
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Baby"  
-    Required Selectors: marketplace_id,language_tag
-    Required Keys: language_tag,value
-        language_tag ()
-            Title: 
-            Description: 
-        value (string)
-            Title: Age Range Description
-            Description: Specify an appropriate age range description for the item
-
-
-  material (array) - What material is the product made out of?
-    Constraints: Min: 1, Max: 10 items
-    Examples: "nylon, wood, steel"  
-    Required Selectors: marketplace_id,language_tag
-    Required Keys: language_tag,value
-        language_tag ()
-            Title: 
-            Description: 
-        value (string)
-            Title: Material Type
-            Description: Specify the primary materials used for manufacturing the item
-
-
-  lining_description (array) - Provide the type of fabric or material used to line the interior of the item.
-    Constraints: Min: 1, Max: 1 items
-    Required Selectors: marketplace_id,language_tag
-    Required Keys: language_tag,value
-        language_tag ()
-            Title: 
-            Description: 
-        value (string)
-            Title: Lining Description
-            Description: Provide the type of fabric or material used to line the interior of the item.
-
-
-  number_of_items (array) - Provide the total number of identical items in the selling unit to the customer
-    Constraints: Min: 1, Max: 1 items
-    Required Selectors: marketplace_id
-    Required Keys: value
-        value (integer)
-            Title: Number of Items
-            Description: Provide the total number of identical items in the selling unit to the customer
-
-
-  item_package_quantity (array) - Quantity of the item for sale in one package
-    Constraints: Min: 1, Max: 1 items
-    Required Selectors: marketplace_id
-    Required Keys: value
-        value (integer)
-            Title: Item Package Quantity
-            Description: Provide the number of packages sold as part of a single item. An ASIN selling 5 boxes of paperclips with 100 paperclips per box would have item package quantity = '5'
-
-
-  subject_character (array) - Provide the primary character the item represents
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Batman"  
-    Required Selectors: marketplace_id,language_tag
-    Required Keys: language_tag,value
-        language_tag ()
-            Title: 
-            Description: 
-        value (string)
-            Title: Subject Character
-            Description: Provide the primary character the item represents
-
-
-  special_size_type (array) - Specify the special size type for the item
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Husky, Petite"  
-    Required Selectors: marketplace_id,language_tag
-    Required Keys: language_tag,value
-        language_tag ()
-            Title: 
-            Description: 
-        value (string)
-            Title: Special Size
-            Description: Specify the special size type for the item
-
-
-  color (array) - Provide the color of the product
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Cranberry"  
-    Required Selectors: marketplace_id,language_tag
-    Required Keys: language_tag
-        language_tag ()
-            Title: 
-            Description: 
-
-
-  size (array) - An alphanumeric string detailing the size of the product that a customer would select when purchasing.  E.g. Small, Medium, Large.  For items that do not vary by size, simply state “One Size”.
-    Constraints: Min: 1, Max: 1 items
-    Examples: "X-Large"  
-    Required Selectors: marketplace_id,language_tag
-    Required Keys: language_tag,value
-        language_tag ()
-            Title: 
-            Description: 
-        value (string)
-            Title: Size
-            Description: Provide the size of the item
-
-
-  metal_type (array) - Provide the type of metal on the item.
-    Constraints: Min: 1, Max: 5 items
-    Examples: "Bronze"  
-    Required Selectors: marketplace_id,language_tag
-    Required Keys: language_tag,value
-        language_tag ()
-            Title: 
-            Description: 
-        value (string)
-            Title: Metal Type
-            Description: Provide the type of metal on the item.
-
-
-  part_number (array) - For most products, this will be identical to the model number; however, some manufacturers distinguish part number from model number.
-    Constraints: Min: 1, Max: 1 items
-    Examples: "LE"  
-    Required Selectors: marketplace_id
-    Required Keys: value
-        value (string)
-            Title: Part Number
-            Description: Provide the part number. For many products, this will be identical to the model number however some manufacturers distinguish part number from model number
-
-
-  item_shape (array) - Specify the shape of the item
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Round"  
-    Required Selectors: marketplace_id,language_tag
-    Required Keys: language_tag,value
-        language_tag ()
-            Title: 
-            Description: 
-        value (string)
-            Title: Item Shape
-            Description: Specify the shape of the item
-
-
-  theme (array) - Provide the primary high-level subject, concept, topic, motif, or idea of an item.
-    Constraints: Min: 1, Max: 4 items
-    Examples: "Sports"  
-    Required Selectors: marketplace_id,language_tag
-    Required Keys: language_tag,value
-        language_tag ()
-            Title: 
-            Description: 
-        value (string)
-            Title: Theme
-            Description: Provide the primary high-level subject, concept, topic, motif, or idea of an item.
-
-
-  ring (array) - The attribute indicates Ring of the product
-    Constraints: Min: 1, Max: 1 items
-    Examples: "One Size"  
-    Required Selectors: marketplace_id
-
-  fit_type (array) - Specify the item's fit type
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Relaxed"  
-    Required Selectors: marketplace_id,language_tag
-    Required Keys: language_tag,value
-        language_tag ()
-            Title: 
-            Description: 
-        value (string)
-            Title: Fit Type
-            Description: Specify the item's fit type
-
-
-  pocket_description (array) - Enter the appropriate description. Mandatory if style is a denim, short or pant style.
-    Constraints: Min: 1, Max: 6 items
-    Examples: "Basic 5 Pocket"  
-    Required Selectors: marketplace_id,language_tag
-    Required Keys: language_tag,value
-        language_tag ()
-            Title: 
-            Description: 
-        value (string)
-            Title: Pocket Description
-            Description: Provide the pocket description
-
-
-  care_instructions (array) - Provide instructions related to how to care for the item
-    Constraints: Min: 1, Max: 2 items
-    Required Selectors: marketplace_id,language_tag
-    Required Keys: language_tag,value
-        language_tag ()
-            Title: 
-            Description: 
-        value (string)
-            Title: Care Instructions
-            Description: Provide instructions related to how to care for the item
-
-
-  edition (array) - Provide the version or edition of the item
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Teacher's Edition, Unabridged Version"  
-    Required Selectors: marketplace_id,language_tag
-    Required Keys: language_tag,value
-        language_tag ()
-            Title: 
-            Description: 
-        value (string)
-            Title: Edition
-            Description: Provide the version or edition of the item
-
-
-  configuration (array) - Indicate the configuration of the item
-    Constraints: Min: 1, Max: 1 items
-    Examples: "AWD Configuration"  
-    Required Selectors: marketplace_id,language_tag
-    Required Keys: language_tag,value
-        language_tag ()
-            Title: 
-            Description: 
-        value (string)
-            Title: Configuration
-            Description: Indicate the configuration of the item
-
-
-  paper_size (array) - Specify the size of the paper
-    Constraints: Min: 1, Max: 1 items
-    Examples: "6 x 5 Millimeters, 8 1/2 x 11 Inches"  
-    Required Selectors: marketplace_id,language_tag
-    Required Keys: language_tag,value
-        language_tag ()
-            Title: 
-            Description: 
-        value (string)
-            Title: Paper Size
-            Description: Specify the size of the paper as a numeric value
-
-
-  platform_for_display (array) - Provide the platform associated with the product.
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Android, Mac, PC"  
-    Required Selectors: marketplace_id,language_tag
-    Required Keys: language_tag,value
-        language_tag ()
-            Title: 
-            Description: 
-        value (string)
-            Title: Platform for Display
-            Description: Provide the platform associated with the product.
-
-
-  is_customizable (array) - Is customizable?
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Yes"  
-    Options: false ("No")  true ("Yes")  
-    Required Selectors: marketplace_id
-    Required Keys: value
-        value (boolean)
-            Title: Is Customizable?
-            Description: Specify if this product is customizable.
-            Enums:
-                 (No)
-                 (Yes)
-
-
-  lens (array) - The attribute indicates Lens of the product
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Chemical Resistant Coating"  
-    Required Selectors: marketplace_id
-
-  item_display_dimensions (array) - Provide the dimensions of the product, without packaging and fully assembled
-    Constraints: Min: 1, Max: 1 items
-    Examples: "5.7 Inches x 3.5 Inches x 1.8 Inches"  
-    Required Selectors: marketplace_id
-
-  flavor (array) - What flavor is the product?
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Double Rich Chocolate, Cherry, Chocolate, Vanilla"  
-    Required Selectors: marketplace_id,language_tag
-    Required Keys: language_tag,value
-        language_tag ()
-            Title: 
-            Description: 
-        value (string)
-            Title: Flavor
-            Description: Specify the flavor of the product
-
-
-  form_factor (array) - Specify the outward design characteristics of the item
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Box Bed, Bunk, Camp Bed, Loveseat"  
-    Required Selectors: marketplace_id,language_tag
-    Required Keys: language_tag,value
-        language_tag ()
-            Title: 
-            Description: 
-        value (string)
-            Title: Form Factor
-            Description: Specify the outward design characteristics of the item
-
-
-  access_method (array) - Provide the access method
-    Constraints: Min: 1, Max: 1 items
-    Examples: "example text goes here"  
-    Required Selectors: marketplace_id,language_tag
-    Required Keys: language_tag,value
-        language_tag ()
-            Title: 
-            Description: 
-        value (string)
-            Title: Access Method
-            Description: Provide the access method
-
-
-  leather_type (array) - Provide leather type of the product
-    Constraints: Min: 1, Max: 7 items
-    Examples: "Nubuck, Patent Leather, Suede, Smooth Leather"  
-    Required Selectors: marketplace_id,language_tag
-    Required Keys: language_tag,value
-        language_tag ()
-            Title: 
-            Description: 
-        value (string)
-            Title: Leather Type
-            Description: Provide leather type of the product
-
-
-  pattern (array) - Provide the most prominent repeated decorative design of the item
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Floral, Geometric, Polka Dot"  
-    Required Selectors: marketplace_id,language_tag
-    Required Keys: language_tag,value
-        language_tag ()
-            Title: 
-            Description: 
-        value (string)
-            Title: Pattern
-            Description: Provide the most prominent repeated decorative design of the item
-
-
-  unit_count (array) - Specify the number of units and the unit type of the product
-    Constraints: Min: 1, Max: 1 items
-    Examples: "72.0 Ounces"  
-    Required Selectors: marketplace_id
-    Required Keys: value
-        value (number)
-            Title: Unit Count
-            Description: For products that are consumed by volume, weight, linear dimension, etc., provide the net quantity that would be shipped to a customer who orders one ASIN (e.g. 12 pack of 6 floz. bottles of water = 72, vs. a single 2 liter bottle = 2). For products consumed as individual units, provide the total number of units (pack of 12 pens = 12). For packed assortments of non-identical items, enter 1
-
-
-  product_site_launch_date (array) - Date you wish this detail page to launch.
-    Constraints: Min: 1, Max: 1 items
-    Required Selectors: marketplace_id
-    Required Keys: value
-        value (string)
-            Title: Product Site Launch Date
-            Description: Provide the date the product launches and should first be shown on the Amazon website (YYYY-MM-DD format). PSLD does not impact buyability or pre-order logic, it is used to indicate when a product will be visible and searchable on the Amazon website
-
-
-  included_components (array) - Which components are included?
-    Constraints: Min: 1, Max: 79 items
-    Examples: "Camera Body, Battery Pack"  
-    Required Selectors: marketplace_id,language_tag
-    Required Keys: language_tag,value
-        language_tag ()
-            Title: 
-            Description: 
-        value (string)
-            Title: Included Components
-            Description: Specify the items that are included with this product
-
-
-  league_name (array) - Name of league associated with this event
-    Constraints: Min: 1, Max: 6 items
-    Examples: "NBA"  
-    Required Selectors: marketplace_id,language_tag
-    Required Keys: language_tag,value
-        language_tag ()
-            Title: 
-            Description: 
-        value (string)
-            Title: League Name
-            Description: Provide the league name associated with this product
-
-
-  team_name (array) - Name of team participating in this event.
-    Constraints: Min: 1, Max: 2 items
-    Examples: "Seattle Seahawks, Wisconsin Badgers"  
-    Required Selectors: marketplace_id,language_tag
-    Required Keys: language_tag,value
-        language_tag ()
-            Title: 
-            Description: 
-        value (string)
-            Title: Team Name
-            Description: Please enter the team name of this product
-
-
-  is_autographed (array) - Provide if the product has been autographed by a celebrity or player.
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Yes"  
-    Options: false ("No")  true ("Yes")  
-    Required Selectors: marketplace_id
-    Required Keys: value
-        value (boolean)
-            Title: Is Autographed
-            Description: Provide if the product has been autographed by a celebrity or player.
-            Enums:
-                 (No)
-                 (Yes)
-
-
-  band (array) - The attribute indicates Band of the product
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Angstrom"  
-    Required Selectors: marketplace_id
-
-  embellishment_feature (array) - Description of something extra attached to the item for decorative purposes.
-    Constraints: Min: 1, Max: 8 items
-    Examples: "Buckle"  
-    Required Selectors: marketplace_id,language_tag
-    Required Keys: language_tag,value
-        language_tag ()
-            Title: 
-            Description: 
-        value (string)
-            Title: Embellishment Feature
-            Description: Description of something extra attached to the item for decorative purposes.
-
-
-  ink (array) - The attribute indicates Ink of the product
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Multicolor"  
-    Required Selectors: marketplace_id
-
-  length_range (array) - Length range for blinds
-    Constraints: Min: 1, Max: 1000 items
-    Examples: "24-60\" long"  
-    Required Selectors: marketplace_id,language_tag
-    Required Keys: language_tag,value
-        language_tag ()
-            Title: 
-            Description: 
-        value (string)
-            Title: Length Range
-            Description: Length range for blinds
-
-
-  width_range (array) - Width range for blinds
-    Constraints: Min: 1, Max: 1000 items
-    Examples: "24-60\" wide"  
-    Required Selectors: marketplace_id,language_tag
-    Required Keys: language_tag,value
-        language_tag ()
-            Title: 
-            Description: 
-        value (string)
-            Title: Width Range
-            Description: Width range for blinds
-
-
-  number_of_compartments (array) - Indicates number of internal compartments.
-    Constraints: Min: 1, Max: 1 items
-    Examples: "3, 4, 5"  
-    Required Selectors: marketplace_id
-    Required Keys: value
-        value (integer)
-            Title: Number of Compartments
-            Description: Provide the number of compartments that the item has
-
-
-  number_of_pockets (array) - Provide the total count of pockets on the product.
-    Constraints: Min: 1, Max: 1 items
-    Examples: "12"  
-    Required Selectors: marketplace_id
-    Required Keys: value
-        value (integer)
-            Title: Number of Pockets
-            Description: Provide the total count of pockets on the product.
-
-
-  number_of_sections (array) - Enter the number of sections
-    Constraints: Min: 1, Max: 1 items
-    Examples: "6"  
-    Required Selectors: marketplace_id
-    Required Keys: value
-        value (integer)
-            Title: Number of Sections
-            Description: Enter the number of sections
-
-
-  closure (array) - The attribute indicates the Closure of the product
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Zipper"  
-    Required Selectors: marketplace_id
-
-  item_depth_width_height (array) - The depth and width of the item in ready to use condition. Ready to use is defined as out of packaging and displayed as used for example fully rolled out for a rug or blanket.
-    Constraints: Min: 1, Max: 1 items
-    Examples: "40 Inches"  
-    Required Selectors: marketplace_id
-    Required Keys: depth,height,width
-        depth (object)
-            Title: Item Depth Front to Back
-            Description: Provide the depth of the item from front to back when kept horizontal & closed.
-            Required Keys: unit,value
-                unit (string)
-                    Title: Item Depth Unit
-                    Description: Select the unit of measure for the item depth.
-                    Enums:
-                        inches (Inches)
-                value (number)
-                    Title: Item Depth Front to Back
-                    Description: Provide the depth of the item from front to back when kept horizontal & closed.
-        height (object)
-            Title: Height Top to Bottom
-            Description: Provide the height of the item from top to bottom when kept horizontal & closed.
-            Required Keys: unit,value
-                unit (string)
-                    Title: Item Height Unit
-                    Description: Select the unit of measure for the item height.
-                    Enums:
-                        inches (Inches)
-                value (number)
-                    Title: Height Top to Bottom
-                    Description: Provide the height of the item from top to bottom when kept horizontal & closed.
-        width (object)
-            Title: Item Width Side to Side
-            Description: Provide the width from side to side of the front of the item when kept horizontal and closed.
-            Required Keys: unit,value
-                unit (string)
-                    Title: Item Width Unit
-                    Description: Select the unit of measure for the item width.
-                    Enums:
-                        inches (Inches)
-                value (number)
-                    Title: Item Width Side to Side
-                    Description: Provide the width from side to side of the front of the item when kept horizontal and closed.
-
-
-  wallet_compartment_type (array) - Provide the type(s) of compartments that the wallet includes. This indicates which items the wallet is capable of holding.
-    Constraints: Min: 1, Max: 9 items
-    Examples: "Business Card"  
-    Options: "business_card" ("Business Card")  "checkbook" ("Checkbook")  "coin" ("Coin")  "credit_card" ("Credit Card")  "id_card" ("ID Card")  "key" ("Key")  "paper_money" ("Paper Money")  "passport" ("Passport")  "photo" ("Photo")  "sd_card" ("SD Card")  "vaccine_card" ("Vaccine Card")  
-    Required Selectors: marketplace_id
-    Required Keys: value
-        value (string)
-            Title: Wallet Compartment Type
-            Description: Provide the type(s) of compartments that the wallet includes. This indicates which items the wallet is capable of holding.
-            Enums:
-                business_card (Business Card)
-                checkbook (Checkbook)
-                coin (Coin)
-                credit_card (Credit Card)
-                id_card (ID Card)
-                key (Key)
-                paper_money (Paper Money)
-                passport (Passport)
-                photo (Photo)
-                sd_card (SD Card)
-                vaccine_card (Vaccine Card)
-
-
-  denier (array) - Provide the denier of the item. Denier measures the density of the fabric of the item which impacts how transparent the item is.
-    Constraints: Min: 1, Max: 1 items
-    Examples: "20"  
-    Required Selectors: marketplace_id
-    Required Keys: value
-        value (integer)
-            Title: Denier
-            Description: Provide the denier of the item. Denier measures the density of the fabric of the item which impacts how transparent the item is.
-
-
-  wallet_card_slot_count (array) - Provide the number of card slots the wallet contains.
-    Constraints: Min: 1, Max: 1 items
-    Examples: "5"  
-    Required Selectors: marketplace_id
-    Required Keys: value
-        value (integer)
-            Title: Wallet Card Slot Count
-            Description: Provide the number of card slots the wallet contains.
-
-
-  parentage_level (array) - Specify whether a SKU is a parent or child
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Parent"  
-    Options: "child" ("Child")  "parent" ("Parent")  
-    Required Selectors: marketplace_id
-    Required Keys: value
-        value (string)
-            Title: Parentage Level
-            Description: Specify whether a SKU is a parent or child
-            Enums:
-                child (Child)
-                parent (Parent)
-
-
-  child_parent_sku_relationship (array) - The attribute indicates the Child Parent Sku Relationship of the product
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Accessory"  
-    Required Selectors: marketplace_id
-    Required Keys: child_relationship_type
-        child_relationship_type (string)
-            Title: Child Relationship Type
-            Description: The relationship that the child has to the parent
-            Enums:
-                variation (Variation)
-
-
-  variation_theme (array) - Specify the variation theme that the product will use. The theme's attributes must be populated for all items in the grouping.
-    Examples: "Size/Color"  
-    Required Keys: name
-        name (string)
-            Title: Variation Theme Name
-            Description: Specify the variation theme that the product will use. The theme's attributes must be populated for all items in the grouping.
-            Enums:
-                BAND_COLOR (BAND_COLOR)
-                COLOR (COLOR)
-                COLOR/MATERIAL (COLOR/MATERIAL)
-                COLOR/NUMBER_OF_ITEMS (COLOR/NUMBER_OF_ITEMS)
-                COLOR/SIZE (COLOR/SIZE)
-                COLOR/STYLE (COLOR/STYLE)
-                COLOR_NAME (COLOR_NAME)
-                COLOR_NAME/ITEM_PACKAGE_QUANTITY (COLOR_NAME/ITEM_PACKAGE_QUANTITY)
-                COLOR_NAME/MATERIAL_TYPE (COLOR_NAME/MATERIAL_TYPE)
-                COLOR_NAME/METAL_TYPE (COLOR_NAME/METAL_TYPE)
-                COLOR_NAME/NUMBER_OF_ITEMS (COLOR_NAME/NUMBER_OF_ITEMS)
-                COLOR_NAME/PATTERN_NAME (COLOR_NAME/PATTERN_NAME)
-                COLOR_NAME/SIZE_NAME (COLOR_NAME/SIZE_NAME)
-                COLOR_NAME/SIZE_NAME/PATTERN_NAME (COLOR_NAME/SIZE_NAME/PATTERN_NAME)
-                COLOR_NAME/SIZE_NAME/STYLE_NAME (COLOR_NAME/SIZE_NAME/STYLE_NAME)
-                COLOR_NAME/SIZE_NAME/STYLE_NAME/PATTERN_NAME (COLOR_NAME/SIZE_NAME/STYLE_NAME/PATTERN_NAME)
-                COLOR_NAME/STYLE_NAME (COLOR_NAME/STYLE_NAME)
-                COLOR_NAME/STYLE_NAME/PATTERN_NAME (COLOR_NAME/STYLE_NAME/PATTERN_NAME)
-                CONFIGURATION (CONFIGURATION)
-                EDITION (EDITION)
-                FIT_TYPE/COLOR_NAME/SIZE_NAME (FIT_TYPE/COLOR_NAME/SIZE_NAME)
-                FLAVOR_NAME (FLAVOR_NAME)
-                FLAVOR_NAME/SIZE_NAME (FLAVOR_NAME/SIZE_NAME)
-                INK_COLOR (INK_COLOR)
-                ITEM_DISPLAY_LENGTH (ITEM_DISPLAY_LENGTH)
-                ITEM_DISPLAY_WEIGHT (ITEM_DISPLAY_WEIGHT)
-                ITEM_PACKAGE_QUANTITY (ITEM_PACKAGE_QUANTITY)
-                ITEM_PACKAGE_QUANTITY/COLOR_NAME (ITEM_PACKAGE_QUANTITY/COLOR_NAME)
-                ITEM_PACKAGE_QUANTITY/SIZE_NAME (ITEM_PACKAGE_QUANTITY/SIZE_NAME)
-                ITEM_PACKAGE_QUANTITY/STYLE_NAME (ITEM_PACKAGE_QUANTITY/STYLE_NAME)
-                ITEM_SHAPE (ITEM_SHAPE)
-                ITEM_WEIGHT (ITEM_WEIGHT)
-                LENGTH_RANGE (LENGTH_RANGE)
-                LENS_COLOR (LENS_COLOR)
-                MATERIAL/COLOR (MATERIAL/COLOR)
-                MATERIAL/SIZE (MATERIAL/SIZE)
-                MATERIAL/STYLE (MATERIAL/STYLE)
-                MATERIAL_TYPE (MATERIAL_TYPE)
-                MATERIAL_TYPE/COLOR_NAME (MATERIAL_TYPE/COLOR_NAME)
-                MATERIAL_TYPE/SIZE_NAME (MATERIAL_TYPE/SIZE_NAME)
-                MATERIAL_TYPE/STYLE_NAME (MATERIAL_TYPE/STYLE_NAME)
-                METAL_TYPE (METAL_TYPE)
-                MODEL (MODEL)
-                MODEL/SIZE_NAME (MODEL/SIZE_NAME)
-                MODEL/STYLE_NAME/PART_NUMBER (MODEL/STYLE_NAME/PART_NUMBER)
-                MODEL_NAME/COLOR_NAME (MODEL_NAME/COLOR_NAME)
-                MODEL_NUMBER/SIZE (MODEL_NUMBER/SIZE)
-                MODEL_NUMBER/STYLE/PART_NUMBER (MODEL_NUMBER/STYLE/PART_NUMBER)
-                NUMBER_OF_ITEMS (NUMBER_OF_ITEMS)
-                NUMBER_OF_ITEMS/COLOR_NAME/SIZE_NAME (NUMBER_OF_ITEMS/COLOR_NAME/SIZE_NAME)
-                NUMBER_OF_ITEMS/STYLE (NUMBER_OF_ITEMS/STYLE)
-                NUMBER_OF_ITEMS/STYLE_NAME (NUMBER_OF_ITEMS/STYLE_NAME)
-                PAPER_SIZE (PAPER_SIZE)
-                PATTERN (PATTERN)
-                PATTERN_NAME (PATTERN_NAME)
-                PATTERN_NAME/COLOR_NAME (PATTERN_NAME/COLOR_NAME)
-                PATTERN_NAME/STYLE_NAME (PATTERN_NAME/STYLE_NAME)
-                PLATFORM_FOR_DISPLAY/EDITION/ACCESS_METHOD (PLATFORM_FOR_DISPLAY/EDITION/ACCESS_METHOD)
-                RING_SIZE (RING_SIZE)
-                SIZE (SIZE)
-                SIZE/COLOR (SIZE/COLOR)
-                SIZE/COLOR/NUMBER_OF_ITEMS (SIZE/COLOR/NUMBER_OF_ITEMS)
-                SIZE/MATERIAL (SIZE/MATERIAL)
-                SIZE/NUMBER_OF_ITEMS (SIZE/NUMBER_OF_ITEMS)
-                SIZE/STYLE (SIZE/STYLE)
-                SIZE/STYLE/COLOR (SIZE/STYLE/COLOR)
-                SIZE/UNIT_COUNT (SIZE/UNIT_COUNT)
-                SIZE_NAME (SIZE_NAME)
-                SIZE_NAME/COLOR_NAME (SIZE_NAME/COLOR_NAME)
-                SIZE_NAME/COLOR_NAME/CLOSURE_TYPE (SIZE_NAME/COLOR_NAME/CLOSURE_TYPE)
-                SIZE_NAME/COLOR_NAME/FIT_TYPE (SIZE_NAME/COLOR_NAME/FIT_TYPE)
-                SIZE_NAME/COLOR_NAME/NUMBER_OF_ITEMS (SIZE_NAME/COLOR_NAME/NUMBER_OF_ITEMS)
-                SIZE_NAME/COLOR_NAME/PATTERN_NAME (SIZE_NAME/COLOR_NAME/PATTERN_NAME)
-                SIZE_NAME/MATERIAL_TYPE (SIZE_NAME/MATERIAL_TYPE)
-                SIZE_NAME/NUMBER_OF_ITEMS (SIZE_NAME/NUMBER_OF_ITEMS)
-                SIZE_NAME/PATTERN_NAME (SIZE_NAME/PATTERN_NAME)
-                SIZE_NAME/STYLE_NAME (SIZE_NAME/STYLE_NAME)
-                SIZE_NAME/STYLE_NAME/COLOR_NAME (SIZE_NAME/STYLE_NAME/COLOR_NAME)
-                SIZE_NAME/STYLE_NAME/PATTERN_NAME (SIZE_NAME/STYLE_NAME/PATTERN_NAME)
-                SIZE_NAME/UNIT_COUNT (SIZE_NAME/UNIT_COUNT)
-                SPECIAL_SIZE_TYPE/SIZE_NAME/COLOR_NAME (SPECIAL_SIZE_TYPE/SIZE_NAME/COLOR_NAME)
-                STYLE (STYLE)
-                STYLE/COLOR (STYLE/COLOR)
-                STYLE/MATERIAL (STYLE/MATERIAL)
-                STYLE/MODEL_NUMBER/MATERIAL/SIZE/NUMBER_OF_ITEMS/PART_NUMBER (STYLE/MODEL_NUMBER/MATERIAL/SIZE/NUMBER_OF_ITEMS/PART_NUMBER)
-                STYLE/MODEL_NUMBER/NUMBER_OF_ITEMS/PART_NUMBER (STYLE/MODEL_NUMBER/NUMBER_OF_ITEMS/PART_NUMBER)
-                STYLE/SIZE (STYLE/SIZE)
-                STYLE/UNIT_COUNT (STYLE/UNIT_COUNT)
-                STYLE_NAME (STYLE_NAME)
-                STYLE_NAME/COLOR_NAME (STYLE_NAME/COLOR_NAME)
-                STYLE_NAME/MATERIAL_TYPE (STYLE_NAME/MATERIAL_TYPE)
-                STYLE_NAME/MODEL/MATERIAL_TYPE/SIZE_NAME/NUMBER_OF_ITEMS/PART_NUMBER (STYLE_NAME/MODEL/MATERIAL_TYPE/SIZE_NAME/NUMBER_OF_ITEMS/PART_NUMBER)
-                STYLE_NAME/MODEL/NUMBER_OF_ITEMS/PART_NUMBER (STYLE_NAME/MODEL/NUMBER_OF_ITEMS/PART_NUMBER)
-                STYLE_NAME/PATTERN_NAME (STYLE_NAME/PATTERN_NAME)
-                STYLE_NAME/SIZE_NAME (STYLE_NAME/SIZE_NAME)
-                STYLE_NAME/SIZE_NAME/COLOR_NAME (STYLE_NAME/SIZE_NAME/COLOR_NAME)
-                STYLE_NAME/UNIT_COUNT (STYLE_NAME/UNIT_COUNT)
-                TEAM_NAME (TEAM_NAME)
-                TEAM_NAME/COLOR_NAME (TEAM_NAME/COLOR_NAME)
-                TEAM_NAME/SIZE_NAME (TEAM_NAME/SIZE_NAME)
-                TEAM_NAME/SIZE_NAME/COLOR_NAME (TEAM_NAME/SIZE_NAME/COLOR_NAME)
-                WIDTH_RANGE (WIDTH_RANGE)
-
-
-* country_of_origin (array) - The country in which the product was published.
-    Constraints: Min: 1, Max: 1 items
-    Options: "AF" ("Afghanistan")  "AX" ("Aland Islands")  "AL" ("Albania")  "DZ" ("Algeria")  "AS" ("American Samoa")  "AD" ("Andorra")  "AO" ("Angola")  "AI" ("Anguilla")  "AQ" ("Antarctica")  "AG" ("Antigua and Barbuda")  "AR" ("Argentina")  "AM" ("Armenia")  "AW" ("Aruba")  "AC" ("Ascension Island")  "AU" ("Australia")  "AT" ("Austria")  "AZ" ("Azerbaijan")  "BH" ("Bahrain")  "BD" ("Bangladesh")  "BB" ("Barbados")  "BY" ("Belarus")  "BE" ("Belgium")  "BZ" ("Belize")  "BJ" ("Benin")  "BM" ("Bermuda")  "BT" ("Bhutan")  "BO" ("Bolivia")  "BQ" ("Bonaire, Saint Eustatius and Saba")  "BA" ("Bosnia and Herzegovina")  "BW" ("Botswana")  "BV" ("Bouvet Island")  "BR" ("Brazil")  "IO" ("British Indian Ocean Territory")  "VG" ("British Virgin Islands")  "BN" ("Brunei Darussalam")  "BG" ("Bulgaria")  "BF" ("Burkina Faso")  "BI" ("Burundi")  "KH" ("Cambodia")  "CM" ("Cameroon")  "CA" ("Canada")  "IC" ("Canary Islands")  "CV" ("Cape Verde")  "KY" ("Cayman Islands")  "CF" ("Central African Republic")  "TD" ("Chad")  "CL" ("Chile")  "CN" ("China")  "CX" ("Christmas Island")  "CC" ("Cocos (Keeling) Islands")  "CO" ("Colombia")  "KM" ("Comoros")  "CG" ("Congo")  "CK" ("Cook Islands")  "CR" ("Costa Rica")  "HR" ("Croatia")  "CU" ("Cuba")  "CW" ("Curaçao")  "CY" ("Cyprus")  "CZ" ("Czech Republic")  "KP" ("Democratic People's Republic of Korea")  "DK" ("Denmark")  "DJ" ("Djibouti")  "DM" ("Dominica")  "DO" ("Dominican Republic")  "TP" ("East Timor")  "EC" ("Ecuador")  "EG" ("Egypt")  "SV" ("El Salvador")  "GQ" ("Equatorial Guinea")  "ER" ("Eritrea")  "EE" ("Estonia")  "ET" ("Ethiopia")  "FK" ("Falkland Islands (Malvinas)")  "FO" ("Faroe Islands")  "FM" ("Federated States of Micronesia")  "FJ" ("Fiji")  "FI" ("Finland")  "FR" ("France")  "GF" ("French Guiana")  "PF" ("French Polynesia")  "TF" ("French Southern Territories")  "GA" ("Gabon")  "GE" ("Georgia")  "DE" ("Germany")  "GH" ("Ghana")  "GI" ("Gibraltar")  "GB" ("Great Britain")  "GR" ("Greece")  "GL" ("Greenland")  "GD" ("Grenada")  "GP" ("Guadeloupe")  "GU" ("Guam")  "GT" ("Guatemala")  "GG" ("Guernsey")  "GN" ("Guinea")  "GW" ("Guinea-Bissau")  "GY" ("Guyana")  "HT" ("Haiti")  "HM" ("Heard Island and the McDonald Islands")  "VA" ("Holy See")  "HN" ("Honduras")  "HK" ("Hong Kong")  "HU" ("Hungary")  "IS" ("Iceland")  "IN" ("India")  "ID" ("Indonesia")  "IR" ("Iran")  "IE" ("Ireland")  "IQ" ("Islamic Republic of Iraq")  "IM" ("Isle of Man")  "IL" ("Israel")  "IT" ("Italy")  "CI" ("Ivory Coast")  "JM" ("Jamaica")  "JP" ("Japan")  "JE" ("Jersey")  "JO" ("Jordan")  "KZ" ("Kazakhstan")  "KE" ("Kenya")  "KI" ("Kiribati")  "KW" ("Kuwait")  "KG" ("Kyrgyzstan")  "LA" ("Lao People's Democratic Republic")  "LV" ("Latvia")  "LB" ("Lebanon")  "LS" ("Lesotho")  "LR" ("Liberia")  "LY" ("Libya")  "LI" ("Liechtenstein")  "LT" ("Lithuania")  "LU" ("Luxembourg")  "MO" ("Macao")  "MK" ("Macedonia")  "MG" ("Madagascar")  "MW" ("Malawi")  "MY" ("Malaysia")  "MV" ("Maldives")  "ML" ("Mali")  "MT" ("Malta")  "MH" ("Marshall Islands")  "MQ" ("Martinique")  "MR" ("Mauritania")  "MU" ("Mauritius")  "YT" ("Mayotte")  "MX" ("Mexico")  "MC" ("Monaco")  "MN" ("Mongolia")  "ME" ("Montenegro")  "MS" ("Montserrat")  "MA" ("Morocco")  "MZ" ("Mozambique")  "MM" ("Myanmar")  "NA" ("Namibia")  "NR" ("Nauru")  "NP" ("Nepal")  "NL" ("Netherlands")  "AN" ("Netherlands Antilles")  "NC" ("New Caledonia")  "NZ" ("New Zealand")  "NI" ("Nicaragua")  "NE" ("Niger")  "NG" ("Nigeria")  "NU" ("Niue")  "NF" ("Norfolk Island")  "MP" ("Northern Mariana Islands")  "NO" ("Norway")  "OM" ("Oman")  "PK" ("Pakistan")  "PW" ("Palau")  "PS" ("Palestinian Territories")  "PA" ("Panama")  "PG" ("Papua New Guinea")  "PY" ("Paraguay")  "PE" ("Peru")  "PH" ("Philippines")  "PN" ("Pitcairn")  "PL" ("Poland")  "PT" ("Portugal")  "PR" ("Puerto Rico")  "QA" ("Qatar")  "KR" ("Republic of Korea")  "MD" ("Republic of Moldova")  "RE" ("Reunion")  "RO" ("Romania")  "RU" ("Russian Federation")  "RW" ("Rwanda")  "BL" ("Saint Barthelemy")  "SH" ("Saint Helena, Ascension and Tristan da Cunha")  "KN" ("Saint Kitts and Nevis")  "LC" ("Saint Lucia")  "MF" ("Saint Martin")  "PM" ("Saint Pierre and Miquelon")  "VC" ("Saint Vincent and the Grenadines")  "WS" ("Samoa")  "SM" ("San Marino")  "ST" ("Sao Tome and Principe")  "SA" ("Saudi Arabia")  "SN" ("Senegal")  "RS" ("Serbia")  "CS" ("Serbia and Montenegro")  "SC" ("Seychelles")  "SL" ("Sierra Leone")  "SG" ("Singapore")  "SX" ("Sint Maarten")  "SK" ("Slovakia")  "SI" ("Slovenia")  "SB" ("Solomon Islands")  "SO" ("Somalia")  "ZA" ("South Africa")  "GS" ("South Georgia and the South Sandwich Islands")  "SS" ("South Sudan")  "ES" ("Spain")  "LK" ("Sri Lanka")  "SD" ("Sudan")  "SR" ("Suriname")  "SJ" ("Svalbard and Jan Mayen")  "SZ" ("Swaziland")  "SE" ("Sweden")  "CH" ("Switzerland")  "SY" ("Syria")  "TW" ("Taiwan")  "TJ" ("Tajikistan")  "TH" ("Thailand")  "BS" ("The Bahamas")  "CD" ("The Democratic Republic of the Congo")  "GM" ("The Gambia")  "TL" ("Timor-Leste")  "TG" ("Togo")  "TK" ("Tokelau")  "TO" ("Tonga")  "TT" ("Trinidad and Tobago")  "TA" ("Tristan da Cunha")  "TN" ("Tunisia")  "TR" ("Turkey")  "TM" ("Turkmenistan")  "TC" ("Turks and Caicos Islands")  "TV" ("Tuvalu")  "VI" ("U.S. Virgin Islands")  "UG" ("Uganda")  "UA" ("Ukraine")  "AE" ("United Arab Emirates")  "UK" ("United Kingdom")  "TZ" ("United Republic of Tanzania")  "US" ("United States")  "UM" ("United States Minor Outlying Islands")  "unknown" ("Unknown")  "UY" ("Uruguay")  "UZ" ("Uzbekistan")  "VU" ("Vanuatu")  "VE" ("Venezuela")  "VN" ("Vietnam")  "WF" ("Wallis and Futuna")  "WD" ("WD")  "EH" ("Western Sahara")  "WZ" ("WZ")  "XB" ("XB")  "XC" ("XC")  "XE" ("XE")  "XK" ("XK")  "XM" ("XM")  "XN" ("XN")  "XY" ("XY")  "YE" ("Yemen")  "YU" ("Yugoslavia")  "ZR" ("Zaire")  "ZM" ("Zambia")  "ZW" ("Zimbabwe")  
-    Required Selectors: marketplace_id
-    Required Keys: value
-        value (string)
-            Title: Country of Origin
-            Description: Select the product's country of origin
-            Enums:
-                AF (Afghanistan)
-                AX (Aland Islands)
-                AL (Albania)
-                DZ (Algeria)
-                AS (American Samoa)
-                AD (Andorra)
-                AO (Angola)
-                AI (Anguilla)
-                AQ (Antarctica)
-                AG (Antigua and Barbuda)
-                AR (Argentina)
-                AM (Armenia)
-                AW (Aruba)
-                AC (Ascension Island)
-                AU (Australia)
-                AT (Austria)
-                AZ (Azerbaijan)
-                BH (Bahrain)
-                BD (Bangladesh)
-                BB (Barbados)
-                BY (Belarus)
-                BE (Belgium)
-                BZ (Belize)
-                BJ (Benin)
-                BM (Bermuda)
-                BT (Bhutan)
-                BO (Bolivia)
-                BQ (Bonaire, Saint Eustatius and Saba)
-                BA (Bosnia and Herzegovina)
-                BW (Botswana)
-                BV (Bouvet Island)
-                BR (Brazil)
-                IO (British Indian Ocean Territory)
-                VG (British Virgin Islands)
-                BN (Brunei Darussalam)
-                BG (Bulgaria)
-                BF (Burkina Faso)
-                BI (Burundi)
-                KH (Cambodia)
-                CM (Cameroon)
-                CA (Canada)
-                IC (Canary Islands)
-                CV (Cape Verde)
-                KY (Cayman Islands)
-                CF (Central African Republic)
-                TD (Chad)
-                CL (Chile)
-                CN (China)
-                CX (Christmas Island)
-                CC (Cocos (Keeling) Islands)
-                CO (Colombia)
-                KM (Comoros)
-                CG (Congo)
-                CK (Cook Islands)
-                CR (Costa Rica)
-                HR (Croatia)
-                CU (Cuba)
-                CW (Curaçao)
-                CY (Cyprus)
-                CZ (Czech Republic)
-                KP (Democratic People's Republic of Korea)
-                DK (Denmark)
-                DJ (Djibouti)
-                DM (Dominica)
-                DO (Dominican Republic)
-                TP (East Timor)
-                EC (Ecuador)
-                EG (Egypt)
-                SV (El Salvador)
-                GQ (Equatorial Guinea)
-                ER (Eritrea)
-                EE (Estonia)
-                ET (Ethiopia)
-                FK (Falkland Islands (Malvinas))
-                FO (Faroe Islands)
-                FM (Federated States of Micronesia)
-                FJ (Fiji)
-                FI (Finland)
-                FR (France)
-                GF (French Guiana)
-                PF (French Polynesia)
-                TF (French Southern Territories)
-                GA (Gabon)
-                GE (Georgia)
-                DE (Germany)
-                GH (Ghana)
-                GI (Gibraltar)
-                GB (Great Britain)
-                GR (Greece)
-                GL (Greenland)
-                GD (Grenada)
-                GP (Guadeloupe)
-                GU (Guam)
-                GT (Guatemala)
-                GG (Guernsey)
-                GN (Guinea)
-                GW (Guinea-Bissau)
-                GY (Guyana)
-                HT (Haiti)
-                HM (Heard Island and the McDonald Islands)
-                VA (Holy See)
-                HN (Honduras)
-                HK (Hong Kong)
-                HU (Hungary)
-                IS (Iceland)
-                IN (India)
-                ID (Indonesia)
-                IR (Iran)
-                IE (Ireland)
-                IQ (Islamic Republic of Iraq)
-                IM (Isle of Man)
-                IL (Israel)
-                IT (Italy)
-                CI (Ivory Coast)
-                JM (Jamaica)
-                JP (Japan)
-                JE (Jersey)
-                JO (Jordan)
-                KZ (Kazakhstan)
-                KE (Kenya)
-                KI (Kiribati)
-                KW (Kuwait)
-                KG (Kyrgyzstan)
-                LA (Lao People's Democratic Republic)
-                LV (Latvia)
-                LB (Lebanon)
-                LS (Lesotho)
-                LR (Liberia)
-                LY (Libya)
-                LI (Liechtenstein)
-                LT (Lithuania)
-                LU (Luxembourg)
-                MO (Macao)
-                MK (Macedonia)
-                MG (Madagascar)
-                MW (Malawi)
-                MY (Malaysia)
-                MV (Maldives)
-                ML (Mali)
-                MT (Malta)
-                MH (Marshall Islands)
-                MQ (Martinique)
-                MR (Mauritania)
-                MU (Mauritius)
-                YT (Mayotte)
-                MX (Mexico)
-                MC (Monaco)
-                MN (Mongolia)
-                ME (Montenegro)
-                MS (Montserrat)
-                MA (Morocco)
-                MZ (Mozambique)
-                MM (Myanmar)
-                NA (Namibia)
-                NR (Nauru)
-                NP (Nepal)
-                NL (Netherlands)
-                AN (Netherlands Antilles)
-                NC (New Caledonia)
-                NZ (New Zealand)
-                NI (Nicaragua)
-                NE (Niger)
-                NG (Nigeria)
-                NU (Niue)
-                NF (Norfolk Island)
-                MP (Northern Mariana Islands)
-                NO (Norway)
-                OM (Oman)
-                PK (Pakistan)
-                PW (Palau)
-                PS (Palestinian Territories)
-                PA (Panama)
-                PG (Papua New Guinea)
-                PY (Paraguay)
-                PE (Peru)
-                PH (Philippines)
-                PN (Pitcairn)
-                PL (Poland)
-                PT (Portugal)
-                PR (Puerto Rico)
-                QA (Qatar)
-                KR (Republic of Korea)
-                MD (Republic of Moldova)
-                RE (Reunion)
-                RO (Romania)
-                RU (Russian Federation)
-                RW (Rwanda)
-                BL (Saint Barthelemy)
-                SH (Saint Helena, Ascension and Tristan da Cunha)
-                KN (Saint Kitts and Nevis)
-                LC (Saint Lucia)
-                MF (Saint Martin)
-                PM (Saint Pierre and Miquelon)
-                VC (Saint Vincent and the Grenadines)
-                WS (Samoa)
-                SM (San Marino)
-                ST (Sao Tome and Principe)
-                SA (Saudi Arabia)
-                SN (Senegal)
-                RS (Serbia)
-                CS (Serbia and Montenegro)
-                SC (Seychelles)
-                SL (Sierra Leone)
-                SG (Singapore)
-                SX (Sint Maarten)
-                SK (Slovakia)
-                SI (Slovenia)
-                SB (Solomon Islands)
-                SO (Somalia)
-                ZA (South Africa)
-                GS (South Georgia and the South Sandwich Islands)
-                SS (South Sudan)
-                ES (Spain)
-                LK (Sri Lanka)
-                SD (Sudan)
-                SR (Suriname)
-                SJ (Svalbard and Jan Mayen)
-                SZ (Swaziland)
-                SE (Sweden)
-                CH (Switzerland)
-                SY (Syria)
-                TW (Taiwan)
-                TJ (Tajikistan)
-                TH (Thailand)
-                BS (The Bahamas)
-                CD (The Democratic Republic of the Congo)
-                GM (The Gambia)
-                TL (Timor-Leste)
-                TG (Togo)
-                TK (Tokelau)
-                TO (Tonga)
-                TT (Trinidad and Tobago)
-                TA (Tristan da Cunha)
-                TN (Tunisia)
-                TR (Turkey)
-                TM (Turkmenistan)
-                TC (Turks and Caicos Islands)
-                TV (Tuvalu)
-                VI (U.S. Virgin Islands)
-                UG (Uganda)
-                UA (Ukraine)
-                AE (United Arab Emirates)
-                UK (United Kingdom)
-                TZ (United Republic of Tanzania)
-                US (United States)
-                UM (United States Minor Outlying Islands)
-                unknown (Unknown)
-                UY (Uruguay)
-                UZ (Uzbekistan)
-                VU (Vanuatu)
-                VE (Venezuela)
-                VN (Vietnam)
-                WF (Wallis and Futuna)
-                WD (WD)
-                EH (Western Sahara)
-                WZ (WZ)
-                XB (XB)
-                XC (XC)
-                XE (XE)
-                XK (XK)
-                XM (XM)
-                XN (XN)
-                XY (XY)
-                YE (Yemen)
-                YU (Yugoslavia)
-                ZR (Zaire)
-                ZM (Zambia)
-                ZW (Zimbabwe)
-
-
-  batteries_required (array) - Indicate if batteries are required.
-    Constraints: Min: 1, Max: 1 items
-    Options: false ("No")  true ("Yes")  
-    Required Selectors: marketplace_id
-    Required Keys: value
-        value (boolean)
-            Title: Are batteries required?
-            Description: Select "yes" if batteries are required to power the item (or if the item is a battery) or "no" if they are not. Please note that an internal rechargeable battery is also considered a battery
-            Enums:
-                 (No)
-                 (Yes)
-
-
-  batteries_included (array) - Indicate if batteries are included with the product.
-    Constraints: Min: 1, Max: 1 items
-    Options: false ("No")  true ("Yes")  
-    Required Selectors: marketplace_id
-    Required Keys: value
-        value (boolean)
-            Title: Are batteries included?
-            Description: Select "yes" if batteries are contained in the product (e.g. batteries inside a pair of Bluetooth headphones) and/or included with the product (e.g. batteries packed separately with a camera), otherwise select "no"
-            Enums:
-                 (No)
-                 (Yes)
-
-
-  battery (array) - Provide battery information
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Alkaline"  
-    Required Selectors: marketplace_id
-
-  num_batteries (array) - Provide the quantity and type of batteries needed to power the item.  If batteries are included with the item be sure to account for spare batteries provided
-    Constraints: Min: 1, Max: 1 items
-    Examples: "1 AA, 2 AAA"  
-    Required Selectors: marketplace_id,type
-    Required Keys: quantity,type
-        quantity (integer)
-            Title: Number of Batteries
-            Description: Specify the number of batteries needed to power the item.  If batteries are included with the item be sure to account for spare batteries provided
-        type (string)
-            Title: Battery Type
-            Description: Provide battery type needed to power the item, including spares if included. Some options may be moved under other attribute eg. IEC code
-            Enums:
-                12v (12V)
-                9v (9V)
-                a (A)
-                aa (AA)
-                aaa (AAA)
-                aaaa (AAAA)
-                c (C)
-                cr123a (CR123A)
-                cr2 (CR2)
-                cr2032 (CR2032)
-                cr2430 (CR2430)
-                cr5 (CR5)
-                d (D)
-                lithium_ion (Lithium Ion)
-                lithium_metal (Lithium Metal)
-                lithium_polymer (Lithium Polymer)
-                lr41 (LR41)
-                lr43 (LR43)
-                lr44 (LR44)
-                nonstandard_battery (Nonstandard Battery)
-                p76 (P76)
-                product_specific (Product Specific)
-                unknown (Unknown)
-
-
-  number_of_lithium_metal_cells (array) - Specify the total number of Lithium Metal cells in the product where the cell isn't contained in an encased battery (e.g. coin cells)
-    Constraints: Min: 1, Max: 1 items
-    Examples: "7"  
-    Required Selectors: marketplace_id
-    Required Keys: value
-        value (integer)
-            Title: Number of Lithium Metal Cells
-            Description: Specify the total number of Lithium Metal cells in the product where the cell isn't contained in an encased battery (e.g. coin cells)
-
-
-  number_of_lithium_ion_cells (array) - Specify the total number of Lithium-ion cells in the product where the cell isn't contained in an encased battery. For example, an AA battery is considered a cell
-    Constraints: Min: 1, Max: 1 items
-    Examples: "7"  
-    Required Selectors: marketplace_id
-    Required Keys: value
-        value (integer)
-            Title: Number of Lithium-ion Cells
-            Description: Specify the total number of Lithium-ion cells in the product where the cell isn't contained in an encased battery. For example, an AA battery is considered a cell
-
-
-  lithium_battery (array) - The attribute indicates the Lithium Battery of the product
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Milligrams"  
-    Required Selectors: marketplace_id
-
-* supplier_declared_dg_hz_regulation (array) - If the product is a Dangerous Good or Hazardous Material, Substance or Waste that is regulated for transportation, storage, and/or waste select from the list of valid values
-    Constraints: Min: 1, Max: 1000 items
-    Examples: "GHS, Storage, Transportation"  
-    Options: "ghs" ("GHS")  "not_applicable" ("Not Applicable")  "other" ("Other")  "storage" ("Storage")  "transportation" ("Transportation")  "unknown" ("Unknown")  "waste" ("Waste")  
-    Required Selectors: marketplace_id
-    Required Keys: value
-        value (string)
-            Title: Dangerous Goods Regulations
-            Description: If the product is a Dangerous Good or Hazardous Material, Substance or Waste that is regulated for transportation, storage, and/or waste select from the list of valid values
-            Enums:
-                ghs (GHS)
-                not_applicable (Not Applicable)
-                other (Other)
-                storage (Storage)
-                transportation (Transportation)
-                unknown (Unknown)
-                waste (Waste)
-
-
-  ghs (array) - Provide the Global Harmonized System (GHS) information
-    Constraints: Min: 1, Max: 1 items
-    Examples: "NGK"  
-    Required Selectors: marketplace_id
-
-  hazmat (array) - Provide hazmat information that is relevant to the product based on the aspect selected
-    Constraints: Min: 1, Max: 1 items
-    Examples: "UN1993"  
-    Required Selectors: marketplace_id,aspect
-    Required Keys: aspect,value
-        aspect (string)
-            Title: Hazmat Aspect
-            Description: Select the aspect or regulatory body used for the hazardous product information
-            Enums:
-                united_nations_regulatory_id (UN Regulatory Id)
-        value (string)
-            Title: Hazmat
-            Description: Provide hazmat information that is relevant to the product based on the aspect selected
-
-
-  safety_data_sheet_url (array) - Provide the SDS/MSDS URL. Required for Hazardous material SDS/MSDS provides information such as physical data (flashpoint, pH, etc.), health concerns, storage, and transportation information for potentially dangerous substances.
-    Constraints: Min: 1, Max: 1 items
-    Examples: "www.safetysheetsRus.com/hazardous_substance/msds.pdf"  
-    Required Selectors: marketplace_id,language_tag
-    Required Keys: language_tag,value
-        language_tag ()
-            Title: 
-            Description: 
-        value (string)
-            Title: Safety Data Sheet (SDS or MSDS) URL
-            Description: Provide the SDS/MSDS URL if any value other than Not Applicable or Unknown is selected in the Dangerous Goods Regulation column.
-
-
-  item_weight (array) - Provide the weight of the item (not including the packaging)
-    Constraints: Min: 1, Max: 1 items
-    Examples: "30.0 Pounds, 1.5 Kilograms"  
-    Required Selectors: marketplace_id
-    Required Keys: unit,value
-        unit (string)
-            Title: Item Weight Unit
-            Description: Provide unit for item weight
-            Enums:
-                grams (Grams)
-                kilograms (Kilograms)
-                milligrams (Milligrams)
-                ounces (Ounces)
-                pounds (Pounds)
-                tonnes (Tonnes)
-        value (number)
-            Title: Item Weight
-            Description: Provide the item weight numeric value (not including the packaging)
-
-
-  outer (array) - Provide the products outer material
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Leather, Carbon Fiber"  
-    Required Selectors: marketplace_id
-
-  inner (array) - Provide the inner material of the product
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Cotton, Denim, Ceramic"  
-    Required Selectors: marketplace_id
-
-  california_proposition_65 (array) - Provide the Proposition 65 warning information applicable to your product, if any. By removing or changing the information you certify that the previously provided warning information is no longer legally required
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Furniture; Lead"  
-    Required Selectors: marketplace_id
-    Required Keys: compliance_type
-        compliance_type (string)
-            Title: California Proposition 65 Warning Type
-            Description: Select the warning type applicable to your product, if any. You certify that the warning provided satisfies legal requirements and that you’ll remove a warning previously provided only if it is no longer legally required.
-            Enums:
-                alcoholic_beverage (Alcoholic Beverage)
-                chemical (Chemical)
-                diesel_engines (Diesel Engines)
-                food (Food)
-                furniture (Furniture)
-                on_product_cancer (On Product Cancer)
-                on_product_combined_cancer_reproductive (On Product Combined Cancer Reproductive)
-                on_product_reproductive (On Product Reproductive)
-                passenger_or_off_road_vehicle (Passenger or Off Road Vehicle)
-                raw_wood (Raw Wood)
-                recreational_vessel (Recreational Vessel)
-
-
-  pesticide_marking (array) - Provide any pesticide marking on the item or packaging.
-    Constraints: Min: 1, Max: 3 items
-    Examples: "EPA Establishment Number"  
-    Required Selectors: marketplace_id,marking_type
-    Required Keys: marking_type
-        marking_type (string)
-            Title: Pesticide Marking
-            Description: Provide any pesticide marking on the item or packaging.
-            Enums:
-                epa_establishment_number (EPA Establishment Number)
-                epa_registration_number (EPA Registration Number)
-
-
-  fcc_radio_frequency_emission_compliance (array) - Provide details on compliance to FCC regulations for products that may emit radio frequencies.
-    Constraints: Min: 1, Max: 1 items
-    Required Selectors: marketplace_id
-    Required Keys: registration_status
-        registration_status (string)
-            Title: Radio Frequency Emission & Authorization Status
-            Description: Indicate whether this product is capable of emitting radio frequency energy, and if so, what type of FCC RF equipment authorization this product has.
-            Enums:
-                fcc_supplier_declaration_of_conformity (Product has a Supplier's Declaration of Conformity (SDoC) with the FCC Rules)
-                has_fcc_id (Product has an FCC ID)
-                fcc_incidental_radiator (Product is an incidental radiator as defined by the FCC. It is not designed to intentionally use, generate or emit RF energy over 9 kHz. It does not require FCC RF equipment authorization)
-                not_capable_emitting_rf_energy (Product not capable of emitting radio frequency energy)
-
-
-  regulatory_compliance_certification (array) - Provide any regulation that is relevant to the product as well as any required regulatory identications such as certification numbers.
-    Constraints: Min: 1, Max: 5 items
-    Examples: "FDA 510(k) Number,\r\nF2345G234"  
-    Required Selectors: marketplace_id,regulation_type
-    Required Keys: regulation_type,value
-        regulation_type (string)
-            Title: Compliance Regulation Type
-            Description: Select applicable regulation type
-            Enums:
-                carb_eo (CARB EO)
-                cdpr_pest_id (CDPR Pest Identification)
-                energy_star_unique_id (ENERGY STAR Unique ID)
-                certificate_of_conformity (EPA Certificate of Conformity (CoC))
-                fda_510_k (FDA 510(k) Number)
-                intertek_certificate_no (Intertek Certificate Number)
-                national_organic_program_id (National Organic Program ID)
-                tuv_certificate_no (TUV Certificate Number)
-                ul_cetrification_no (UL Certificate Number)
-                wasda_pest_id (WASDA Pest Identification)
-        value (string)
-            Title: Regulatory Identification
-            Description: Provide the regulatory identification associated with the regulation type.
-
-
-  dsa_responsible_party_address (array) - Provide the email address or URL for the EU Responsible Person to comply with the General Product Safety Regulation (GPSR). If you’ve already submitted this Responsible Person’s information in the past, make sure you use the same email or URL.
-    Constraints: Min: 1, Max: 1 items
-    Examples: "rsp-email@example.com"  
-    Required Selectors: marketplace_id
-    Required Keys: value
-        value (string)
-            Title: Responsible Person's Email or Electronic Address
-            Description: Provide the email address or URL for the EU Responsible Person to comply with the General Product Safety Regulation (GPSR). If you’ve already submitted this Responsible Person’s information in the past, make sure you use the same email or URL.
-
-
-  compliance_media (array) - Provide information on the product documents you want to display on the product detail page to comply with the General Product Safety Regulation (GPSR). Alternatively, you can upload images under the PS01-PS06 variants in the Image Manager.
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Installation Manual"  
-    Required Selectors: marketplace_id,content_type,content_language
-    Required Keys: content_language,content_type,source_location
-        content_language (string)
-            Title: Compliance Media Language
-            Description: Provide the language used for the content of the compliance media.
-            Enums:
-                ar_AE (ar_AE)
-                ar_BH (ar_BH)
-                ar_DZ (ar_DZ)
-                ar_EG (ar_EG)
-                ar_IQ (ar_IQ)
-                ar_JO (ar_JO)
-                ar_KW (ar_KW)
-                ar_LB (ar_LB)
-                ar_LY (ar_LY)
-                ar_MA (ar_MA)
-                ar_OM (ar_OM)
-                ar_QA (ar_QA)
-                ar_SA (ar_SA)
-                ar_SD (ar_SD)
-                ar_SY (ar_SY)
-                ar_TN (ar_TN)
-                ar_YE (ar_YE)
-                az_AZ (az_AZ)
-                be_BY (be_BY)
-                bg_BG (bg_BG)
-                bn_IN (bn_IN)
-                bs_BA (bs_BA)
-                ca_AD (ca_AD)
-                ca_ES (ca_ES)
-                cs_CZ (cs_CZ)
-                da_DK (da_DK)
-                de_AT (de_AT)
-                de_CH (de_CH)
-                de_DE (de_DE)
-                de_LU (de_LU)
-                el_CY (el_CY)
-                el_GR (el_GR)
-                en_AE (en_AE)
-                en_AU (en_AU)
-                en_CA (en_CA)
-                en_GB (en_GB)
-                en_IE (en_IE)
-                en_IN (en_IN)
-                en_MT (en_MT)
-                en_NG (en_NG)
-                en_NZ (en_NZ)
-                en_PH (en_PH)
-                en_SG (en_SG)
-                en_US (en_US)
-                en_ZA (en_ZA)
-                es_AR (es_AR)
-                es_BO (es_BO)
-                es_CL (es_CL)
-                es_CO (es_CO)
-                es_CR (es_CR)
-                es_DO (es_DO)
-                es_EC (es_EC)
-                es_ES (es_ES)
-                es_GT (es_GT)
-                es_HN (es_HN)
-                es_MX (es_MX)
-                es_NI (es_NI)
-                es_PA (es_PA)
-                es_PE (es_PE)
-                es_PR (es_PR)
-                es_PY (es_PY)
-                es_SV (es_SV)
-                es_US (es_US)
-                es_UY (es_UY)
-                es_VE (es_VE)
-                et_EE (et_EE)
-                fi_FI (fi_FI)
-                fil (fil)
-                fil_PH (fil_PH)
-                fr_BE (fr_BE)
-                fr_CA (fr_CA)
-                fr_CH (fr_CH)
-                fr_FR (fr_FR)
-                fr_LU (fr_LU)
-                ga_IE (ga_IE)
-                gu_IN (gu_IN)
-                he_IL (he_IL)
-                hi_IN (hi_IN)
-                hr_HR (hr_HR)
-                hu_HU (hu_HU)
-                id_ID (id_ID)
-                in_ID (in_ID)
-                is_IS (is_IS)
-                it_CH (it_CH)
-                it_IT (it_IT)
-                iw_IL (iw_IL)
-                ja_JP (ja_JP)
-                ka_GE (ka_GE)
-                kn_IN (kn_IN)
-                ko_KR (ko_KR)
-                lt_LT (lt_LT)
-                lv_LV (lv_LV)
-                mk_MK (mk_MK)
-                ml_IN (ml_IN)
-                mr_IN (mr_IN)
-                ms_MY (ms_MY)
-                mt_MT (mt_MT)
-                nb_NO (nb_NO)
-                nl_BE (nl_BE)
-                nl_NL (nl_NL)
-                no_NO (no_NO)
-                pl_PL (pl_PL)
-                pt_BR (pt_BR)
-                pt_PT (pt_PT)
-                ro_RO (ro_RO)
-                ru_RU (ru_RU)
-                sk_SK (sk_SK)
-                sl_SI (sl_SI)
-                sq_AL (sq_AL)
-                sr_BA (sr_BA)
-                sr_CS (sr_CS)
-                sr_ME (sr_ME)
-                sr_RS (sr_RS)
-                sv_SE (sv_SE)
-                ta_IN (ta_IN)
-                te_IN (te_IN)
-                th_TH (th_TH)
-                tr_TR (tr_TR)
-                uk_UA (uk_UA)
-                vi_VN (vi_VN)
-                zh_CN (zh_CN)
-                zh_HK (zh_HK)
-                zh_SG (zh_SG)
-                zh_TW (zh_TW)
-        content_type (string)
-            Title: Compliance Media Content Type
-            Description: Please enter the content type of the compliance document.
-            Enums:
-                application_guide (Application Guide)
-                certificate_of_analysis (Certificate of Analysis)
-                certificate_of_compliance (Certificate of Compliance)
-                compatibility_guide (Compatibility Guide)
-                emergency_use_authorization (Emergency Use Authorization)
-                emergency_use_authorization_amendment (Emergency Use Authorization Amendment)
-                installation_manual (Installation Manual)
-                instructions_for_use (Instructions for Use)
-                patient_fact_sheet (Patient Fact Sheet)
-                provider_fact_sheet (Provider Fact Sheet)
-                safety_data_sheet (Safety Data Sheet)
-                safety_information (Safety Information)
-                specification_sheet (Specification Sheet)
-                troubleshooting_guide (Troubleshooting Guide)
-                user_guide (User Guide)
-                user_manual (User Manual)
-                warranty (Warranty)
-        source_location (string)
-            Title: Compliance Media Source Location
-            Description: Provide the source location of the compliance media.
-
-
-  gpsr_safety_attestation (array) - Check “yes” if your product doesn’t have any warning and safety information, as it can be used safely and as intended without it.
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Yes"  
-    Options: false ("No")  true ("Yes")  
-    Required Selectors: marketplace_id
-    Required Keys: value
-        value (boolean)
-            Title: GPSR Safety Attestation
-            Description: Check “yes” if your product doesn’t have any warning and safety information, as it can be used safely and as intended without it.
-            Enums:
-                 (No)
-                 (Yes)
-
-
-  gpsr_manufacturer_reference (array) - Provide the email address or URL of the manufacturer to comply with the EU General Product Safety Regulation (GPSR). If you’ve already submitted this manufacturer’s information in the past, make sure you use the same email or URL.
-    Constraints: Min: 1, Max: 1 items
-    Examples: "abc@example.com"  
-    Required Selectors: marketplace_id
-
-  ships_globally (array) - Provide whether the item can be shipped globally by Amazon 
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Yes"  
-    Options: false ("No")  true ("Yes")  
-    Required Selectors: marketplace_id
-    Required Keys: value
-        value (boolean)
-            Title: Ships Globally
-            Description: Provide whether the item can be shipped globally by Amazon 
-            Enums:
-                 (No)
-                 (Yes)
-
-
-  compliance_animal_leather (array) - Provide the type of leather used in the production of the item, for compliance purposes.
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Cattle, Calf, Pig, Sheep"  
-    Options: "alligator" ("Alligator")  "buffalo" ("Buffalo")  "calf" ("Calf")  "cattle" ("Cattle")  "crocodile" ("Crocodile")  "goat" ("Goat")  "horse" ("Horse")  "lizard" ("Lizard")  "pig" ("Pig")  "shark" ("Shark")  "sheep" ("Sheep")  "snake" ("Snake")  "stingray" ("Stingray")  
-    Required Selectors: marketplace_id
-    Required Keys: value
-        value (string)
-            Title: Compliance - Animal Leather
-            Description: Provide the type of leather used in the production of the item, for compliance purposes.
-            Enums:
-                alligator (Alligator)
-                buffalo (Buffalo)
-                calf (Calf)
-                cattle (Cattle)
-                crocodile (Crocodile)
-                goat (Goat)
-                horse (Horse)
-                lizard (Lizard)
-                pig (Pig)
-                shark (Shark)
-                sheep (Sheep)
-                snake (Snake)
-                stingray (Stingray)
-
-
-  compliance_wallet_type (array) - Provide style of wallet which best fits the item, for compliance purposes.
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Wallet, Wallet Purse, Billfold"  
-    Options: "billfold" ("Billfold")  "other" ("Other")  "wallet" ("Wallet")  "wallet_purse" ("Wallet Purse")  
-    Required Selectors: marketplace_id
-    Required Keys: value
-        value (string)
-            Title: Compliance - Wallet Type
-            Description: Provide style of wallet which best fits the item, for compliance purposes.
-            Enums:
-                billfold (Billfold)
-                other (Other)
-                wallet (Wallet)
-                wallet_purse (Wallet Purse)
-
-
-  compliance_plastic_sheeting_type (array) - Provide, the type of sheeting used in the manufacturing of the item, for compliance purposes.
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Reinforced or Laminate Sheeting"  
-    Options: "other" ("Other")  "reinforced_or_laminate_sheeting" ("Reinforced or Laminate Sheeting")  
-    Required Selectors: marketplace_id
-    Required Keys: value
-        value (string)
-            Title: Compliance - Plastic Sheeting Type
-            Description: Provide, the type of sheeting used in the manufacturing of the item, for compliance purposes.
-            Enums:
-                other (Other)
-                reinforced_or_laminate_sheeting (Reinforced or Laminate Sheeting)
-
-
-  compliance_is_handmade (array) - Provide whether or not the item has been made by hand, for compliance purposes.
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Yes"  
-    Options: false ("No")  true ("Yes")  
-    Required Selectors: marketplace_id
-    Required Keys: value
-        value (boolean)
-            Title: Compliance - Is Handmade
-            Description: Provide whether or not the item has been made by hand, for compliance purposes.
-            Enums:
-                 (No)
-                 (Yes)
-
-
-  compliance_outer_surface_material (array) - Provide the material composition for the outer surface of the item, for compliance purposes.
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Leather, Rubber, Cotton"  
-    Options: "canvas" ("Canvas")  "carbon_fiber" ("Carbon Fiber")  "cotton" ("Cotton")  "denim" ("Denim")  "leather" ("Leather")  "nylon" ("Nylon")  "other" ("Other")  "other_plastics" ("Other Plastics")  "polyester" ("Polyester")  "pvc" ("PVC")  "rubber" ("Rubber")  "silicone" ("Silicone")  "silk" ("Silk")  "suede" ("Suede")  "wool" ("Wool")  
-    Required Selectors: marketplace_id
-    Required Keys: value
-        value (string)
-            Title: Compliance - Outer Surface Material
-            Description: Provide the material composition for the outer surface of the item, for compliance purposes.
-            Enums:
-                canvas (Canvas)
-                carbon_fiber (Carbon Fiber)
-                cotton (Cotton)
-                denim (Denim)
-                leather (Leather)
-                nylon (Nylon)
-                other (Other)
-                other_plastics (Other Plastics)
-                polyester (Polyester)
-                pvc (PVC)
-                rubber (Rubber)
-                silicone (Silicone)
-                silk (Silk)
-                suede (Suede)
-                wool (Wool)
-
-
-  main_product_image_locator (array) - The attribute indicates the Main Product Image Locator of the product
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Feed"  
-    Required Selectors: marketplace_id
-    Required Keys: media_location
-        media_location (string)
-            Title: Main Image URL
-            Description: The URL where the main offer-specific image of the product is located.
-
-
-  other_product_image_locator_1 (array) - The attribute indicates the Other Product Image Locator 1 of the product
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Feed"  
-    Required Selectors: marketplace_id
-    Required Keys: media_location
-        media_location (string)
-            Title: Other Image URL
-            Description: The URL for additional images of your product. These images will be shown on the detail page when the customer clicks through to see other views associated with the product.
-
-
-  other_product_image_locator_2 (array) - The attribute indicates the Other Product Image Locator 2 of the product
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Feed"  
-    Required Selectors: marketplace_id
-    Required Keys: media_location
-        media_location (string)
-            Title: Other Image URL
-            Description: The URL for additional images of your product. These images will be shown on the detail page when the customer clicks through to see other views associated with the product.
-
-
-  other_product_image_locator_3 (array) - The attribute indicates the Other Product Image Locator 3 of the product
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Feed"  
-    Required Selectors: marketplace_id
-    Required Keys: media_location
-        media_location (string)
-            Title: Other Image URL
-            Description: The URL for additional images of your product. These images will be shown on the detail page when the customer clicks through to see other views associated with the product.
-
-
-  other_product_image_locator_4 (array) - The attribute indicates the Other Product Image Locator 4 of the product
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Feed"  
-    Required Selectors: marketplace_id
-    Required Keys: media_location
-        media_location (string)
-            Title: Other Image URL
-            Description: The URL for additional images of your product. These images will be shown on the detail page when the customer clicks through to see other views associated with the product.
-
-
-  other_product_image_locator_5 (array) - The attribute indicates the Other Product Image Locator 5 of the product
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Feed"  
-    Required Selectors: marketplace_id
-    Required Keys: media_location
-        media_location (string)
-            Title: Other Image URL
-            Description: The URL for additional images of your product. These images will be shown on the detail page when the customer clicks through to see other views associated with the product.
-
-
-  other_product_image_locator_6 (array) - The attribute indicates the Other Product Image Locator 6 of the product
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Feed"  
-    Required Selectors: marketplace_id
-    Required Keys: media_location
-        media_location (string)
-            Title: Other Image URL
-            Description: The URL for additional images of your product. These images will be shown on the detail page when the customer clicks through to see other views associated with the product.
-
-
-  other_product_image_locator_7 (array) - The attribute indicates the Other Product Image Locator 7 of the product
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Feed"  
-    Required Selectors: marketplace_id
-    Required Keys: media_location
-        media_location (string)
-            Title: Other Image URL
-            Description: The URL for additional images of your product. These images will be shown on the detail page when the customer clicks through to see other views associated with the product.
-
-
-  other_product_image_locator_8 (array) - The attribute indicates the Other Product Image Locator 8 of the product
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Feed"  
-    Required Selectors: marketplace_id
-    Required Keys: media_location
-        media_location (string)
-            Title: Other Image URL
-            Description: The URL for additional images of your product. These images will be shown on the detail page when the customer clicks through to see other views associated with the product.
-
-
-  swatch_product_image_locator (array) - The attribute indicates the Swatch Product Image Locator of the product
-    Constraints: Min: 1, Max: 1 items
-    Examples: "Feed"  
-    Required Selectors: marketplace_id
-    Required Keys: media_location
-        media_location (string)
-            Title: Swatch Image URL
-            Description: The URL where an image of a color swatch from the product is located
-
-
-  item_package_dimensions (array) - Provide the item's package dimensions
-    Constraints: Min: 1, Max: 1 items
-    Examples: "10 x 2 x 2.7 inches"  
-    Required Selectors: marketplace_id
-    Required Keys: height,length,width
-        height (object)
-            Title: Package Height
-            Description: Provide the package height
-            Required Keys: unit,value
-                unit (string)
-                    Title: Package Height Unit
-                    Description: Select the unit of measure for Package Height. If a value is provided for Package Height, you must also enter the corresponding unit.
-                    Enums:
-                        centimeters (Centimeters)
-                        feet (Feet)
-                        inches (Inches)
-                        meters (Meters)
-                        millimeters (Millimeters)
-                        yards (Yards)
-                value (number)
-                    Title: Item Package Height
-                    Description: Provide the package height as a numeric value.
-        length (object)
-            Title: Package Length
-            Description: Provide the package length
-            Required Keys: unit,value
-                unit (string)
-                    Title: Package Length Unit
-                    Description: Select the unit of measure for Package Length. If a value is provided for Package Length, you must also enter the corresponding unit.
-                    Enums:
-                        centimeters (Centimeters)
-                        feet (Feet)
-                        inches (Inches)
-                        meters (Meters)
-                        millimeters (Millimeters)
-                        yards (Yards)
-                value (number)
-                    Title: Item Package Length
-                    Description: Provide the package length as a numeric value.
-        width (object)
-            Title: Package Width
-            Description: Provide the package width
-            Required Keys: unit,value
-                unit (string)
-                    Title: Package Width Unit
-                    Description: Select the unit of measure for Package Width. If a value is provided for Package Width, you must also enter the corresponding unit.
-                    Enums:
-                        centimeters (Centimeters)
-                        feet (Feet)
-                        inches (Inches)
-                        meters (Meters)
-                        millimeters (Millimeters)
-                        yards (Yards)
-                value (number)
-                    Title: Item Package Width
-                    Description: Provide the package width as a numeric value.
-
-
-  item_package_weight (array) - The weight in original package
-    Constraints: Min: 1, Max: 1 items
-    Examples: "14.89"  
-    Required Selectors: marketplace_id
-    Required Keys: unit,value
-        unit (string)
-            Title: Package Weight Unit
-            Description: Select the unit of measure for Package Weight. If a value is provided for Package Weight, you must also enter the corresponding unit.
-            Enums:
-                grams (Grams)
-                kilograms (Kilograms)
-                milligrams (Milligrams)
-                ounces (Ounces)
-                pounds (Pounds)
-                tonnes (Tonnes)
-        value (number)
-            Title: Package Weight
-            Description: This attribute represents the weight of the item plus the packaging. If your item is shipped to the customer in multiple packages, enter the dimensions of the heaviest package
-
-
-  item_display_weight (array) - Provide the item weight if the product is a solid
-    Constraints: Min: 1, Max: 1 items
-    Required Selectors: marketplace_id
-    Required Keys: unit,value
-        unit (string)
-            Title: Item Display Weight Unit
-            Description: Select the corresponding unit
-            Enums:
-                grams (Grams)
-                kilograms (Kilograms)
-                milligrams (Milligrams)
-                ounces (Ounces)
-                pounds (Pounds)
-                tonnes (Tonnes)
-        value (number)
-            Title: Item Display Weight
-            Description: Provide the item weight (numeric) if the product is a solid
-
-
-Note: Properties marked with * are required
+* item_name:
+    type: "array"
+    description: "Provide a title for the item that may be customer facing"
+    title: "Title"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Provide a title for the item that may be customer facing"
+            title: "Item Name"
+            Constraints: Max Length: 200
+        * language_tag:
+          marketplace_id:
+* brand:
+    type: "array"
+    description: "Max. 50 characters"
+    title: "Brand Name"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Provide the brand name of the product"
+            title: "Brand Name"
+            Constraints: Min Length: 1, Max Length: 100
+        * language_tag:
+          marketplace_id:
+  externally_assigned_product_identifier:
+    type: "array"
+    description: "Provide the external ID (barcode) type and corresponding value that is being used to identify the product"
+    title: "External Product ID"
+    Items:
+        type: "object"
+        Properties:
+        * type:
+            type: "string"
+            description: "Select the type of external ID (barcode) that is being used to identify this product"
+            title: "External Product ID Type"
+        * value:
+            type: "string"
+            description: "Provide the corresponding external product id value based on the type that was selected"
+            title: "External Product ID"
+          marketplace_id:
+  merchant_suggested_asin:
+    type: "array"
+    description: "Provide an ASIN for your product if one exists. If a value is not provided, the system will attempt a match based on the External Product ID."
+    title: "Merchant Suggested ASIN"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Provide an ASIN for your product if one exists. If a value is not provided, the system will attempt a match based on the External Product ID."
+            title: "Merchant Suggested Asin"
+            Constraints: Min Length: 10, Max Length: 10
+          marketplace_id:
+  supplier_declared_has_product_identifier_exemption:
+    type: "array"
+    description: "Please specify if the product is exempt from supplier declared external product identifiers."
+    title: "Is exempt from a supplier declared external identifier"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "boolean"
+            description: "Please specify if the product is exempt from supplier declared external product identifiers."
+            title: "Is exempt from supplier declared external product identifier"
+          marketplace_id:
+* item_type_keyword:
+    type: "array"
+    description: "Item type keywords are used to place new ASINs in the appropriate place(s) within the graph. Select the most specific accurate term for optimal placement."
+    title: "Item Type Keyword"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Item type keywords are used to place new ASINs in the appropriate place(s) within the graph. Select the most specific accurate term for optimal placement."
+            title: "Item Type Keyword"
+            Constraints: Min Length: 1, Max Length: 500
+          marketplace_id:
+  target_audience:
+    type: "array"
+    description: "Specify the target audience that the product is intended for"
+    title: "Target Audience"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Specify the target audience that the product is intended for"
+            title: "Target Audience"
+            Constraints: Max Length: 3949
+        * language_tag:
+          marketplace_id:
+  model_number:
+    type: "array"
+    description: "Product code assigned by the manufacturer; can be numbers, letters, or both"
+    title: "Model Number"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Provide the manufacturer 's model number for the item"
+            title: "Model Number"
+            Constraints: Min Length: 1, Max Length: 40
+          marketplace_id:
+  model_name:
+    type: "array"
+    description: "Specify the model name of the product as defined by the manufacturer or brand excluding item type, color, brand or size"
+    title: "Model Name"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Specify the model name of the product as defined by the manufacturer or brand excluding item type, color, brand or size"
+            title: "Model Name"
+            Constraints: Min Length: 1, Max Length: 120
+        * language_tag:
+          marketplace_id:
+  manufacturer:
+    type: "array"
+    description: "Provide the company that manufactures the product."
+    title: "Manufacturer"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Provide the company that manufactures the product."
+            title: "Manufacturer"
+            Constraints: Max Length: 100
+        * language_tag:
+          marketplace_id:
+  skip_offer:
+    type: "array"
+    description: "Please indicate whether the offer should be skipped and a buyable offer should not be created. A value of \"Yes\", means no offer will be created."
+    title: "Skip Offer"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "boolean"
+            description: "Please indicate whether the offer should be skipped and a buyable offer should not be created. A value of \"Yes\", means no offer will be created."
+            title: "Skip Offer"
+          marketplace_id:
+  fulfillment_availability:
+    type: "array"
+    description: "For those merchants using Amazon fulfillment services, please provide associated logistical information."
+    title: "Fulfillment Availability"
+    Items:
+        type: "object"
+        Properties:
+        * fulfillment_channel_code:
+            type: "string"
+            description: "For those merchants using Amazon fulfillment services, this designates which fulfillment network will be used. Specifying a value other than DEFAULT will cancel the Merchant-fulfilled offering."
+            title: "Fulfillment Channel Code"
+          quantity:
+            type: "integer"
+            description: "Enter the quantity of the item you are making available for sale. This is your current inventory commitment (as a whole number)"
+            title: "Quantity"
+            Constraints: Minimum: 0.000000
+          lead_time_to_ship_max_days:
+            type: "integer"
+            description: "Provide the time, in days, between when you receive an order for an item and when you can ship the item"
+            title: "Handling Time"
+            Constraints: Minimum: 0.000000, Maximum: 30.000000
+          restock_date:
+            type: "string"
+            description: "Date that product will be restocked"
+            title: "Restock Date"
+            OneOf:
+                type: "string"
+                Constraints: Format: date
+                type: "string"
+                Constraints: Format: date-time
+          is_inventory_available:
+            type: "boolean"
+            description: "Always available inventory is an alternative to quantity that allows inventory to never deplete. Enabling or disabling will toggle this feature on or off. Note that a quantity cannot be specified when provided."
+            title: "Inventory Always Available"
+  map_policy:
+    type: "array"
+    description: "Select one."
+    title: "Minimum Advertised Price Display"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Select one."
+            title: "Minimum Advertised Price Display"
+          marketplace_id:
+  purchasable_offer:
+    type: "array"
+    description: "The attribute indicates the Purchasable Offer of the product"
+    title: "Purchasable Offer"
+    Items:
+        type: "object"
+        Properties:
+          map_price:
+            type: "array"
+            description: "The attribute indicates the Purchasable Offer Map Price of the product"
+            title: "Purchasable Offer Map Price"
+            Items:
+                type: "object"
+                Properties:
+                  schedule:
+                    type: "array"
+                    description: "The attribute indicates the Purchasable Offer Map Price Schedule of the product"
+                    title: "Purchasable Offer Map Price Schedule"
+                    Items:
+                        type: "object"
+                        Properties:
+                          value_with_tax:
+                            type: "number"
+                            description: "Provide the minimum advertised price"
+                            title: "Minimum Advertised Price"
+          currency:
+            type: "string"
+            description: "Select the corresponding currency"
+            title: "Currency"
+          marketplace_id:
+          our_price:
+            type: "array"
+            description: "The attribute indicates the Purchasable Offer Our Price of the product"
+            title: "Purchasable Offer Our Price"
+            Items:
+                type: "object"
+                Properties:
+                * schedule:
+                    type: "array"
+                    description: "The attribute indicates the Purchasable Offer Our Price Schedule of the product"
+                    title: "Purchasable Offer Our Price Schedule"
+                    Items:
+                        type: "object"
+                        Properties:
+                        * value_with_tax:
+                            type: "number"
+                            description: "Provide base price of the item at which it is being offered to the intended buyer segment"
+                            title: "Your Price"
+          minimum_seller_allowed_price:
+            type: "array"
+            description: "The attribute indicates the Purchasable Offer Minimum Seller Allowed Price of the product"
+            title: "Purchasable Offer Minimum Seller Allowed Price"
+            Items:
+                type: "object"
+                Properties:
+                  schedule:
+                    type: "array"
+                    description: "The attribute indicates the Purchasable Offer Minimum Seller Allowed Price Schedule of the product"
+                    title: "Purchasable Offer Minimum Seller Allowed Price Schedule"
+                    Items:
+                        type: "object"
+                        Properties:
+                          value_with_tax:
+                            type: "number"
+                            description: "Provide the minimum seller allowed price"
+                            title: "Minimum Seller Alllowed Price"
+          maximum_seller_allowed_price:
+            type: "array"
+            description: "The attribute indicates the Purchasable Offer Maximum Seller Allowed Price of the product"
+            title: "Purchasable Offer Maximum Seller Allowed Price"
+            Items:
+                type: "object"
+                Properties:
+                  schedule:
+                    type: "array"
+                    description: "The attribute indicates the Purchasable Offer Maximum Seller Allowed Price Schedule of the product"
+                    title: "Purchasable Offer Maximum Seller Allowed Price Schedule"
+                    Items:
+                        type: "object"
+                        Properties:
+                          value_with_tax:
+                            type: "number"
+                            description: "Provide the maximum seller allowed price"
+                            title: "Maximum Seller Allowed Price"
+          discounted_price:
+            type: "array"
+            description: "The attribute indicates the Purchasable Offer Discounted Price of the product"
+            title: "Purchasable Offer Discounted Price"
+            Items:
+                type: "object"
+                Properties:
+                * schedule:
+                    type: "array"
+                    description: "The attribute indicates the Purchasable Offer Discounted Price Schedule of the product"
+                    title: "Purchasable Offer Discounted Price Schedule"
+                    Items:
+                        type: "object"
+                        Properties:
+                        * value_with_tax:
+                            type: "number"
+                            description: "The price at which you offer the product for sale."
+                            title: "Sale Price"
+                        * start_at:
+                            type: "string"
+                            description: "The date that the sale price will begin to override the product's standard price; the sale price will be displayed after 0:00AM of Sale From Date."
+                            title: "Sale Start Date"
+                            OneOf:
+                                type: "string"
+                                Constraints: Format: date
+                                type: "string"
+                                Constraints: Format: date-time
+                        * end_at:
+                            type: "string"
+                            description: "The last date that the sale price will override the item's standard price; the product's standard price will be displayed after 0:00AM of Sale End Date."
+                            title: "Sale End Date"
+                            OneOf:
+                                type: "string"
+                                Constraints: Format: date
+                                type: "string"
+                                Constraints: Format: date-time
+          start_at:
+            type: "object"
+            description: "The attribute indicates the Purchasable Offer Start At of the product"
+            title: "Purchasable Offer Start At"
+            Properties:
+              value:
+                type: "string"
+                description: "Your price start date"
+                title: "Offering Release Date"
+                OneOf:
+                    type: "string"
+                    Constraints: Format: date
+                    type: "string"
+                    Constraints: Format: date-time
+          end_at:
+            type: "object"
+            description: "The attribute indicates the Purchasable Offer End At of the product"
+            title: "Purchasable Offer End At"
+            Properties:
+              value:
+                type: "string"
+                description: "Your price end date"
+                title: "Stop Selling Date"
+                OneOf:
+                    type: "string"
+                    Constraints: Format: date
+                    type: "string"
+                    Constraints: Format: date-time
+          audience:
+            type: "string"
+            description: "Provide the intended buyer segment or program that this purchasable offer is applicable to."
+            title: "Audience"
+          quantity_discount_plan:
+            type: "array"
+            description: "Provide and define the quantity discount plan for your business price."
+            title: "Purchasable Business Offer Quantity Discount Plan"
+            Items:
+                type: "object"
+                Properties:
+                * schedule:
+                    type: "array"
+                    description: "Provide the details, such as dates, pricing type that define your scheduled quantity discount plan."
+                    title: "Schedule"
+                    Items:
+                        type: "object"
+                        Properties:
+                        * discount_type:
+                            type: "string"
+                            description: "Provide whether the quantity price type is fixed, a price set in local currency for each quantity threshold, or a percentage of business price"
+                            title: "Quantity Price Type"
+                        * levels:
+                            type: "array"
+                            description: "Quantity Discount Plan Schedule Levels"
+                            title: "Levels"
+                            Items:
+                                type: "object"
+                                Properties:
+                                * lower_bound:
+                                    type: "integer"
+                                    description: "Provide the minimum purchase quantity necessary to receive the discount. It will apply to all units if the quantity threshold is met."
+                                    title: "Quantity Threshold (Lower Bound)"
+                                    Constraints: Minimum: 0.000000
+                                * value:
+                                    type: "number"
+                                    description: "Provide the quantity price for each quantity threshold or the discount percentage offered on the business price for each quantity threshold."
+                                    title: "Quantity Price (Fixed Price/Percentage Discount)"
+                                    Constraints: Minimum: 0.000000
+  condition_type:
+    type: "array"
+    description: "Provide the actual condition type of the product"
+    title: "Offering Condition Type"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Provide the actual condition type of the product"
+            title: "Offering Condition Type"
+          marketplace_id:
+  condition_note:
+    type: "array"
+    description: "Provide descriptive text explaining the actual condition of the item"
+    title: "Offer Condition Note"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Provide descriptive text explaining the actual condition of the item"
+            title: "Offer Condition Note"
+            Constraints: Max Length: 2204
+        * language_tag:
+          marketplace_id:
+  list_price:
+    type: "array"
+    description: "Provide the list price for the product. List Price is the suggested retail price of a product as provided by a manufacturer, supplier, or seller. This is not the offering or cost price."
+    title: "List Price"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "number"
+            description: "Provide the list price for the product not including tax. List Price is the suggested retail price of a product as provided by a manufacturer, supplier, or seller. This is not the offering or cost price. If you are unable to provide a value, enter 0."
+            title: "List Price"
+            Constraints: Max Length: 20, Minimum: 0.000000, Multiple Of: 0.010000
+        * currency:
+            type: "string"
+            description: "Select the corresponding currency"
+            title: "List Price Currency"
+          marketplace_id:
+  product_tax_code:
+    type: "array"
+    description: "Enter the product tax code supplied to you by Amazon.com"
+    title: "Product Tax Code"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Enter the product tax code supplied to you by Amazon.com"
+            title: "Product Tax Code"
+            Constraints: Max Length: 50
+          marketplace_id:
+  merchant_release_date:
+    type: "array"
+    description: "Provide the merchant release date using YYYY-MM-DD format"
+    title: "Offering Release Date"
+    Items:
+        type: "object"
+        Properties:
+          marketplace_id:
+        * value:
+            type: "string"
+            description: "Provide the merchant release date using YYYY-MM-DD format"
+            title: "Merchant Release Date"
+            OneOf:
+                type: "string"
+                Constraints: Format: date
+                type: "string"
+                Constraints: Format: date-time
+  merchant_shipping_group:
+    type: "array"
+    description: "The ship configuration group for an offer. The ship configuration group is created and managed by the seller through the ship setting UI."
+    title: "Merchant Shipping Group"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "The ship configuration group for an offer. The ship configuration group is created and managed by the seller through the ship setting UI."
+            title: "Merchant Shipping Group"
+            Constraints: Max Length: 100
+          marketplace_id:
+  max_order_quantity:
+    type: "array"
+    description: "Max order quantity."
+    title: "Max Order Quantity"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "integer"
+            description: "Max order quantity."
+            title: "Maximum Order Quantity"
+            Constraints: Minimum: 1.000000
+          marketplace_id:
+  gift_options:
+    type: "array"
+    description: "Provide gift card options"
+    title: "Gift Options"
+    Items:
+        type: "object"
+        Properties:
+          can_be_messaged:
+            type: "boolean"
+            description: "If you can print a gift message with the item indicate that here.  If left blank, defaults to 'false'"
+            title: "Offering Can Be Gift Messaged"
+          can_be_wrapped:
+            type: "boolean"
+            description: "If you can gift wrap an item indicate that here.  If left blank, defaults to 'false'"
+            title: "Is Gift Wrap Available"
+          marketplace_id:
+  main_offer_image_locator:
+    type: "array"
+    description: "Provide the location of the image"
+    title: "Main Offer Image Locator"
+    Items:
+        type: "object"
+        Properties:
+          marketplace_id:
+        * media_location:
+            type: "string"
+            description: "The URL where the main offer-specific image of the product is located"
+            title: "Main Image Location"
+            Constraints: Format: uri
+  other_offer_image_locator_1:
+    type: "array"
+    description: "Provide the location of the image"
+    title: "Other Offer Image Locator"
+    Items:
+        type: "object"
+        Properties:
+          marketplace_id:
+        * media_location:
+            type: "string"
+            description: "The URL for additional images of your product. These images will be shown on the detail page when the customer clicks through to see other views associated with the product."
+            title: "Other Image Location"
+            Constraints: Format: uri
+  other_offer_image_locator_2:
+    type: "array"
+    description: "Provide the location of the image"
+    title: "Other Offer Image Locator"
+    Items:
+        type: "object"
+        Properties:
+          marketplace_id:
+        * media_location:
+            type: "string"
+            description: "The URL for additional images of your product. These images will be shown on the detail page when the customer clicks through to see other views associated with the product."
+            title: "Other Image Location"
+            Constraints: Format: uri
+  other_offer_image_locator_3:
+    type: "array"
+    description: "Provide the location of the image"
+    title: "Other Offer Image Locator"
+    Items:
+        type: "object"
+        Properties:
+          marketplace_id:
+        * media_location:
+            type: "string"
+            description: "The URL for additional images of your product. These images will be shown on the detail page when the customer clicks through to see other views associated with the product."
+            title: "Other Image Location"
+            Constraints: Format: uri
+  other_offer_image_locator_4:
+    type: "array"
+    description: "Provide the location of the image"
+    title: "Other Offer Image Locator"
+    Items:
+        type: "object"
+        Properties:
+          marketplace_id:
+        * media_location:
+            type: "string"
+            description: "The URL for additional images of your product. These images will be shown on the detail page when the customer clicks through to see other views associated with the product."
+            title: "Other Image Location"
+            Constraints: Format: uri
+  other_offer_image_locator_5:
+    type: "array"
+    description: "Provide the location and source of the image"
+    title: "Other Offer Image Locator"
+    Items:
+        type: "object"
+        Properties:
+          marketplace_id:
+        * media_location:
+            type: "string"
+            description: "The URL for additional images of your product. These images will be shown on the detail page when the customer clicks through to see other views associated with the product."
+            title: "Other Image Location"
+            Constraints: Format: uri
+  handmade_classification:
+    type: "array"
+    description: "Select the value that best describes how the product was produced"
+    title: "Handmade Classification"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Select the value that best describes how the product was produced"
+            title: "Handmade Classification"
+          marketplace_id:
+* product_description:
+    type: "array"
+    description: "The description you provide should pertain to the product in general, not your particular item. There is a 2,000 character maximum."
+    title: "Product Description"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Provide a text description of the product. This information will appear in paragraph form on the detail page of your product. Include unique product features, product line details, and product specifications. Do not use all caps."
+            title: "Product Description"
+        * language_tag:
+          marketplace_id:
+* bullet_point:
+    type: "array"
+    description: "Max. 100 characters per line. Use these to highlight some of the product's most important qualities. Each line will be displayed as a separate bullet point above the product description."
+    title: "Key Product Features"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Brief descriptive text, called out via a bullet point, regarding a specific aspect of the product. These display directly under or next to your product photo, it is useful to put interesting information in these fields. Do NOT use all caps or abbreviations. Please do NOT use for fabric content, care instructions or country as these are populated in different fields."
+            title: "Bullet Point"
+            Constraints: Max Length: 700
+        * language_tag:
+          marketplace_id:
+  generic_keyword:
+    type: "array"
+    description: "Provide specific search terms to help customers find your product."
+    title: "Search Terms"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Provide any terms that may be relevant to customer searches. No repetition, no competitor brand names or ASINs."
+            title: "Generic Keyword"
+            Constraints: Max Length: 500
+        * language_tag:
+          marketplace_id:
+  special_feature:
+    type: "array"
+    description: "An additional text field where you can indicate any additional relevant product information."
+    title: "Additional Features"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Provide any special features an item has that distinguish it from other, comparable products"
+            title: "Special Features"
+            Constraints: Max Length: 500
+        * language_tag:
+          marketplace_id:
+  style:
+    type: "array"
+    description: "The style of the item"
+    title: "Style Name"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Provide the style of the product. Style refers to the aesthetic choices of a person or a group of people. It describes the distinctive visual representation of a product"
+            title: "Style"
+            Constraints: Min Length: 1, Max Length: 100
+        * language_tag:
+          marketplace_id:
+  department:
+    type: "array"
+    description: "List the department in which the product is found."
+    title: "Department"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Provide the gender/age for which this item is intended"
+            title: "Department Name"
+            Constraints: Min Length: 1, Max Length: 50
+        * language_tag:
+          marketplace_id:
+  target_gender:
+    type: "array"
+    description: "Provide the target gender for the product"
+    title: "Target Gender"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Provide the target gender for the product"
+            title: "Target Gender"
+          marketplace_id:
+  age_range_description:
+    type: "array"
+    description: "Specify an appropriate age range description for the item"
+    title: "Age Range Description"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Specify an appropriate age range description for the item"
+            title: "Age Range Description"
+            Constraints: Max Length: 100
+        * language_tag:
+          marketplace_id:
+  material:
+    type: "array"
+    description: "What material is the product made out of?"
+    title: "Material Type"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Specify the primary materials used for manufacturing the item"
+            title: "Material Type"
+            Constraints: Min Length: 1, Max Length: 500
+        * language_tag:
+          marketplace_id:
+  lining_description:
+    type: "array"
+    description: "Provide the type of fabric or material used to line the interior of the item."
+    title: "Lining Description"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Provide the type of fabric or material used to line the interior of the item."
+            title: "Lining Description"
+            Constraints: Max Length: 2126
+        * language_tag:
+          marketplace_id:
+  number_of_items:
+    type: "array"
+    description: "Provide the total number of identical items in the selling unit to the customer"
+    title: "Number of Items"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "integer"
+            description: "Provide the total number of identical items in the selling unit to the customer"
+            title: "Number of Items"
+            Constraints: Minimum: 0.000000, Maximum: 999999999999.000000
+          marketplace_id:
+  item_package_quantity:
+    type: "array"
+    description: "Quantity of the item for sale in one package"
+    title: "Package Quantity"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "integer"
+            description: "Provide the number of packages sold as part of a single item. An ASIN selling 5 boxes of paperclips with 100 paperclips per box would have item package quantity = '5'"
+            title: "Item Package Quantity"
+            Constraints: Minimum: 1.000000, Maximum: 999999999999.000000
+          marketplace_id:
+  subject_character:
+    type: "array"
+    description: "Provide the primary character the item represents"
+    title: "Subject Character"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Provide the primary character the item represents"
+            title: "Subject Character"
+            Constraints: Max Length: 200
+        * language_tag:
+          marketplace_id:
+  special_size_type:
+    type: "array"
+    description: "Specify the special size type for the item"
+    title: "Special Size"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Specify the special size type for the item"
+            title: "Special Size"
+            Constraints: Max Length: 2200
+        * language_tag:
+          marketplace_id:
+  color:
+    type: "array"
+    description: "Provide the color of the product"
+    title: "Color"
+    Items:
+        type: "object"
+        Properties:
+          standardized_values:
+            type: "array"
+            description: "Select the most dominant color of the product."
+            title: "Color Map"
+            Items:
+                type: "string"
+          value:
+            type: "string"
+            description: "Provide the color of the product"
+            title: "Color"
+            Constraints: Max Length: 1000
+        * language_tag:
+          marketplace_id:
+  size:
+    type: "array"
+    description: "An alphanumeric string detailing the size of the product that a customer would select when purchasing.  E.g. Small, Medium, Large.  For items that do not vary by size, simply state “One Size”."
+    title: "Size"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Provide the size of the item"
+            title: "Size"
+            Constraints: Max Length: 50
+        * language_tag:
+          marketplace_id:
+  metal_type:
+    type: "array"
+    description: "Provide the type of metal on the item."
+    title: "Metal Type"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Provide the type of metal on the item."
+            title: "Metal Type"
+            Constraints: Max Length: 540
+        * language_tag:
+          marketplace_id:
+  part_number:
+    type: "array"
+    description: "For most products, this will be identical to the model number; however, some manufacturers distinguish part number from model number."
+    title: "Manufacturer Part Number"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Provide the part number. For many products, this will be identical to the model number however some manufacturers distinguish part number from model number"
+            title: "Part Number"
+            Constraints: Min Length: 1, Max Length: 40
+          marketplace_id:
+  item_shape:
+    type: "array"
+    description: "Specify the shape of the item"
+    title: "Item Shape"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Specify the shape of the item"
+            title: "Item Shape"
+        * language_tag:
+          marketplace_id:
+  theme:
+    type: "array"
+    description: "Provide the primary high-level subject, concept, topic, motif, or idea of an item."
+    title: "Theme"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Provide the primary high-level subject, concept, topic, motif, or idea of an item."
+            title: "Theme"
+            Constraints: Max Length: 1553
+        * language_tag:
+          marketplace_id:
+  ring:
+    type: "array"
+    description: "The attribute indicates Ring of the product"
+    title: "Ring"
+    Items:
+        type: "object"
+        Properties:
+          marketplace_id:
+          size:
+            type: "array"
+            description: "Provide the size of the ring"
+            title: "Ring Size"
+            Items:
+                type: "object"
+                Properties:
+                * value:
+                    type: "string"
+                    description: "Provide the size of the ring"
+                    title: "Ring Size"
+                * language_tag:
+  fit_type:
+    type: "array"
+    description: "Specify the item's fit type"
+    title: "Fit Type"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Specify the item's fit type"
+            title: "Fit Type"
+            Constraints: Max Length: 2201
+        * language_tag:
+          marketplace_id:
+  pocket_description:
+    type: "array"
+    description: "Enter the appropriate description. Mandatory if style is a denim, short or pant style."
+    title: "Pocket Description"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Provide the pocket description"
+            title: "Pocket Description"
+            Constraints: Max Length: 2197
+        * language_tag:
+          marketplace_id:
+  care_instructions:
+    type: "array"
+    description: "Provide instructions related to how to care for the item"
+    title: "Product Care Instructions"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Provide instructions related to how to care for the item"
+            title: "Care Instructions"
+            Constraints: Max Length: 500
+        * language_tag:
+          marketplace_id:
+  edition:
+    type: "array"
+    description: "Provide the version or edition of the item"
+    title: "Edition"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Provide the version or edition of the item"
+            title: "Edition"
+            Constraints: Max Length: 4582
+        * language_tag:
+          marketplace_id:
+  configuration:
+    type: "array"
+    description: "Indicate the configuration of the item"
+    title: "Configuration"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Indicate the configuration of the item"
+            title: "Configuration"
+            Constraints: Max Length: 3261
+        * language_tag:
+          marketplace_id:
+  paper_size:
+    type: "array"
+    description: "Specify the size of the paper"
+    title: "Paper Size"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Specify the size of the paper as a numeric value"
+            title: "Paper Size"
+            Constraints: Max Length: 1335
+          unit:
+            type: "string"
+            description: "Select the corresponding unit"
+            title: "Paper Size Unit"
+        * language_tag:
+          marketplace_id:
+  platform_for_display:
+    type: "array"
+    description: "Provide the platform associated with the product."
+    title: "Platform for Display"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Provide the platform associated with the product."
+            title: "Platform for Display"
+            Constraints: Max Length: 166
+        * language_tag:
+          marketplace_id:
+  is_customizable:
+    type: "array"
+    description: "Is customizable?"
+    title: "Is Customizable?"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "boolean"
+            description: "Specify if this product is customizable."
+            title: "Is Customizable?"
+          marketplace_id:
+  lens:
+    type: "array"
+    description: "The attribute indicates Lens of the product"
+    title: "Lens"
+    Items:
+        type: "object"
+        Properties:
+          color:
+            type: "array"
+            description: "Provide the color of lens"
+            title: "Lens Color"
+            Items:
+                type: "object"
+                Properties:
+                * value:
+                    type: "string"
+                    description: "Provide the color of lens"
+                    title: "Lens Color"
+                * language_tag:
+          marketplace_id:
+  item_display_dimensions:
+    type: "array"
+    description: "Provide the dimensions of the product, without packaging and fully assembled"
+    title: "Item Display Dimensions"
+    Items:
+        type: "object"
+        Properties:
+          length:
+            type: "object"
+            description: "Provide the length of the product without packaging and fully assembled"
+            title: "Item Display Length"
+            Properties:
+            * value:
+                type: "number"
+                description: "Provide the numeric component of the length of the product without packaging and fully assembled"
+                title: "Item Display Length"
+                Constraints: Max Length: 5000
+            * unit:
+                type: "string"
+                description: "Select the corresponding unit"
+                title: "Item Display Length Unit"
+          marketplace_id:
+  flavor:
+    type: "array"
+    description: "What flavor is the product?"
+    title: "Flavor"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Specify the flavor of the product"
+            title: "Flavor"
+            Constraints: Max Length: 2200
+        * language_tag:
+          marketplace_id:
+  form_factor:
+    type: "array"
+    description: "Specify the outward design characteristics of the item"
+    title: "Form Factor"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Specify the outward design characteristics of the item"
+            title: "Form Factor"
+            Constraints: Max Length: 2194
+        * language_tag:
+          marketplace_id:
+  access_method:
+    type: "array"
+    description: "Provide the access method"
+    title: "Access Method"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Provide the access method"
+            title: "Access Method"
+            Constraints: Max Length: 102
+        * language_tag:
+          marketplace_id:
+  leather_type:
+    type: "array"
+    description: "Provide leather type of the product"
+    title: "Leather Type"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Provide leather type of the product"
+            title: "Leather Type"
+            Constraints: Max Length: 2200
+        * language_tag:
+          marketplace_id:
+  pattern:
+    type: "array"
+    description: "Provide the most prominent repeated decorative design of the item"
+    title: "Pattern"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Provide the most prominent repeated decorative design of the item"
+            title: "Pattern"
+            Constraints: Max Length: 2200
+        * language_tag:
+          marketplace_id:
+  unit_count:
+    type: "array"
+    description: "Specify the number of units and the unit type of the product"
+    title: "Unit Count"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "number"
+            description: "For products that are consumed by volume, weight, linear dimension, etc., provide the net quantity that would be shipped to a customer who orders one ASIN (e.g. 12 pack of 6 floz. bottles of water = 72, vs. a single 2 liter bottle = 2). For products consumed as individual units, provide the total number of units (pack of 12 pens = 12). For packed assortments of non-identical items, enter 1"
+            title: "Unit Count"
+          type:
+            type: "object"
+            description: "For items consumed by volume, weight, linear dimension etc., provide the unit of measure listed on the products. For products consumed as individual units, enter: count"
+            title: "Unit Count Type"
+            Properties:
+            * value:
+                type: "string"
+                description: "For items consumed by volume, weight, linear dimension etc., provide the unit of measure listed on the products. For products consumed as individual units, enter: count"
+                title: "Unit Count Type"
+                Constraints: Max Length: 100
+            * language_tag:
+          marketplace_id:
+  product_site_launch_date:
+    type: "array"
+    description: "Date you wish this detail page to launch."
+    title: "Launch Date"
+    Items:
+        type: "object"
+        Properties:
+          marketplace_id:
+        * value:
+            type: "string"
+            description: "Provide the date the product launches and should first be shown on the Amazon website (YYYY-MM-DD format). PSLD does not impact buyability or pre-order logic, it is used to indicate when a product will be visible and searchable on the Amazon website"
+            title: "Product Site Launch Date"
+            OneOf:
+                type: "string"
+                Constraints: Format: date
+                type: "string"
+                Constraints: Format: date-time
+  included_components:
+    type: "array"
+    description: "Which components are included?"
+    title: "Included Components"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Specify the items that are included with this product"
+            title: "Included Components"
+            Constraints: Max Length: 1000
+        * language_tag:
+          marketplace_id:
+  league_name:
+    type: "array"
+    description: "Name of league associated with this event"
+    title: "League Name"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Provide the league name associated with this product"
+            title: "League Name"
+            Constraints: Max Length: 100
+        * language_tag:
+          marketplace_id:
+  team_name:
+    type: "array"
+    description: "Name of team participating in this event."
+    title: "Team Name"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Please enter the team name of this product"
+            title: "Team Name"
+            Constraints: Max Length: 100
+        * language_tag:
+          marketplace_id:
+  is_autographed:
+    type: "array"
+    description: "Provide if the product has been autographed by a celebrity or player."
+    title: "Is Autographed"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "boolean"
+            description: "Provide if the product has been autographed by a celebrity or player."
+            title: "Is Autographed"
+          marketplace_id:
+  band:
+    type: "array"
+    description: "The attribute indicates Band of the product"
+    title: "Band"
+    Items:
+        type: "object"
+        Properties:
+          color:
+            type: "array"
+            description: "Describe the color of the band."
+            title: "Band Color"
+            Items:
+                type: "object"
+                Properties:
+                * value:
+                    type: "string"
+                    description: "Provide the dominant color of the band"
+                    title: "Band Color"
+                    Constraints: Max Length: 600
+                * language_tag:
+          marketplace_id:
+  embellishment_feature:
+    type: "array"
+    description: "Description of something extra attached to the item for decorative purposes."
+    title: "Embellishment Feature"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Description of something extra attached to the item for decorative purposes."
+            title: "Embellishment Feature"
+            Constraints: Max Length: 100
+        * language_tag:
+          marketplace_id:
+  ink:
+    type: "array"
+    description: "The attribute indicates Ink of the product"
+    title: "Ink"
+    Items:
+        type: "object"
+        Properties:
+          color:
+            type: "array"
+            description: "Specify the color of the ink"
+            title: "Ink Color"
+            Items:
+                type: "object"
+                Properties:
+                * value:
+                    type: "string"
+                    description: "Specify the color of the ink"
+                    title: "Ink Color"
+                * language_tag:
+          marketplace_id:
+  length_range:
+    type: "array"
+    description: "Length range for blinds"
+    title: "Length Range"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Length range for blinds"
+            title: "Length Range"
+        * language_tag:
+          marketplace_id:
+  width_range:
+    type: "array"
+    description: "Width range for blinds"
+    title: "Width Range"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Width range for blinds"
+            title: "Width Range"
+        * language_tag:
+          marketplace_id:
+  number_of_compartments:
+    type: "array"
+    description: "Indicates number of internal compartments."
+    title: "Number of Compartments"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "integer"
+            description: "Provide the number of compartments that the item has"
+            title: "Number of Compartments"
+            Constraints: Maximum: 66000.000000
+          marketplace_id:
+  number_of_pockets:
+    type: "array"
+    description: "Provide the total count of pockets on the product."
+    title: "Number Of Pockets"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "integer"
+            description: "Provide the total count of pockets on the product."
+            title: "Number of Pockets"
+            Constraints: Maximum: 123325.000000
+          marketplace_id:
+  number_of_sections:
+    type: "array"
+    description: "Enter the number of sections"
+    title: "Number of Sections"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "integer"
+            description: "Enter the number of sections"
+            title: "Number of Sections"
+            Constraints: Maximum: 100.000000
+          marketplace_id:
+  closure:
+    type: "array"
+    description: "The attribute indicates the Closure of the product"
+    title: "Closure"
+    Items:
+        type: "object"
+        Properties:
+          marketplace_id:
+          type:
+            type: "array"
+            description: "Provide the type of closing mechanism used by the item. The closing type allows a user to fully wear, seal, or close the item."
+            title: "Closure Type"
+            Items:
+                type: "object"
+                Properties:
+                * value:
+                    type: "string"
+                    description: "Provide the type of closing mechanism used by the item. The closing type allows a user to fully wear, seal, or close the item."
+                    title: "Closure Type"
+                    Constraints: Min Length: 1, Max Length: 500
+                * language_tag:
+  item_depth_width_height:
+    type: "array"
+    description: "The depth and width of the item in ready to use condition. Ready to use is defined as out of packaging and displayed as used for example fully rolled out for a rug or blanket."
+    title: "Item Dimensions D x W x H"
+    Items:
+        type: "object"
+        Properties:
+        * depth:
+            type: "object"
+            description: "Provide the depth of the item from front to back when kept horizontal & closed."
+            title: "Item Depth Front to Back"
+            Properties:
+            * value:
+                type: "number"
+                description: "Provide the depth of the item from front to back when kept horizontal & closed."
+                title: "Item Depth Front to Back"
+                Constraints: Max Length: 5000, Minimum: 0.000000, Maximum: 400000.000000
+            * unit:
+                type: "string"
+                description: "Select the unit of measure for the item depth."
+                title: "Item Depth Unit"
+        * height:
+            type: "object"
+            description: "Provide the height of the item from top to bottom when kept horizontal & closed."
+            title: "Height Top to Bottom"
+            Properties:
+            * value:
+                type: "number"
+                description: "Provide the height of the item from top to bottom when kept horizontal & closed."
+                title: "Height Top to Bottom"
+                Constraints: Max Length: 5000, Minimum: 0.000000, Maximum: 400000.000000
+            * unit:
+                type: "string"
+                description: "Select the unit of measure for the item height."
+                title: "Item Height Unit"
+          marketplace_id:
+        * width:
+            type: "object"
+            description: "Provide the width from side to side of the front of the item when kept horizontal and closed."
+            title: "Item Width Side to Side"
+            Properties:
+            * value:
+                type: "number"
+                description: "Provide the width from side to side of the front of the item when kept horizontal and closed."
+                title: "Item Width Side to Side"
+                Constraints: Max Length: 5000, Minimum: 0.000000, Maximum: 400000.000000
+            * unit:
+                type: "string"
+                description: "Select the unit of measure for the item width."
+                title: "Item Width Unit"
+  wallet_compartment_type:
+    type: "array"
+    description: "Provide the type(s) of compartments that the wallet includes. This indicates which items the wallet is capable of holding."
+    title: "Wallet Compartment Type"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Provide the type(s) of compartments that the wallet includes. This indicates which items the wallet is capable of holding."
+            title: "Wallet Compartment Type"
+          marketplace_id:
+  denier:
+    type: "array"
+    description: "Provide the denier of the item. Denier measures the density of the fabric of the item which impacts how transparent the item is."
+    title: "Denier"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "integer"
+            description: "Provide the denier of the item. Denier measures the density of the fabric of the item which impacts how transparent the item is."
+            title: "Denier"
+            Constraints: Minimum: 0.000000, Maximum: 10000.000000
+          marketplace_id:
+  wallet_card_slot_count:
+    type: "array"
+    description: "Provide the number of card slots the wallet contains."
+    title: "Wallet Card Slot Count"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "integer"
+            description: "Provide the number of card slots the wallet contains."
+            title: "Wallet Card Slot Count"
+            Constraints: Minimum: 0.000000, Maximum: 100.000000
+          marketplace_id:
+  parentage_level:
+    type: "array"
+    description: "Specify whether a SKU is a parent or child"
+    title: "Parentage Level"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Specify whether a SKU is a parent or child"
+            title: "Parentage Level"
+          marketplace_id:
+  child_parent_sku_relationship:
+    type: "array"
+    description: "The attribute indicates the Child Parent Sku Relationship of the product"
+    title: "Child Parent Sku Relationship"
+    Items:
+        type: "object"
+        Properties:
+        * child_relationship_type:
+            type: "string"
+            description: "The relationship that the child has to the parent"
+            title: "Child Relationship Type"
+          marketplace_id:
+          parent_sku:
+            type: "string"
+            description: "The SKU of the parent item"
+            title: "Parent SKU"
+  variation_theme:
+    type: "array"
+    description: "Specify the variation theme that the product will use. The theme's attributes must be populated for all items in the grouping."
+    title: "Variation Theme"
+    Items:
+        type: "object"
+        Properties:
+        * name:
+            type: "string"
+            description: "Specify the variation theme that the product will use. The theme's attributes must be populated for all items in the grouping."
+            title: "Variation Theme Name"
+* country_of_origin:
+    type: "array"
+    description: "The country in which the product was published."
+    title: "Country of Publication"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Select the product's country of origin"
+            title: "Country of Origin"
+          marketplace_id:
+  batteries_required:
+    type: "array"
+    description: "Indicate if batteries are required."
+    title: "Are Batteries Required"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "boolean"
+            description: "Select \"yes\" if batteries are required to power the item (or if the item is a battery) or \"no\" if they are not. Please note that an internal rechargeable battery is also considered a battery"
+            title: "Are batteries required?"
+          marketplace_id:
+  batteries_included:
+    type: "array"
+    description: "Indicate if batteries are included with the product."
+    title: "Batteries are Included"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "boolean"
+            description: "Select \"yes\" if batteries are contained in the product (e.g. batteries inside a pair of Bluetooth headphones) and/or included with the product (e.g. batteries packed separately with a camera), otherwise select \"no\""
+            title: "Are batteries included?"
+          marketplace_id:
+  battery:
+    type: "array"
+    description: "Provide battery information"
+    title: "Battery"
+    Items:
+        type: "object"
+        Properties:
+          cell_composition:
+            type: "array"
+            description: "What type or composition is the battery?"
+            title: "Battery Type"
+            Items:
+                type: "object"
+                Properties:
+                * value:
+                    type: "string"
+                    description: "Select the chemical composition of the battery cell"
+                    title: "Battery Cell Composition"
+          cell_composition_other_than_listed:
+            type: "array"
+            description: "Provide the components of the item's battery cell that are not already listed under battery cell composition."
+            title: "Battery Cell Composition Other Than Listed"
+            Items:
+                type: "object"
+                Properties:
+                * value:
+                    type: "string"
+                    description: "Provide the components of the item's battery cell that are not already listed under battery cell composition."
+                    title: "Battery Cell Composition Other Than Listed"
+                    Constraints: Max Length: 50
+                * language_tag:
+          marketplace_id:
+          weight:
+            type: "array"
+            description: "Provide the total net weight of the batteries included. This is the weight of the standalone batteries not including packaging or the device it may be used in"
+            title: "Battery Weight"
+            Items:
+                type: "object"
+                Properties:
+                * value:
+                    type: "number"
+                    description: "Provide the total net weight (numeric value) of the batteries included. This is the weight of the standalone batteries not including packaging or the device it may be used in."
+                    title: "Battery Weight"
+                    Constraints: Max Length: 5000, Minimum: 0.000000
+                * unit:
+                    type: "string"
+                    description: "Provide unit for battery weight"
+                    title: "Battery Weight Unit"
+  num_batteries:
+    type: "array"
+    description: "Provide the quantity and type of batteries needed to power the item.  If batteries are included with the item be sure to account for spare batteries provided"
+    title: "Number of Batteries"
+    Items:
+        type: "object"
+        Properties:
+          marketplace_id:
+        * quantity:
+            type: "integer"
+            description: "Specify the number of batteries needed to power the item.  If batteries are included with the item be sure to account for spare batteries provided"
+            title: "Number of Batteries"
+            Constraints: Minimum: 0.000000
+        * type:
+            type: "string"
+            description: "Provide battery type needed to power the item, including spares if included. Some options may be moved under other attribute eg. IEC code"
+            title: "Battery Type"
+  number_of_lithium_metal_cells:
+    type: "array"
+    description: "Specify the total number of Lithium Metal cells in the product where the cell isn't contained in an encased battery (e.g. coin cells)"
+    title: "Number of Lithium Metal Cells"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "integer"
+            description: "Specify the total number of Lithium Metal cells in the product where the cell isn't contained in an encased battery (e.g. coin cells)"
+            title: "Number of Lithium Metal Cells"
+            Constraints: Minimum: 1.000000
+          marketplace_id:
+  number_of_lithium_ion_cells:
+    type: "array"
+    description: "Specify the total number of Lithium-ion cells in the product where the cell isn't contained in an encased battery. For example, an AA battery is considered a cell"
+    title: "Number of Lithium-ion Cells"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "integer"
+            description: "Specify the total number of Lithium-ion cells in the product where the cell isn't contained in an encased battery. For example, an AA battery is considered a cell"
+            title: "Number of Lithium-ion Cells"
+            Constraints: Minimum: 1.000000
+          marketplace_id:
+  lithium_battery:
+    type: "array"
+    description: "The attribute indicates the Lithium Battery of the product"
+    title: "Lithium Battery"
+    Items:
+        type: "object"
+        Properties:
+          energy_content:
+            type: "array"
+            description: "Provide the total energy stored in the lithium batteries used to power the item, measured in Watt Hours."
+            title: "Lithium Battery Energy Content"
+            Items:
+                type: "object"
+                Properties:
+                * value:
+                    type: "number"
+                    description: "Provide the total energy stored in the lithium batteries used to power the item, measured in Watt Hours."
+                    title: "Lithium Battery Energy Content"
+                    Constraints: Max Length: 5000, Minimum: 0.000000
+                * unit:
+                    type: "string"
+                    description: "Select the corresponding unit"
+                    title: "Lithium Battery Energy Content Unit"
+          marketplace_id:
+          packaging:
+            type: "array"
+            description: "Select “in equipment” if the battery is contained in the item. Select “with equipment” if the battery is packed separately with the device it is meant to power. Select “only” if the product is a battery sold alone or with items it is not meant to power."
+            title: "Lithium Battery Packaging"
+            Items:
+                type: "object"
+                Properties:
+                * value:
+                    type: "string"
+                    description: "Select “in equipment” if the battery is contained in the item. Select “with equipment” if the battery is packed separately with the device it is meant to power. Select “only” if the product is a battery sold alone or with items it is not meant to power."
+                    title: "Lithium Battery Packaging"
+          weight:
+            type: "array"
+            description: "Provide the weight of lithium contained in the cell or battery"
+            title: "Lithium Battery Weight"
+            Items:
+                type: "object"
+                Properties:
+                * value:
+                    type: "number"
+                    description: "Provide the weight of lithium contained in the cell or battery as a numeric value"
+                    title: "Lithium Battery Weight"
+                    Constraints: Max Length: 12, Minimum: 0.000000
+                * unit:
+                    type: "string"
+                    description: "Select the corresponding weight unit"
+                    title: "Lithium Battery Weight Unit"
+* supplier_declared_dg_hz_regulation:
+    type: "array"
+    description: "If the product is a Dangerous Good or Hazardous Material, Substance or Waste that is regulated for transportation, storage, and/or waste select from the list of valid values"
+    title: "Dangerous Goods Regulations"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "If the product is a Dangerous Good or Hazardous Material, Substance or Waste that is regulated for transportation, storage, and/or waste select from the list of valid values"
+            title: "Dangerous Goods Regulations"
+          marketplace_id:
+  ghs:
+    type: "array"
+    description: "Provide the Global Harmonized System (GHS) information"
+    title: "GHS"
+    Items:
+        type: "object"
+        Properties:
+          classification:
+            type: "array"
+            description: "Provide the Global Harmonized System (GHS) CLP classification for the product"
+            title: "GHS Classification"
+            Items:
+                type: "object"
+                Properties:
+                * class:
+                    type: "string"
+                    description: "Select the GHS Class of the product from the list of valid values if GHS is selected as the Dangerous Goods Regulation. GHS Class indicates the warning statement assigned by the GHS classification system."
+                    title: "GHS Class"
+          marketplace_id:
+  hazmat:
+    type: "array"
+    description: "Provide hazmat information that is relevant to the product based on the aspect selected"
+    title: "Hazmat"
+    Items:
+        type: "object"
+        Properties:
+        * aspect:
+            type: "string"
+            description: "Select the aspect or regulatory body used for the hazardous product information"
+            title: "Hazmat Aspect"
+        * value:
+            type: "string"
+            description: "Provide hazmat information that is relevant to the product based on the aspect selected"
+            title: "Hazmat"
+            Constraints: Max Length: 2197
+          marketplace_id:
+  safety_data_sheet_url:
+    type: "array"
+    description: "Provide the SDS/MSDS URL. Required for Hazardous material SDS/MSDS provides information such as physical data (flashpoint, pH, etc.), health concerns, storage, and transportation information for potentially dangerous substances."
+    title: "Safety Data Sheet (SDS or MSDS) URL"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Provide the SDS/MSDS URL if any value other than Not Applicable or Unknown is selected in the Dangerous Goods Regulation column."
+            title: "Safety Data Sheet (SDS or MSDS) URL"
+            Constraints: Max Length: 23397
+        * language_tag:
+          marketplace_id:
+  item_weight:
+    type: "array"
+    description: "Provide the weight of the item (not including the packaging)"
+    title: "Item Weight"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "number"
+            description: "Provide the item weight numeric value (not including the packaging)"
+            title: "Item Weight"
+            Constraints: Max Length: 5000, Minimum: 0.000000, Maximum: 1000000000.000000
+        * unit:
+            type: "string"
+            description: "Provide unit for item weight"
+            title: "Item Weight Unit"
+          marketplace_id:
+  outer:
+    type: "array"
+    description: "Provide the products outer material"
+    title: "Outer"
+    Items:
+        type: "object"
+        Properties:
+          marketplace_id:
+          material:
+            type: "array"
+            description: "Provide the material used to construct the exterior or outer layer of the item."
+            title: "Outer Material"
+            Items:
+                type: "object"
+                Properties:
+                * value:
+                    type: "string"
+                    description: "Provide the material used to construct the exterior or outer layer of the item."
+                    title: "Outer Material"
+                    Constraints: Max Length: 500
+                * language_tag:
+  inner:
+    type: "array"
+    description: "Provide the inner material of the product"
+    title: "Inner"
+    Items:
+        type: "object"
+        Properties:
+          marketplace_id:
+          material:
+            type: "array"
+            description: "Specify the inner material of the product"
+            title: "Inner Material"
+            Items:
+                type: "object"
+                Properties:
+                * value:
+                    type: "string"
+                    description: "Specify the inner material of the product"
+                    title: "Inner Material"
+                    Constraints: Min Length: 1, Max Length: 500
+                * language_tag:
+  california_proposition_65:
+    type: "array"
+    description: "Provide the Proposition 65 warning information applicable to your product, if any. By removing or changing the information you certify that the previously provided warning information is no longer legally required"
+    title: "California Proposition 65"
+    Items:
+        type: "object"
+        Properties:
+        * compliance_type:
+            type: "string"
+            description: "Select the warning type applicable to your product, if any. You certify that the warning provided satisfies legal requirements and that you’ll remove a warning previously provided only if it is no longer legally required."
+            title: "California Proposition 65 Warning Type"
+          chemical_names:
+            type: "array"
+            description: "If you selected the Food, Furniture, or Chemical warning you must indicate a chemical(s). You certify that the chemical(s) satisfies legal requirements and that you’ll remove a chemical previously provided only if it is no longer legally required."
+            title: "California Proposition 65 Chemical Name(s)"
+            Items:
+                type: "string"
+          marketplace_id:
+  pesticide_marking:
+    type: "array"
+    description: "Provide any pesticide marking on the item or packaging."
+    title: "Pesticide Marking"
+    Items:
+        type: "object"
+        Properties:
+        * marking_type:
+            type: "string"
+            description: "Provide any pesticide marking on the item or packaging."
+            title: "Pesticide Marking"
+          registration_status:
+            type: "string"
+            description: "Provide a status whether the item requires registration and an associated registration number."
+            title: "Pesticide Registration Status"
+          certification_number:
+            type: "string"
+            description: "Provide any pesticide certification number which corresponds with the marking type"
+            title: "Pesticide Certification Number"
+            Constraints: Max Length: 300
+          marketplace_id:
+  fcc_radio_frequency_emission_compliance:
+    type: "array"
+    description: "Provide details on compliance to FCC regulations for products that may emit radio frequencies."
+    title: "FCC Radio Frequency Emission Compliance"
+    Items:
+        type: "object"
+        Properties:
+        * registration_status:
+            type: "string"
+            description: "Indicate whether this product is capable of emitting radio frequency energy, and if so, what type of FCC RF equipment authorization this product has."
+            title: "Radio Frequency Emission & Authorization Status"
+          identification_number:
+            type: "string"
+            description: "If the device has an FCC ID, provide it."
+            title: "FCC ID"
+            Constraints: Max Length: 100
+          point_of_contact_name:
+            type: "string"
+            description: "If the device has a Supplier's Declaration of Conformity, provide the name of the point of contact for the Responsible Party, as defined by the FCC."
+            title: "SDoC Contact Name"
+            Constraints: Max Length: 100
+          point_of_contact_address:
+            type: "string"
+            description: "If the device has a Supplier's Declaration of Conformity, provide a US mailing address for the Responsible Party, as defined by the FCC."
+            title: "SDoC Contact US Mailing Address"
+            Constraints: Max Length: 2500
+          point_of_contact_email:
+            type: "string"
+            description: "If the device has an SDoC, provide an e-mail address (in this field) or a US phone number (in the next field) for the Responsible Party, as defined by the FCC. If you provide a phone number in the next field, you may enter \"N/A\" in this field."
+            title: "SDoC Contact Email Address"
+            Constraints: Max Length: 300
+          point_of_contact_phone_number:
+            type: "string"
+            description: "If the device has an SDoC, provide a US phone number (in this field) or an e-mail address (in the prior field) for the Responsible Party, as defined by the FCC. If you provide an e-mail address in the prior field, you may enter \"N/A\" in this field."
+            title: "SDOC Contact US Phone Number"
+            Constraints: Max Length: 100
+          marketplace_id:
+  regulatory_compliance_certification:
+    type: "array"
+    description: "Provide any regulation that is relevant to the product as well as any required regulatory identications such as certification numbers."
+    title: "Regulatory Compliance Certification"
+    Items:
+        type: "object"
+        Properties:
+        * regulation_type:
+            type: "string"
+            description: "Select applicable regulation type"
+            title: "Compliance Regulation Type"
+        * value:
+            type: "string"
+            description: "Provide the regulatory identification associated with the regulation type."
+            title: "Regulatory Identification"
+            Constraints: Min Length: 1, Max Length: 135
+          marketplace_id:
+  dsa_responsible_party_address:
+    type: "array"
+    description: "Provide the email address or URL for the EU Responsible Person to comply with the General Product Safety Regulation (GPSR). If you’ve already submitted this Responsible Person’s information in the past, make sure you use the same email or URL."
+    title: "Responsible Person's Email or Electronic Address"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Provide the email address or URL for the EU Responsible Person to comply with the General Product Safety Regulation (GPSR). If you’ve already submitted this Responsible Person’s information in the past, make sure you use the same email or URL."
+            title: "Responsible Person's Email or Electronic Address"
+            Constraints: Max Length: 1000
+          marketplace_id:
+  compliance_media:
+    type: "array"
+    description: "Provide information on the product documents you want to display on the product detail page to comply with the General Product Safety Regulation (GPSR). Alternatively, you can upload images under the PS01-PS06 variants in the Image Manager."
+    title: "Compliance Media"
+    Items:
+        type: "object"
+        Properties:
+        * content_type:
+            type: "string"
+            description: "Please enter the content type of the compliance document."
+            title: "Compliance Media Content Type"
+        * content_language:
+            type: "string"
+            description: "Provide the language used for the content of the compliance media."
+            title: "Compliance Media Language"
+        * source_location:
+            type: "string"
+            description: "Provide the source location of the compliance media."
+            title: "Compliance Media Source Location"
+          marketplace_id:
+  gpsr_safety_attestation:
+    type: "array"
+    description: "Check “yes” if your product doesn’t have any warning and safety information, as it can be used safely and as intended without it."
+    title: "GPSR Safety Attestation"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "boolean"
+            description: "Check “yes” if your product doesn’t have any warning and safety information, as it can be used safely and as intended without it."
+            title: "GPSR Safety Attestation"
+          marketplace_id:
+  gpsr_manufacturer_reference:
+    type: "array"
+    description: "Provide the email address or URL of the manufacturer to comply with the EU General Product Safety Regulation (GPSR). If you’ve already submitted this manufacturer’s information in the past, make sure you use the same email or URL."
+    title: "GPSR Manufacturer Reference"
+    Items:
+        type: "object"
+        Properties:
+          gpsr_manufacturer_email_address:
+            type: "string"
+            description: "Provide the email address or URL of the manufacturer to comply with the EU General Product Safety Regulation (GPSR). If you’ve already submitted this manufacturer’s information in the past, make sure you use the same email or URL."
+            title: "Manufacturer’s Email or Electronic Address"
+            Constraints: Max Length: 100
+          marketplace_id:
+  ships_globally:
+    type: "array"
+    description: "Provide whether the item can be shipped globally by Amazon "
+    title: "Ships Globally"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "boolean"
+            description: "Provide whether the item can be shipped globally by Amazon "
+            title: "Ships Globally"
+          marketplace_id:
+  compliance_animal_leather:
+    type: "array"
+    description: "Provide the type of leather used in the production of the item, for compliance purposes."
+    title: "Compliance - Animal Leather"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Provide the type of leather used in the production of the item, for compliance purposes."
+            title: "Compliance - Animal Leather"
+          marketplace_id:
+  compliance_wallet_type:
+    type: "array"
+    description: "Provide style of wallet which best fits the item, for compliance purposes."
+    title: "Compliance - Wallet Type"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Provide style of wallet which best fits the item, for compliance purposes."
+            title: "Compliance - Wallet Type"
+          marketplace_id:
+  compliance_plastic_sheeting_type:
+    type: "array"
+    description: "Provide, the type of sheeting used in the manufacturing of the item, for compliance purposes."
+    title: "Compliance - Plastic Sheeting Type"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Provide, the type of sheeting used in the manufacturing of the item, for compliance purposes."
+            title: "Compliance - Plastic Sheeting Type"
+          marketplace_id:
+  compliance_is_handmade:
+    type: "array"
+    description: "Provide whether or not the item has been made by hand, for compliance purposes."
+    title: "Compliance - Is Handmade"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "boolean"
+            description: "Provide whether or not the item has been made by hand, for compliance purposes."
+            title: "Compliance - Is Handmade"
+          marketplace_id:
+  compliance_outer_surface_material:
+    type: "array"
+    description: "Provide the material composition for the outer surface of the item, for compliance purposes."
+    title: "Compliance - Outer Surface Material"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "string"
+            description: "Provide the material composition for the outer surface of the item, for compliance purposes."
+            title: "Compliance - Outer Surface Material"
+          marketplace_id:
+  main_product_image_locator:
+    type: "array"
+    description: "The attribute indicates the Main Product Image Locator of the product"
+    title: "Main Product Image Locator"
+    Items:
+        type: "object"
+        Properties:
+          marketplace_id:
+        * media_location:
+            type: "string"
+            description: "The URL where the main offer-specific image of the product is located."
+            title: "Main Image URL"
+            Constraints: Format: uri
+  other_product_image_locator_1:
+    type: "array"
+    description: "The attribute indicates the Other Product Image Locator 1 of the product"
+    title: "Other Product Image Locator 1"
+    Items:
+        type: "object"
+        Properties:
+          marketplace_id:
+        * media_location:
+            type: "string"
+            description: "The URL for additional images of your product. These images will be shown on the detail page when the customer clicks through to see other views associated with the product."
+            title: "Other Image URL"
+            Constraints: Format: uri
+  other_product_image_locator_2:
+    type: "array"
+    description: "The attribute indicates the Other Product Image Locator 2 of the product"
+    title: "Other Product Image Locator 2"
+    Items:
+        type: "object"
+        Properties:
+          marketplace_id:
+        * media_location:
+            type: "string"
+            description: "The URL for additional images of your product. These images will be shown on the detail page when the customer clicks through to see other views associated with the product."
+            title: "Other Image URL"
+            Constraints: Format: uri
+  other_product_image_locator_3:
+    type: "array"
+    description: "The attribute indicates the Other Product Image Locator 3 of the product"
+    title: "Other Product Image Locator 3"
+    Items:
+        type: "object"
+        Properties:
+          marketplace_id:
+        * media_location:
+            type: "string"
+            description: "The URL for additional images of your product. These images will be shown on the detail page when the customer clicks through to see other views associated with the product."
+            title: "Other Image URL"
+            Constraints: Format: uri
+  other_product_image_locator_4:
+    type: "array"
+    description: "The attribute indicates the Other Product Image Locator 4 of the product"
+    title: "Other Product Image Locator 4"
+    Items:
+        type: "object"
+        Properties:
+          marketplace_id:
+        * media_location:
+            type: "string"
+            description: "The URL for additional images of your product. These images will be shown on the detail page when the customer clicks through to see other views associated with the product."
+            title: "Other Image URL"
+            Constraints: Format: uri
+  other_product_image_locator_5:
+    type: "array"
+    description: "The attribute indicates the Other Product Image Locator 5 of the product"
+    title: "Other Product Image Locator 5"
+    Items:
+        type: "object"
+        Properties:
+          marketplace_id:
+        * media_location:
+            type: "string"
+            description: "The URL for additional images of your product. These images will be shown on the detail page when the customer clicks through to see other views associated with the product."
+            title: "Other Image URL"
+            Constraints: Format: uri
+  other_product_image_locator_6:
+    type: "array"
+    description: "The attribute indicates the Other Product Image Locator 6 of the product"
+    title: "Other Product Image Locator 6"
+    Items:
+        type: "object"
+        Properties:
+          marketplace_id:
+        * media_location:
+            type: "string"
+            description: "The URL for additional images of your product. These images will be shown on the detail page when the customer clicks through to see other views associated with the product."
+            title: "Other Image URL"
+            Constraints: Format: uri
+  other_product_image_locator_7:
+    type: "array"
+    description: "The attribute indicates the Other Product Image Locator 7 of the product"
+    title: "Other Product Image Locator 7"
+    Items:
+        type: "object"
+        Properties:
+          marketplace_id:
+        * media_location:
+            type: "string"
+            description: "The URL for additional images of your product. These images will be shown on the detail page when the customer clicks through to see other views associated with the product."
+            title: "Other Image URL"
+            Constraints: Format: uri
+  other_product_image_locator_8:
+    type: "array"
+    description: "The attribute indicates the Other Product Image Locator 8 of the product"
+    title: "Other Product Image Locator 8"
+    Items:
+        type: "object"
+        Properties:
+          marketplace_id:
+        * media_location:
+            type: "string"
+            description: "The URL for additional images of your product. These images will be shown on the detail page when the customer clicks through to see other views associated with the product."
+            title: "Other Image URL"
+            Constraints: Format: uri
+  swatch_product_image_locator:
+    type: "array"
+    description: "The attribute indicates the Swatch Product Image Locator of the product"
+    title: "Swatch Product Image Locator"
+    Items:
+        type: "object"
+        Properties:
+          marketplace_id:
+        * media_location:
+            type: "string"
+            description: "The URL where an image of a color swatch from the product is located"
+            title: "Swatch Image URL"
+            Constraints: Format: uri
+  item_package_dimensions:
+    type: "array"
+    description: "Provide the item's package dimensions"
+    title: "Item Package Dimensions"
+    Items:
+        type: "object"
+        Properties:
+        * length:
+            type: "object"
+            description: "Provide the package length"
+            title: "Package Length"
+            Properties:
+            * value:
+                type: "number"
+                description: "Provide the package length as a numeric value."
+                title: "Item Package Length"
+                Constraints: Minimum: 0.000000, Maximum: 1000000000.000000
+            * unit:
+                type: "string"
+                description: "Select the unit of measure for Package Length. If a value is provided for Package Length, you must also enter the corresponding unit."
+                title: "Package Length Unit"
+        * width:
+            type: "object"
+            description: "Provide the package width"
+            title: "Package Width"
+            Properties:
+            * value:
+                type: "number"
+                description: "Provide the package width as a numeric value."
+                title: "Item Package Width"
+                Constraints: Minimum: 0.000000, Maximum: 1000000000.000000
+            * unit:
+                type: "string"
+                description: "Select the unit of measure for Package Width. If a value is provided for Package Width, you must also enter the corresponding unit."
+                title: "Package Width Unit"
+        * height:
+            type: "object"
+            description: "Provide the package height"
+            title: "Package Height"
+            Properties:
+            * value:
+                type: "number"
+                description: "Provide the package height as a numeric value."
+                title: "Item Package Height"
+                Constraints: Minimum: 0.000000, Maximum: 1000000000.000000
+            * unit:
+                type: "string"
+                description: "Select the unit of measure for Package Height. If a value is provided for Package Height, you must also enter the corresponding unit."
+                title: "Package Height Unit"
+          marketplace_id:
+  item_package_weight:
+    type: "array"
+    description: "The weight in original package"
+    title: "Package Weight"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "number"
+            description: "This attribute represents the weight of the item plus the packaging. If your item is shipped to the customer in multiple packages, enter the dimensions of the heaviest package"
+            title: "Package Weight"
+            Constraints: Minimum: 0.000000, Maximum: 1000000000.000000
+        * unit:
+            type: "string"
+            description: "Select the unit of measure for Package Weight. If a value is provided for Package Weight, you must also enter the corresponding unit."
+            title: "Package Weight Unit"
+          marketplace_id:
+  item_display_weight:
+    type: "array"
+    description: "Provide the item weight if the product is a solid"
+    title: "Item Display Weight"
+    Items:
+        type: "object"
+        Properties:
+        * value:
+            type: "number"
+            description: "Provide the item weight (numeric) if the product is a solid"
+            title: "Item Display Weight"
+            Constraints: Max Length: 5000
+        * unit:
+            type: "string"
+            description: "Select the corresponding unit"
+            title: "Item Display Weight Unit"
+          marketplace_id:

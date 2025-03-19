@@ -38,7 +38,6 @@ func (m *RateLimiterManager) RateLimiterInterceptor(key string) func(context.Con
 	return func(ctx context.Context, req *http.Request) error {
 		limiter := m.GetLimiter(key)
 
-		// Try to reserve a token
 		reservation := limiter.Reserve()
 		if !reservation.OK() {
 			return fmt.Errorf("rate limit exceeded for request to %s (exceeds maximum wait time)",

@@ -1,7 +1,7 @@
 default: build
 
 name := "halycon"
-version := "0.2.0"
+version := "0.21"
 
 build_dir := "dist"
 build_flags := "-trimpath -ldflags='-s -w'"
@@ -55,4 +55,5 @@ package: build
     zip {{name}}-windows-arm64.zip {{name}}-windows-arm64.exe
 
 lint:
+    go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
     golangci-lint run --config .golangci.yml

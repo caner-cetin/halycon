@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"strconv"
+	"slices"
 	"strings"
 
 	"github.com/caner-cetin/halycon/internal"
@@ -40,6 +40,7 @@ var (
 
 func getDefinitionsCmd() *cobra.Command {
 	searchProductTypeDefinitionCfg.ItemName = internal.Ptr("")
+	searchProductTypeDefinitionCfg.Keywords = internal.Ptr([]string{})
 	searchProductTypeDefinitionCmd.PersistentFlags().StringArrayVar(
 		searchProductTypeDefinitionCfg.Keywords,
 		"keywords",
@@ -97,23 +98,17 @@ func getProductTypeDefinition(cmd *cobra.Command, args []string) {
 	}
 
 	result := status.JSON200
-	detailedMode := getProductTypeDefinitionDetailed
 	displayProductSummary(result)
-	if getProductTypeDefinitionDetailed {
-		schema, err := fetchAndParseSchema(result.Schema.Link.Resource)
-		if err != nil {
-			log.Error().Err(err).Send()
-			return
-		}
-		requiredProps, err := getRequiredProperties(schema)
-		if err != nil {
-			log.Error().Err(err).Msg("error while looking for required properties")
-			return
-		}
-		displayProperties(schema, requiredProps, detailedMode)
-	}
-}
+	schemaURL := result.Schema.Link.Resource
 
+	schema, err := fetchAndParseSchema(schemaURL)
+	if err != nil {
+		log.Error().Err(err).Send()
+		return
+	}
+
+	displayAllSchemaDetails(schema, 0)
+}
 func displayProductSummary(payload *product_type_definitions.ProductTypeDefinition) {
 	bold := color.New(color.Bold).SprintFunc()
 	cyan := color.New(color.FgCyan).SprintFunc()
@@ -142,237 +137,111 @@ func fetchAndParseSchema(schemaURL string) (*fastjson.Value, error) {
 	return fastjson.MustParseBytes(schema_bytes), nil
 }
 
-func getRequiredProperties(schema *fastjson.Value) (map[string]bool, error) {
-	requiredProps := make(map[string]bool)
-	for _, prop := range schema.GetArray("required") {
-		prop_name, err := strconv.Unquote(string(prop.MarshalTo(nil)))
-		if err != nil {
-			return nil, fmt.Errorf("failed to unquote property name: %w", err)
-		}
-		requiredProps[prop_name] = true
-	}
-	return requiredProps, nil
-}
-
-func displayProperties(schema *fastjson.Value, requiredProps map[string]bool, detailedMode bool) {
+func displayAllSchemaDetails(schema *fastjson.Value, indentLevel int) {
+	indent := strings.Repeat("  ", indentLevel)
 	bold := color.New(color.Bold).SprintFunc()
-	yellow := color.New(color.FgYellow).SprintFunc()
-	cyan := color.New(color.FgCyan).SprintFunc()
-	dim := color.New(color.Faint).SprintFunc()
-	green := color.New(color.FgGreen).SprintFunc()
 
+	// Print type-agnostic attributes
+	for _, key := range []string{"type", "description", "title"} {
+		if schema.Exists(key) {
+			fmt.Printf("%s%s: %s\n", indent, bold(key), string(schema.Get(key).MarshalTo(nil)))
+		}
+	}
+	// Iterate and print the constrains
+	displayPropertyConstraintsAll(schema, indent, bold)
+	requiredValues := schema.GetArray("required")
+	var requiredKeys = make([]string, 0, len(requiredValues))
+	for _, required := range requiredValues {
+		requiredKeys = append(requiredKeys, string(required.GetStringBytes()))
+	}
+
+	// Recursively handle "properties"
 	properties := schema.GetObject("properties")
-
-	fmt.Println(bold("Properties:"))
-	fmt.Println(strings.Repeat("-", 40))
-
-	i := 0
-	properties.Visit(func(key []byte, v *fastjson.Value) {
-		propName := string(key)
-		description := string(v.GetStringBytes("description"))
-		propType := string(v.GetStringBytes("type"))
-
-		reqMarker := " "
-		if requiredProps[propName] {
-			reqMarker = "*"
-		}
-
-		if len(description) > 50 && !detailedMode {
-			description = description[:47] + "..."
-		}
-
-		fmt.Printf("%s %s (%s) - %s\n",
-			yellow(reqMarker),
-			bold(propName),
-			cyan(propType),
-			description)
-
-		if detailedMode {
-			displayPropertyDetails(v, dim, green)
-		}
-
-		i++
-		if !detailedMode && i%5 == 0 {
-			fmt.Println(dim(strings.Repeat("-", 40)))
-		}
-	})
-
-	displayFooterTips(detailedMode, dim, yellow)
-}
-
-func displayPropertyDetails(prop *fastjson.Value, dim, green func(a ...interface{}) string) {
-	indent := "    "
-
-	displayPropertyConstraints(prop, indent, dim)
-	displayPropertyExamples(prop, indent, dim, green)
-	displayPropertyEnums(prop, indent, dim, green, true)
-	displayPropertySelectors(prop, indent)
-	displayRequiredKeys(prop, indent, dim, green)
-
-	fmt.Println()
-}
-
-func displayPropertyConstraints(prop *fastjson.Value, indent string, dim func(a ...interface{}) string) {
-	minItems := prop.GetInt("minUniqueItems")
-	maxItems := prop.GetInt("maxUniqueItems")
-	if minItems > 0 || maxItems > 0 {
-		fmt.Printf("%s%s Min: %d, Max: %d items\n",
-			indent, dim("Constraints:"), minItems, maxItems)
-	}
-}
-
-func displayPropertyExamples(prop *fastjson.Value, indent string, dim, green func(a ...interface{}) string) {
-	examples := prop.GetArray("examples")
-	if len(examples) > 0 {
-		fmt.Printf("%s%s ", indent, dim("Examples:"))
-		for j, example := range examples {
-			if j < 2 {
-				fmt.Printf("%s  ", green(example))
-			} else if j == 2 {
-				fmt.Printf("...")
-				break
+	if properties != nil {
+		fmt.Printf("%sProperties:\n", indent)
+		properties.Visit(func(key []byte, value *fastjson.Value) {
+			k := string(key)
+			if slices.Contains(requiredKeys, k) {
+				fmt.Printf("%s* %s:\n", indent, string(key))
+			} else {
+				fmt.Printf("%s  %s:\n", indent, string(key))
 			}
-		}
-		fmt.Println()
-	}
-}
-
-func displayPropertyEnums(prop *fastjson.Value, indent string, dim, green func(a ...interface{}) string, isDetailed bool) {
-	enums := prop.GetArray("items", "properties", "value", "enum")
-	if len(enums) > 0 {
-		enum_names := prop.GetArray("items", "properties", "value", "enumNames")
-		fmt.Printf("%s%s ", indent, dim("Options:"))
-
-		var displayCount int
-		if isDetailed {
-			displayCount = len(enums)
-		} else {
-			displayCount = min(3, len(enums))
-		}
-
-		for j := range displayCount {
-			fmt.Printf("%s (%s)  ",
-				green(enums[j]),
-				dim(enum_names[j]))
-		}
-
-		if len(enums) > 3 && !isDetailed {
-			fmt.Printf("... %d more", len(enums)-3)
-		}
-
-		fmt.Println()
-	}
-}
-
-func displayPropertySelectors(prop *fastjson.Value, indent string) {
-	selectors := prop.GetArray("selectors")
-	if len(selectors) > 0 {
-		selector_strings := []string{}
-		for _, selector := range selectors {
-			selector_strings = append(selector_strings, string(selector.GetStringBytes()))
-		}
-		fmt.Printf("%sRequired Selectors: %s\n", indent, strings.Join(selector_strings, ","))
-	}
-}
-
-func displayRequiredKeys(prop *fastjson.Value, indent string, dim, green func(a ...interface{}) string) {
-	required_keys := prop.GetArray("items", "required")
-	if len(required_keys) == 0 {
-		return
+			displayAllSchemaDetails(value, indentLevel+2) // Recurse!
+		})
 	}
 
-	required_key_strings := []string{}
-	for _, key := range required_keys {
-		required_key_strings = append(required_key_strings, string(key.GetStringBytes()))
+	// Handle "items" for array types
+	items := schema.Get("items")
+	if items != nil && items.Type() == fastjson.TypeObject {
+		fmt.Printf("%sItems:\n", indent)
+		displayAllSchemaDetails(items, indentLevel+2) // Recurse!
 	}
-
-	fmt.Printf("%sRequired Keys: %s\n", indent, strings.Join(required_key_strings, ","))
-
-	for _, required_key := range required_key_strings {
-		displayRequiredKeyDetails(prop, required_key, indent, dim, green)
-	}
-
-	fmt.Println()
-}
-
-func displayRequiredKeyDetails(prop *fastjson.Value, required_key, indent string, dim, green func(a ...interface{}) string) {
-	obj := prop.GetObject("items", "properties", required_key)
-	if obj == nil {
-		return
-	}
-
-	fmt.Printf("%s%s (%s)\n", strings.Repeat(indent, 2), required_key, string(obj.Get("type").GetStringBytes()))
-	fmt.Printf("%sTitle: %s\n", strings.Repeat(indent, 3), string(obj.Get("title").GetStringBytes()))
-	fmt.Printf("%sDescription: %s\n", strings.Repeat(indent, 3), string(obj.Get("description").GetStringBytes()))
-
-	// display enumerations and required keys if present
-	displayNestedEnums(obj, indent, 3, dim, green)
-	displayNestedRequiredKeys(prop, required_key, obj, indent, dim, green)
-}
-
-func displayNestedEnums(obj *fastjson.Object, indent string, indentLevel int, dim, green func(a ...interface{}) string) {
-	enums := obj.Get("enum").GetArray()
-	if len(enums) == 0 {
-		return
-	}
-
-	fmt.Printf("%sEnums:\n", strings.Repeat(indent, indentLevel))
-	enum_name_vals := obj.Get("enumNames").GetArray()
-
-	for i := range enum_name_vals {
-		fmt.Printf("%s%s (%s)\n",
-			strings.Repeat(indent, indentLevel+1),
-			enums[i].GetStringBytes(),
-			enum_name_vals[i].GetStringBytes())
-	}
-}
-
-func displayNestedRequiredKeys(prop *fastjson.Value, parent_key string, obj *fastjson.Object, indent string, dim, green func(a ...interface{}) string) {
-	obj_required := obj.Get("required").GetArray()
-	if len(obj_required) == 0 {
-		return
-	}
-
-	obj_keys := []string{}
-	for j := range obj_required {
-		obj_keys = append(obj_keys, string(obj_required[j].GetStringBytes()))
-	}
-
-	fmt.Printf("%sRequired Keys: %s\n", strings.Repeat(indent, 3), strings.Join(obj_keys, ","))
-
-	for _, key := range obj_keys {
-		displayNestedKeyDetails(prop, parent_key, key, indent, dim, green)
-	}
-}
-
-func displayNestedKeyDetails(prop *fastjson.Value, parent_key, key, indent string, dim, green func(a ...interface{}) string) {
-	obj_detail := prop.GetObject("items", "properties", parent_key, "properties", key)
-
-	fmt.Printf("%s%s (%s)\n", strings.Repeat(indent, 4), key, string(obj_detail.Get("type").GetStringBytes()))
-
-	fmt.Printf("%sTitle: %s\n", strings.Repeat(indent, 5), string(obj_detail.Get("title").GetStringBytes()))
-	fmt.Printf("%sDescription: %s\n", strings.Repeat(indent, 5), string(obj_detail.Get("description").GetStringBytes()))
-
-	enums := obj_detail.Get("enum").GetArray()
-	if len(enums) > 0 {
-		fmt.Printf("%sEnums:\n", strings.Repeat(indent, 5))
-		enum_name_vals := obj_detail.Get("enumNames").GetArray()
-
-		for i := range enum_name_vals {
-			fmt.Printf("%s%s (%s)\n",
-				strings.Repeat(indent, 6),
-				enums[i].GetStringBytes(),
-				enum_name_vals[i].GetStringBytes())
+	oneOfs := schema.GetArray("oneOf")
+	if len(oneOfs) > 0 {
+		fmt.Printf("%sOneOf:\n", indent)
+		for _, oneOf := range oneOfs {
+			displayAllSchemaDetails(oneOf, indentLevel+2)
 		}
 	}
+	// this seems unnecessary
+	// allOfs := schema.GetArray("allOf")
+	// if len(allOfs) > 0 {
+	// 	fmt.Printf("%sAllOf:\n", indent)
+	// 	for _, allOf := range allOfs {
+	// 		displayAllSchemaDetails(allOf, indentLevel+2)
+	// 	}
+	// }
+	// anyOfs := schema.GetArray("anyOf")
+	// if len(anyOfs) > 0 {
+	// 	fmt.Printf("%sAnyOf:\n", indent)
+	// 	for _, anyOf := range anyOfs {
+	// 		displayAllSchemaDetails(anyOf, indentLevel+2)
+	// 	}
+	// }
+	if schema.Exists("not") {
+		fmt.Printf("%sNot:\n", indent)
+		displayAllSchemaDetails(schema.Get("not"), indentLevel+2)
+	}
 }
 
-func displayFooterTips(detailedMode bool, dim, yellow func(a ...interface{}) string) {
-	if !detailedMode {
-		fmt.Printf("\n%s use --detailed flag for complete property information\n",
-			dim("Tip:"))
+func displayPropertyConstraintsAll(prop *fastjson.Value, indent string, dim func(a ...interface{}) string) {
+	minLength := prop.GetInt("minLength")
+	maxLength := prop.GetInt("maxLength")
+	minimum := prop.GetFloat64("minimum")
+	maximum := prop.GetFloat64("maximum")
+	multipleOf := prop.GetFloat64("multipleOf")
+	format := ""
+	formatBytes := prop.GetStringBytes("format")
+	if formatBytes != nil {
+		format = string(formatBytes)
+	}
+	unique := prop.GetBool("uniqueItems")
+
+	constraints := []string{}
+
+	if minLength > 0 {
+		constraints = append(constraints, fmt.Sprintf("Min Length: %d", minLength))
+	}
+	if maxLength > 0 {
+		constraints = append(constraints, fmt.Sprintf("Max Length: %d", maxLength))
+	}
+	if prop.Exists("minimum") {
+		constraints = append(constraints, fmt.Sprintf("Minimum: %f", minimum))
+	}
+	if prop.Exists("maximum") {
+		constraints = append(constraints, fmt.Sprintf("Maximum: %f", maximum))
+	}
+	if prop.Exists("multipleOf") {
+		constraints = append(constraints, fmt.Sprintf("Multiple Of: %f", multipleOf))
+	}
+	if format != "" {
+		constraints = append(constraints, fmt.Sprintf("Format: %s", format))
+	}
+	if unique {
+		constraints = append(constraints, "Unique Items")
 	}
 
-	fmt.Printf("%s Properties marked with %s are required\n",
-		dim("Note:"), yellow("*"))
+	if len(constraints) > 0 {
+		fmt.Printf("%s%s %s\n", indent, dim("Constraints:"), strings.Join(constraints, ", "))
+	}
 }

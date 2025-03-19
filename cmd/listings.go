@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"strconv"
@@ -8,6 +9,7 @@ import (
 
 	"github.com/caner-cetin/halycon/internal"
 	"github.com/caner-cetin/halycon/internal/amazon/listings"
+	"github.com/fatih/color"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"github.com/valyala/fastjson"
@@ -24,6 +26,13 @@ type createListingsConfig struct {
 
 type getListingConfig struct {
 	DisplayAttritubes bool
+	Related           bool
+}
+
+type patchListingConfig struct {
+	EditFile string
+	Params   listings.PatchListingsItemParams
+	Body     listings.PatchListingsItemJSONRequestBody
 }
 
 var (
@@ -42,7 +51,12 @@ var (
 		Run: WrapCommandWithResources(deleteListing, ResourceConfig{Resources: []ResourceType{ResourceAmazon}, Services: []ServiceType{ServiceListings}}),
 	}
 	deleteListingCfg listings.DeleteListingsItemParams
-	listingsCmd      = &cobra.Command{
+	patchListingCmd  = &cobra.Command{
+		Use: "patch",
+		Run: WrapCommandWithResources(patchListing, ResourceConfig{Resources: []ResourceType{ResourceAmazon}, Services: []ServiceType{ServiceListings}}),
+	}
+	patchListingCfg patchListingConfig
+	listingsCmd     = &cobra.Command{
 		Use: "listings",
 	}
 	listingOperationSku string
@@ -57,11 +71,15 @@ func getListingsCmd() *cobra.Command {
 	createListingsCmd.PersistentFlags().StringVarP(&createListingsCfg.Requirements, "requirements", "r", "", "")
 	createListingsCmd.PersistentFlags().StringVar(&createListingsCfg.IssueLocale, "issue-locale", "", "Locale for issue localization. Default: When no locale is provided, the default locale of the first marketplace is used. Localization defaults to en_US when a localized message is not available in the specified locale.")
 
-	getListingCmd.PersistentFlags().BoolVar(&getListingCfg.DisplayAttritubes, "display-attributes", false, "logs listing attributes line by line if given")
+	getListingCmd.PersistentFlags().BoolVar(&getListingCfg.DisplayAttritubes, "attributes", false, "logs listing attributes line by line if given")
+	getListingCmd.PersistentFlags().BoolVar(&getListingCfg.Related, "related", false, "also display products related with this product (variations etc...)")
+
+	patchListingCmd.PersistentFlags().StringVarP(&patchListingCfg.EditFile, "input", "i", "", "json file containing edits")
 	listingsCmd.PersistentFlags().StringVarP(&listingOperationSku, "sku", "s", "", "")
 	listingsCmd.AddCommand(createListingsCmd)
 	listingsCmd.AddCommand(getListingCmd)
 	listingsCmd.AddCommand(deleteListingCmd)
+	listingsCmd.AddCommand(patchListingCmd)
 	return listingsCmd
 }
 
@@ -161,91 +179,211 @@ func getListing(cmd *cobra.Command, args []string) {
 		return
 	}
 	result := status.JSON200
-	logListingIssues(*result.Issues)
-	for _, summary := range *result.Summaries {
-		ev := log.Info()
-		if summary.Asin != nil {
-			ev.Str("asin", *summary.Asin)
-		}
-		if summary.ConditionType != nil {
-			ev.Str("condition", string(*summary.ConditionType))
-		}
-		if summary.ItemName != nil {
-			ev.Str("name", *summary.ItemName)
-		}
-		if summary.Status != nil {
-			var sts strings.Builder
-			for i, st := range summary.Status {
-				if i > 0 {
-					sts.WriteString(",")
-				}
-				sts.WriteString(string(st))
-			}
-			ev.Str("status", sts.String())
-		}
-		ev.Send()
-
-	}
-	for _, relationship := range *result.Relationships {
-		for i, rls := range relationship.Relationships {
-			ev := log.Info().
-				Str("type", string(rls.Type))
-			if rls.ChildSkus != nil {
-				ev.Str("child_skus", strings.Join(*rls.ChildSkus, ","))
-			}
-			if rls.ParentSkus != nil {
-				ev.Str("parent_skus", strings.Join(*rls.ParentSkus, ","))
-			}
-			if rls.VariationTheme != nil {
-				ev.Str("theme", rls.VariationTheme.Theme).
-					Str("theme_attributes", strings.Join(rls.VariationTheme.Attributes, ","))
-			}
-			ev.Msgf("relationship %d", i+1)
-
-		}
-	}
-	if len(*result.Offers) == 0 {
-		log.Warn().Msg("no offers found")
-	} else {
-		for i, offer := range *result.Offers {
-			ev := log.Info().
-				Str("type", string(offer.OfferType)).
-				Int("points", offer.Points.PointsNumber).
-				Str("currency_code", offer.Price.CurrencyCode).
-				Str("price", string(offer.Price.Amount))
-			if offer.Audience != nil {
-				ev.Str("audience_name", *offer.Audience.DisplayName).
-					Str("audience_value", *offer.Audience.Value)
-			}
-			ev.Msgf("offer %d", i+1)
-		}
-	}
-	if getListingCfg.DisplayAttritubes {
-		attrs_bytes, err := json.Marshal(result.Attributes)
-		if err != nil {
-			log.Error().Err(err).Send()
-			return
-		}
-		attrs := fastjson.MustParseBytes(attrs_bytes)
-		attrs.GetObject().Visit(func(key []byte, v *fastjson.Value) {
-			ev := log.Info()
-			for _, obj := range v.GetArray() {
-				obj.GetObject().Visit(func(key []byte, v *fastjson.Value) {
-					if v.Type() == fastjson.TypeString {
-						marshalled, err := strconv.Unquote(string(v.MarshalTo(nil)))
+	var results = []*listings.Item{result}
+	if getListingCfg.Related && result.Relationships != nil {
+		for _, relationship := range *result.Relationships {
+			for _, rls := range relationship.Relationships {
+				if rls.ChildSkus != nil {
+					fmt.Printf("%s %s\n", color.CyanString("Related:"), color.YellowString("Querying child SKUs: %s", strings.Join(*rls.ChildSkus, ",")))
+					for _, child := range *rls.ChildSkus {
+						status, err := app.Amazon.Client.GetListingsItem(cmd.Context(), &params, cfg.Amazon.Auth.DefaultMerchant.SellerToken, child)
 						if err != nil {
 							log.Error().Err(err).Send()
 							return
 						}
-						ev.Str(string(key), marshalled)
-					} else {
-						marshalled := v.MarshalTo(nil)
-						ev.Bytes(string(key), marshalled)
+						results = append(results, status.JSON200)
 					}
-				})
+				}
+				if rls.ParentSkus != nil {
+					fmt.Printf("%s %s\n", color.CyanString("Related:"), color.YellowString("Querying parent SKUs: %s", strings.Join(*rls.ParentSkus, ",")))
+					for _, parent := range *rls.ParentSkus {
+						status, err := app.Amazon.Client.GetListingsItem(cmd.Context(), &params, cfg.Amazon.Auth.DefaultMerchant.SellerToken, parent)
+						if err != nil {
+							log.Error().Err(err).Send()
+							return
+						}
+						results = append(results, status.JSON200)
+					}
+				}
 			}
-			ev.Msg(string(key))
+		}
+	}
+
+	for i, result := range results {
+		if i > 0 {
+			fmt.Println(color.HiYellowString("\n%s\n", strings.Repeat("=", 80)))
+		}
+		fmt.Println(color.HiMagentaString("LISTING #%d: %s", i+1, result.Sku))
+		fmt.Println(color.HiYellowString("%s\n", strings.Repeat("-", 80)))
+
+		if result.Issues != nil && len(*result.Issues) > 0 {
+			fmt.Println(color.HiRedString("ISSUES:"))
+			printIssues(*result.Issues)
+			fmt.Println()
+		}
+
+		if result.Summaries != nil && len(*result.Summaries) > 0 {
+			fmt.Println(color.HiGreenString("SUMMARIES:"))
+			for i, summary := range *result.Summaries {
+				if i > 0 {
+					fmt.Println()
+				}
+				fmt.Printf("  %s:\n", color.GreenString("Summary #%d", i+1))
+				if summary.Asin != nil {
+					fmt.Printf("    %s: %s\n", color.CyanString("ASIN"), *summary.Asin)
+				}
+				if summary.ConditionType != nil {
+					fmt.Printf("    %s: %s\n", color.CyanString("Condition"), string(*summary.ConditionType))
+				}
+				if summary.ItemName != nil {
+					fmt.Printf("    %s: %s\n", color.CyanString("Name"), *summary.ItemName)
+				}
+				if summary.Status != nil {
+					var statuses []string
+					for _, st := range summary.Status {
+						statuses = append(statuses, string(st))
+					}
+					fmt.Printf("    %s: %s\n", color.CyanString("Status"), strings.Join(statuses, ", "))
+				}
+			}
+			fmt.Println()
+		}
+
+		if result.Relationships != nil && len(*result.Relationships) > 0 {
+			fmt.Println(color.HiBlueString("RELATIONSHIPS:"))
+			for _, relationship := range *result.Relationships {
+				for i, rls := range relationship.Relationships {
+					fmt.Printf("  %s:\n", color.BlueString("Relationship #%d", i+1))
+					fmt.Printf("    %s: %s\n", color.CyanString("Type"), string(rls.Type))
+					if rls.ChildSkus != nil {
+						fmt.Printf("    %s: %s\n", color.CyanString("Child SKUs"), strings.Join(*rls.ChildSkus, ", "))
+					}
+					if rls.ParentSkus != nil {
+						fmt.Printf("    %s: %s\n", color.CyanString("Parent SKUs"), strings.Join(*rls.ParentSkus, ", "))
+					}
+					if rls.VariationTheme != nil {
+						fmt.Printf("    %s: %s\n", color.CyanString("Theme"), rls.VariationTheme.Theme)
+						fmt.Printf("    %s: %s\n", color.CyanString("Theme Attributes"), strings.Join(rls.VariationTheme.Attributes, ", "))
+					}
+					fmt.Println()
+				}
+			}
+		}
+
+		if result.Offers != nil {
+			if len(*result.Offers) == 0 {
+				fmt.Println(color.HiYellowString("OFFERS: None found"))
+			} else {
+				fmt.Println(color.HiYellowString("OFFERS:"))
+				for i, offer := range *result.Offers {
+					fmt.Printf("  %s:\n", color.YellowString("Offer #%d", i+1))
+					fmt.Printf("    %s: %s\n", color.CyanString("Type"), string(offer.OfferType))
+					fmt.Printf("    %s: %d\n", color.CyanString("Points"), offer.Points.PointsNumber)
+					fmt.Printf("    %s: %s %s\n", color.CyanString("Price"), string(offer.Price.Amount), offer.Price.CurrencyCode)
+
+					if offer.Audience != nil {
+						fmt.Printf("    %s: %s (%s)\n", color.CyanString("Audience"), *offer.Audience.DisplayName, *offer.Audience.Value)
+					}
+					fmt.Println()
+				}
+			}
+		}
+
+		if getListingCfg.DisplayAttritubes && result.Attributes != nil {
+			fmt.Println(color.HiCyanString("ATTRIBUTES:"))
+			attrs_bytes, err := json.Marshal(result.Attributes)
+			if err != nil {
+				log.Error().Err(err).Send()
+				return
+			}
+
+			var prettyJSON bytes.Buffer
+			err = json.Indent(&prettyJSON, attrs_bytes, "  ", "  ")
+			if err != nil {
+				log.Error().Err(err).Send()
+				return
+			}
+
+			printJSONWithPaths(fastjson.MustParseBytes(attrs_bytes), "/attributes", 2)
+			fmt.Println()
+		}
+	}
+}
+
+func printIssues(issues []listings.Issue) {
+	for i, issue := range issues {
+		fmt.Printf("  %s:\n", color.RedString("Issue #%d", i+1))
+		fmt.Printf("    %s: %s\n", color.CyanString("Code"), issue.Code)
+		fmt.Printf("    %s: %s\n", color.CyanString("Message"), issue.Message)
+		fmt.Printf("    %s: %s\n", color.CyanString("Severity"), string(issue.Severity))
+		if issue.AttributeNames != nil {
+			fmt.Printf("    %s: %s\n", color.CyanString("Attribute"), strings.Join(*issue.AttributeNames, ","))
+		}
+		fmt.Println()
+	}
+}
+
+func printJSONWithPaths(v *fastjson.Value, currentPath string, indent int) {
+	indentStr := strings.Repeat("  ", indent)
+	pathColor := color.New(color.FgHiBlue).SprintFunc()
+	valueColor := color.New(color.FgHiWhite).SprintFunc()
+	typeColor := color.New(color.FgYellow).SprintFunc()
+
+	switch v.Type() {
+	case fastjson.TypeObject:
+		fmt.Printf("%s%s %s\n", indentStr, pathColor(currentPath), typeColor("(Object)"))
+		v.GetObject().Visit(func(key []byte, childValue *fastjson.Value) {
+			keyStr := string(key)
+			newPath := currentPath + "/" + keyStr
+
+			// Print value directly if it's a simple type
+			switch childValue.Type() {
+			case fastjson.TypeString:
+				marshalled, err := strconv.Unquote(string(childValue.MarshalTo(nil)))
+				if err == nil {
+					fmt.Printf("%s%s: %s %s\n", indentStr+"  ", pathColor(keyStr), valueColor(marshalled), typeColor("(String)"))
+				} else {
+					fmt.Printf("%s%s: %s\n", indentStr+"  ", pathColor(keyStr), typeColor("(String - Error unquoting)"))
+				}
+			case fastjson.TypeNumber:
+				fmt.Printf("%s%s: %s %s\n", indentStr+"  ", pathColor(keyStr), valueColor(string(childValue.MarshalTo(nil))), typeColor("(Number)"))
+			case fastjson.TypeTrue, fastjson.TypeFalse:
+				fmt.Printf("%s%s: %s %s\n", indentStr+"  ", pathColor(keyStr), valueColor(string(childValue.MarshalTo(nil))), typeColor("(Boolean)"))
+			case fastjson.TypeNull:
+				fmt.Printf("%s%s: %s\n", indentStr+"  ", pathColor(keyStr), typeColor("(Null)"))
+			case fastjson.TypeObject:
+				printJSONWithPaths(childValue, newPath, indent+1)
+			case fastjson.TypeArray:
+				fmt.Printf("%s%s %s\n", indentStr+"  ", pathColor(keyStr), typeColor("(Array)"))
+				printJSONWithPaths(childValue, newPath, indent+1)
+			}
 		})
+	case fastjson.TypeArray:
+		fmt.Printf("%s%s %s\n", indentStr, pathColor(currentPath), typeColor("(Array)"))
+		arr := v.GetArray()
+		for i, item := range arr {
+			indexPath := fmt.Sprintf("%s/%d", currentPath, i)
+
+			// For simple values in arrays, print them directly
+			switch item.Type() {
+			case fastjson.TypeString:
+				marshalled, err := strconv.Unquote(string(item.MarshalTo(nil)))
+				if err == nil {
+					fmt.Printf("%s[%d]: %s %s\n", indentStr+"  ", i, valueColor(marshalled), typeColor("(String)"))
+				} else {
+					fmt.Printf("%s[%d]: %s\n", indentStr+"  ", i, typeColor("(String - Error unquoting)"))
+				}
+			case fastjson.TypeNumber:
+				fmt.Printf("%s[%d]: %s %s\n", indentStr+"  ", i, valueColor(string(item.MarshalTo(nil))), typeColor("(Number)"))
+			case fastjson.TypeTrue, fastjson.TypeFalse:
+				fmt.Printf("%s[%d]: %s %s\n", indentStr+"  ", i, valueColor(string(item.MarshalTo(nil))), typeColor("(Boolean)"))
+			case fastjson.TypeNull:
+				fmt.Printf("%s[%d]: %s\n", indentStr+"  ", i, typeColor("(Null)"))
+			case fastjson.TypeObject, fastjson.TypeArray:
+				// For complex types, continue recursion
+				printJSONWithPaths(item, indexPath, indent+1)
+			}
+		}
 	}
 }
 
@@ -265,6 +403,84 @@ func deleteListing(cmd *cobra.Command, args []string) {
 		Str("submission_id", result.SubmissionId).
 		Send()
 	logListingIssues(*result.Issues)
+}
+
+func patchListing(cmd *cobra.Command, args []string) {
+	app := GetApp(cmd)
+	logger := log.With().Str("path", patchListingCfg.EditFile).Logger()
+	patch_byte, err := internal.ReadFile(patchListingCfg.EditFile)
+	if err != nil {
+		logger.Error().Err(err).Msg("error reading patch file")
+		return
+	}
+	edit, err := fastjson.ParseBytes(patch_byte)
+	if err != nil {
+		logger.Error().Err(err).Msg("error parsing patch file")
+		return
+	}
+	productTypeVal := edit.Get("productType")
+	if productTypeVal == nil {
+		logger.Error().Msg("no product type found (looking for key: productType)")
+		return
+	}
+	patchesVal := edit.Get("patches")
+	if patchesVal == nil {
+		logger.Error().Msg("no patch found (looking for key: patches)")
+	}
+	patchListingCfg.Body.ProductType = "WALLET"
+	patches := patchesVal.GetArray()
+	if patches == nil {
+		log.Error().Msg("patch is not array")
+		return
+	}
+	var patch_ops = make([]listings.PatchOperation, 0, len(patches))
+	for i, patch := range patches {
+		var patch_op listings.PatchOperation
+		ev := log.With().Int("index", i).Logger()
+		op_str := patch.GetStringBytes("op")
+		if op_str == nil {
+			bold := color.New(color.Bold)
+			ev.Error().Msg(fmt.Sprintf("patch is missing op or not string (looking for key: op), valid values are %s, %s and %s", bold.Sprint("add"), bold.Sprint("replace"), bold.Sprint("delete")))
+			return
+		}
+		path := patch.GetStringBytes("path")
+		if path == nil {
+			ev.Error().Msg("patch is missing path or not string (looking for key: path)")
+			return
+		}
+		value := patch.Get("value")
+		if value == nil {
+			ev.Error().Msg("patch is missing value (looking for key: value)")
+			return
+		}
+		if value.Type() != fastjson.TypeArray {
+			ev.Error().Msg("patchs value is not array")
+			return
+		}
+		var val *[]map[string]interface{}
+		if err := json.Unmarshal(value.MarshalTo(nil), &val); err != nil {
+			log.Error().Err(err).Send()
+			return
+		}
+		patch_op.Value = val
+		patch_op.Op = listings.PatchOperationOp(string(op_str))
+		patch_op.Path = string(path)
+		patch_ops = append(patch_ops, patch_op)
+	}
+	patchListingCfg.Params.MarketplaceIds = cfg.Amazon.Auth.DefaultMerchant.MarketplaceID
+	patchListingCfg.Params.IncludedData = &[]listings.PatchListingsItemParamsIncludedData{"issues"}
+	patchListingCfg.Params.IssueLocale = internal.Ptr("en_US")
+	patchListingCfg.Body.Patches = patch_ops
+	status, err := app.Amazon.Client.PatchListingsItem(cmd.Context(), &patchListingCfg.Params, patchListingCfg.Body, cfg.Amazon.Auth.DefaultMerchant.SellerToken, listingOperationSku)
+	if err != nil {
+		log.Error().Err(err).Send()
+		return
+	}
+	result := status.JSON200
+	if result.Issues != nil {
+		logListingIssues(*status.JSON200.Issues)
+	}
+
 }
 
 func logListingIssues(issues []listings.Issue) {

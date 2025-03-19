@@ -28,6 +28,9 @@ utilities for Amazon SP API, mostly for my annoyances
       - [how](#how-6)
     - [Create Child-Parent Listings](#create-child-parent-listings)
       - [how](#how-7)
+    - [Editing Listings](#editing-listings)
+      - [why](#why-4)
+      - [how](#how-8)
   - [halycon?](#halycon-1)
 
 ## usage
@@ -37,6 +40,7 @@ fill the `.halycon.dummy.yaml`, rename to `.halycon.yaml`, move the config to ho
 ### pre-built binaries
 
 i am bad at versioning and releases so just use nightly build, it will be fine.
+
 https://github.com/caner-cetin/halycon/releases
 
 ### build yourself / development
@@ -190,6 +194,10 @@ halycon definition get --type SOCKS -v --detailed > reference.json
 ```
 example output [can be found here](./static/example/wallet_definition.txt)
 
+required values are prefixed with `*`
+
+ctrl+f is your friend
+
 ### Create Listing
 #### how
 ```bash
@@ -327,6 +335,169 @@ and then create the child listings with attributes
 }
 ```
 
+### Editing Listings
+#### why
+*you can edit the listing from dashboard, it is easy, why do you need this*
+
+yes, indeed you can edit the listing from dashboard, and I recommend you to do that way if you can. API for editing listings requires a bit too much manual labour, if you can, edit from dashboard. if you cant, my condolences. follow along.
+#### how
+essentially, all you need to do is writing JSON patches. see the examples here https://datatracker.ietf.org/doc/html/rfc6902#appendix-A
+
+amazon supports `add`, `replace` and `delete` operations.
+
+for example, to change scheduled pricing change for a listing:
+```json
+{
+  "productType": "PRODUCT",
+  "patches": [
+    {
+      "op": "replace",
+      "path": "/attributes/purchasable_offer/0/our_price/0/schedule/0/value_with_tax",
+      "value": [
+        {
+          "value":"14.95",
+        }
+      ]
+    }
+  ]
+}
+```
+where
+```
+purchasable_offer - The overall offer details for your product
+our_price - Your selling price information
+schedule - A scheduled price change configuration
+value_with_tax - The price amount including any applicable tax, set to $14.95
+```
+
+to figure out the possible paths with your current flags, use `listings get` with the `--attributes` flag
+```bash
+halycon listings get --sku WOULD-I-LOOK-CUTE-IN-MAID-OUTFIT -v --attributes
+```
+which will give you a lengthy list of attributes with their corresponding paths and objects
+```
+      /attributes/purchasable_offer (Array)
+        /attributes/purchasable_offer/0 (Object)
+          audience: ALL (String)
+          currency: USD (String)
+          marketplace_id: ATVPDKIKX0DER (String)
+          our_price (Array)
+          /attributes/purchasable_offer/0/our_price (Array)
+            /attributes/purchasable_offer/0/our_price/0 (Object)
+              schedule (Array)
+              /attributes/purchasable_offer/0/our_price/0/schedule (Array)
+                /attributes/purchasable_offer/0/our_price/0/schedule/0 (Object)
+                  value_with_tax: 14.95 (Number)
+          /attributes/purchasable_offer/0/start_at (Object)
+            value: 2025-03-17T06:22:07.258Z (String)
+```
+if you want to find all possible attributes and dont care for your current values, use `definition get` with the `--detailed` flag and pipe the output to a file
+```bash
+halycon definition get --type CUTE-OUTFITS -vvv --detailed > log.txt
+```
+which will give you a loooooong long output.
+
+example:
+```
+  purchasable_offer:
+    type: "array"
+    description: "The attribute indicates the Purchasable Offer of the product"
+    title: "Purchasable Offer"
+    Items:
+        type: "object"
+        Properties:
+          map_price:
+            type: "array"
+            description: "The attribute indicates the Purchasable Offer Map Price of the product"
+            title: "Purchasable Offer Map Price"
+            Items:
+                type: "object"
+                Properties:
+                  schedule:
+                    type: "array"
+                    description: "The attribute indicates the Purchasable Offer Map Price Schedule of the product"
+                    title: "Purchasable Offer Map Price Schedule"
+                    Items:
+                        type: "object"
+                        Properties:
+                          value_with_tax:
+                            type: "number"
+                            description: "Provide the minimum advertised price"
+                            title: "Minimum Advertised Price"
+```
+here, path will be
+```
+/attributes/purchasable_offer/0/map_price/0/schedule/0/value_with_tax
+ ^ editing  ^ offer details   ^ first offer
+```
+see? trust me, it is easy! just needs a bit of manual labour and parsing with your shiny, pretty eyes.
+
+after your patch file is ready, just send it over here
+```bash
+halycon listings patch --sku WOULD-I-LOOK-CUTE-IN-MAID-OUTFIT -i patch.json -v
+```
+then
+```bash
+halycon listings get --sku WOULD-I-LOOK-CUTE-IN-MAID-OUTFIT -v --attributes
+```
+
+you can provide multiple patches for same attribute.
+
+as I understand, there are no maximum limit for patches, so, you can send all the patches for a listing in one file.
+
+for deleting, value array must be the same with the one currently registered. example:
+```json
+{
+  "productType": "WALLET",
+  "patches": [
+    {
+      "op": "add",
+      "path": "/attributes/fulfillment_availability",
+      "value": [
+        {
+          "fulfillment_channel_code": "AMAZON_NA",
+          "quantity": 0
+        }
+      ]
+    }
+  ]
+}
+```
+if you have added a fulfillment channel_code like this, instead of doing this
+```json
+{
+  "productType": "WALLET",
+  "patches": [
+    {
+      "op": "delete",
+      "path": "/attributes/fulfillment_availability"
+    }
+  ]
+}
+```
+do this
+```json
+{
+  "productType": "WALLET",
+  "patches": [
+    {
+      "op": "delete",
+      "path": "/attributes/fulfillment_availability",
+      "value": [
+        {
+          "fulfillment_channel_code": "AMAZON_NA",
+          "quantity": 0
+        }
+      ]
+    }
+  ]
+}
+```
+again, see
+```bash
+halycon listings get --sku WOULD-I-LOOK-CUTE-IN-MAID-OUTFIT -v --attributes
+```
+for current attribute values.
 ## halycon?
 
 one of ma favourite mono song https://www.youtube.com/watch?v=2_OYaI37bi0
