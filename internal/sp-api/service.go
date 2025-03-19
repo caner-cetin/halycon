@@ -8,6 +8,7 @@ import (
 
 	osRuntime "runtime"
 
+	"github.com/caner-cetin/halycon/internal"
 	"github.com/caner-cetin/halycon/internal/amazon/catalog"
 	"github.com/caner-cetin/halycon/internal/amazon/fba_inbound"
 	"github.com/caner-cetin/halycon/internal/amazon/fba_inventory"
@@ -223,7 +224,7 @@ func (a *Client) WithAuth() func(ctx context.Context, req *http.Request) error {
 	return func(ctx context.Context, r *http.Request) error {
 		r.Header.Set("x-amz-access-token", a.Token)
 		r.Header.Set("x-amz-date", time.Now().UTC().Format("20060102T150405Z"))
-		r.Header.Set("user-agent", fmt.Sprintf("Halycon/0.2 (Language=Go; Platform=%s)", osRuntime.GOOS))
+		r.Header.Set("user-agent", fmt.Sprintf("Halycon/%s (Language=Go; Platform=%s)", internal.Version, osRuntime.GOOS))
 		r.Header.Set("host", fmt.Sprintf("https://%s", config.Config.Amazon.Auth.DefaultClient.APIEndpoint))
 		return nil
 	}

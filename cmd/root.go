@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/caner-cetin/halycon/internal"
 	"github.com/caner-cetin/halycon/internal/config"
 	"github.com/fatih/color"
 	"github.com/rs/zerolog"
@@ -121,7 +122,7 @@ func initConfig() {
 	}
 }
 func displayVersion(cmd *cobra.Command, args []string) {
-	_, err := color.New(color.Bold).Println("Halycon 0.2.0")
+	_, err := color.New(color.Bold).Printf("Halycon %s \n", internal.Version)
 	if err != nil {
 		// how the fuck does this even throw error
 		log.Error().Err(err).Send()

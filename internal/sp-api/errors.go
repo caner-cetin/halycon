@@ -29,7 +29,7 @@ import (
 //		return recordError(a.GetListingsService().PutListingsItemWithResponse(ctx, sellerId, sku, params, body, a.WithAuth(), a.WithRateLimit(CreateListingRLKey)))
 //	}
 //
-// https://go.dev/play/p/jGQbR-Ri6Wq
+// https://go.dev/play/p/jGQbR-Ri6WQ
 func recordError[T any](resp *T, err error) (*T, error) {
 	if err != nil {
 		return nil, err

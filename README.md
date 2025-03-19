@@ -39,8 +39,6 @@ fill the `.halycon.dummy.yaml`, rename to `.halycon.yaml`, move the config to ho
 
 ### pre-built binaries
 
-i am bad at versioning and releases so just use nightly build, it will be fine.
-
 https://github.com/caner-cetin/halycon/releases
 
 ### build yourself / development

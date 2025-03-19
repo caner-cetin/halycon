@@ -1,10 +1,10 @@
 default: build
 
 name := "halycon"
-version := "0.21"
 
 build_dir := "dist"
-build_flags := "-trimpath -ldflags='-s -w'"
+build_flags := "-trimpath -ldflags='-s -w -X github.com/caner-cetin/halycon/internal.Version=0.3'"
+
 
 list:
     @just --list
