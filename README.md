@@ -32,6 +32,9 @@ utilities for Amazon SP API, mostly for my annoyances
       - [why](#why-4)
       - [how](#how-8)
   - [halycon?](#halycon-1)
+    - [Image-Text to Text AI INference](#image-text-to-text-ai-inference)
+      - [why](#why-5)
+      - [how](#how-9)
 
 ## usage
 
@@ -499,3 +502,22 @@ for current attribute values.
 ## halycon?
 
 one of ma favourite mono song https://www.youtube.com/watch?v=2_OYaI37bi0
+### Image-Text to Text AI INference
+#### why
+This is not related with SP-API, but I need it for generating details, title, bullet points, proofreading, etc.
+#### how
+load prompt from file
+```bash
+halycon generate --prompt-file  prompt.txt --input 'https://example.com/image.jpeg' -vvv
+```
+prompt from command
+```bash
+halycon generate --prompt  "would i look cute in maid outfit?" --input 'https://i.imgur.com/XXXXXXX.png"' -vvv
+```
+outputs
+```
+Wearing a maid outfit can be a fun and playful way to express yourself, but it's ultimately up to personal preference and how confident you feel in the outfit. If you're comfortable and excited to wear it, then go for it and have fun with it. If not, there are many other ways to express your personality and style.
+```
+groq API key is required, see config.
+
+refer to `--help` for default models, local files, etc.

@@ -8,6 +8,7 @@ import (
 	"github.com/caner-cetin/halycon/internal/amazon/catalog"
 	"github.com/caner-cetin/halycon/internal/amazon/fba_inbound"
 	"github.com/caner-cetin/halycon/internal/amazon/fba_inventory"
+	"github.com/caner-cetin/halycon/internal/amazon/feeds"
 	"github.com/caner-cetin/halycon/internal/amazon/listings"
 	"github.com/caner-cetin/halycon/internal/amazon/product_type_definitions"
 	sp_api "github.com/caner-cetin/halycon/internal/sp-api"
@@ -36,6 +37,7 @@ const (
 	ServiceFBAInbound
 	ServiceFBAInventory
 	ServiceProductTypeDefinitions
+	ServiceFeeds
 )
 
 // ResourceConfig defines the configuration structure for resources and services.
@@ -120,6 +122,13 @@ func WrapCommandWithResources(fn func(cmd *cobra.Command, args []string), resour
 							return
 						}
 						app.Amazon.Client.AddService(sp_api.ProductTypeDefinitionsServiceName, client)
+					case ServiceFeeds:
+						client, err := feeds.NewClientWithResponses(server)
+						if err != nil {
+							log.Error().Err(err).Msg("failed to create product type definitions client")
+							return
+						}
+						app.Amazon.Client.AddService(sp_api.FeedsServiceName, client)
 					}
 				}
 

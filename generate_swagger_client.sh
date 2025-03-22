@@ -5,7 +5,7 @@ set -e
 # Setup working directory
 # =====================================
 SCRIPT_DIR=$(pwd)
-mkdir -p internal/amazon/catalog internal/amazon/fba_inbound internal/amazon/fba_inventory internal/amazon/listings internal/amazon/product_type_definitions models
+mkdir -p internal/amazon/catalog internal/amazon/fba_inbound internal/amazon/fba_inventory internal/amazon/listings internal/amazon/product_type_definitions internal/amazon/feeds models
 # =====================================
 # Install required tools
 # =====================================
@@ -85,6 +85,7 @@ install_model fbaInventory.json                         fba-inventory-api-model/
 install_model catalogItems_2022-04-01.json              catalog-items-api-model/catalogItems_2022-04-01.json                        internal/amazon/catalog
 install_model listingsItems_2021-08-01.json             listings-items-api-model/listingsItems_2021-08-01.json                      internal/amazon/listings
 install_model definitionsProductTypes_2020-09-01.json   product-type-definitions-api-model/definitionsProductTypes_2020-09-01.json  internal/amazon/product_type_definitions
+install_model feeds_2021-06-30.json                     feeds-api-model/feeds_2021-06-30.json                                       internal/amazon/feeds
 
 # =====================================
 # Clean up dependencies

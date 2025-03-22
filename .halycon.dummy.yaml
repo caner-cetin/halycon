@@ -64,3 +64,6 @@ amazon:
         # ...
         default: false
   default_language_tag: en_US
+# required for AI generation commands
+groq:
+  token:

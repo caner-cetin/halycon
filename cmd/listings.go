@@ -35,6 +35,11 @@ type patchListingConfig struct {
 	Body     listings.PatchListingsItemJSONRequestBody
 }
 
+type deleteListingConfig struct {
+	Params        listings.DeleteListingsItemParams
+	DeleteRelated bool
+}
+
 var (
 	createListingsCmd = &cobra.Command{
 		Use: "create",
@@ -50,7 +55,7 @@ var (
 		Use: "delete",
 		Run: WrapCommandWithResources(deleteListing, ResourceConfig{Resources: []ResourceType{ResourceAmazon}, Services: []ServiceType{ServiceListings}}),
 	}
-	deleteListingCfg listings.DeleteListingsItemParams
+	deleteListingCfg deleteListingConfig
 	patchListingCmd  = &cobra.Command{
 		Use: "patch",
 		Run: WrapCommandWithResources(patchListing, ResourceConfig{Resources: []ResourceType{ResourceAmazon}, Services: []ServiceType{ServiceListings}}),
@@ -75,6 +80,9 @@ func getListingsCmd() *cobra.Command {
 	getListingCmd.PersistentFlags().BoolVar(&getListingCfg.Related, "related", false, "also display products related with this product (variations etc...)")
 
 	patchListingCmd.PersistentFlags().StringVarP(&patchListingCfg.EditFile, "input", "i", "", "json file containing edits")
+
+	deleteListingCmd.PersistentFlags().BoolVar(&getListingCfg.Related, "related", false, "also delete related (child // parent) listings")
+
 	listingsCmd.PersistentFlags().StringVarP(&listingOperationSku, "sku", "s", "", "")
 	listingsCmd.AddCommand(createListingsCmd)
 	listingsCmd.AddCommand(getListingCmd)
@@ -389,20 +397,60 @@ func printJSONWithPaths(v *fastjson.Value, currentPath string, indent int) {
 
 func deleteListing(cmd *cobra.Command, args []string) {
 	app := GetApp(cmd)
-	var params = deleteListingCfg
-	params.MarketplaceIds = cfg.Amazon.Auth.DefaultMerchant.MarketplaceID
-	status, err := app.Amazon.Client.DeleteListingsItem(cmd.Context(), &params, *getProductTypeDefinitionCfg.Params.SellerId, listingOperationSku)
+	var getListingParams listings.GetListingsItemParams
+	getListingParams.MarketplaceIds = cfg.Amazon.Auth.DefaultMerchant.MarketplaceID
+	getListingParams.IncludedData = &[]listings.GetListingsItemParamsIncludedData{"relationships"}
+	getListingParams.IssueLocale = internal.Ptr("en_US")
+	status, err := app.Amazon.Client.GetListingsItem(cmd.Context(), &getListingParams, cfg.Amazon.Auth.DefaultMerchant.SellerToken, listingOperationSku)
 	if err != nil {
-		log.Error().Err(err).Send()
+		log.Error().Err(err).Msg("error getting listing")
 		return
 	}
+	deleteListingCfg.Params.MarketplaceIds = cfg.Amazon.Auth.DefaultMerchant.MarketplaceID
+	deleteListingCfg.Params.IssueLocale = internal.Ptr("en_US")
+
 	result := status.JSON200
+	if getListingCfg.Related && result.Relationships != nil {
+		for _, relationship := range *result.Relationships {
+			for _, rls := range relationship.Relationships {
+				if rls.ChildSkus != nil {
+					fmt.Printf("%s %s\n", color.CyanString("Related:"), color.YellowString("Deleting child SKUs: %s", strings.Join(*rls.ChildSkus, ",")))
+					for _, child := range *rls.ChildSkus {
+						_, err := app.Amazon.Client.DeleteListingsItem(cmd.Context(), &deleteListingCfg.Params, cfg.Amazon.Auth.DefaultMerchant.SellerToken, child)
+						if err != nil {
+							log.Error().Err(err).Str("sku", child).Msg("error deleting child sku")
+							return
+						}
+					}
+				}
+				if rls.ParentSkus != nil {
+					fmt.Printf("%s %s\n", color.CyanString("Related:"), color.YellowString("Deleting parent SKUs: %s", strings.Join(*rls.ParentSkus, ",")))
+					for _, parent := range *rls.ParentSkus {
+						_, err := app.Amazon.Client.DeleteListingsItem(cmd.Context(), &deleteListingCfg.Params, cfg.Amazon.Auth.DefaultMerchant.SellerToken, parent)
+						if err != nil {
+							log.Error().Err(err).Str("sku", parent).Msg("error deleting parent sku")
+							return
+						}
+					}
+				}
+			}
+		}
+	}
+
+	deleteListingCfg.Params.MarketplaceIds = cfg.Amazon.Auth.DefaultMerchant.MarketplaceID
+	deleteListingCfg.Params.IssueLocale = internal.Ptr("en_US")
+	deleteStatus, err := app.Amazon.Client.DeleteListingsItem(cmd.Context(), &deleteListingCfg.Params, cfg.Amazon.Auth.DefaultMerchant.SellerToken, listingOperationSku)
+	if err != nil {
+		log.Error().Err(err).Msg("error deleting listing")
+		return
+	}
+	deleteResult := deleteStatus.JSON200
 	log.Info().
-		Str("status", string(result.Status)).
+		Str("status", string(deleteResult.Status)).
 		Str("sku", result.Sku).
-		Str("submission_id", result.SubmissionId).
+		Str("submission_id", deleteResult.SubmissionId).
 		Send()
-	logListingIssues(*result.Issues)
+	logListingIssues(*deleteResult.Issues)
 }
 
 func patchListing(cmd *cobra.Command, args []string) {

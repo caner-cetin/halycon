@@ -23,6 +23,7 @@ generate:
     chmod +x generate_swagger_client.sh
     ./generate_swagger_client.sh
 
+
 build: clean setup tidy
     #!/usr/bin/env sh
     GOOS=linux GOARCH=amd64 go build {{build_flags}} -o {{build_dir}}/{{name}}-linux-amd64

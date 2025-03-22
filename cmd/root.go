@@ -57,6 +57,7 @@ func init() {
 	rootCmd.AddCommand(getDefinitionsCmd())
 	rootCmd.AddCommand(getListingsCmd())
 	rootCmd.AddCommand(getCatalogCmd())
+	rootCmd.AddCommand(getGenerateCmd())
 	rootCmd.AddCommand(versionCmd)
 
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")

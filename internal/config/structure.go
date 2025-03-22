@@ -5,9 +5,15 @@ package config
 
 // Cfg represents the root configuration structure for the application
 type Cfg struct {
-	Amazon AmazonConfig `mapstructure:"amazon"`
+	Amazon AmazonConfig `mapstructure:"amazon" yaml:"amazon"`
+	Groq   GroqConfig   `mapstructure:"groq" yaml:"groq"`
 	// Path is the path to the configuration yaml file
 	Path string `yaml:"-"`
+}
+
+// GroqConfig holds the config for HF.
+type GroqConfig struct {
+	Token string `mapstructure:"token" yaml:"token"`
 }
 
 // AmazonConfig holds the configuration for Amazon-specific settings

@@ -12,6 +12,7 @@ import (
 	"github.com/caner-cetin/halycon/internal/amazon/catalog"
 	"github.com/caner-cetin/halycon/internal/amazon/fba_inbound"
 	"github.com/caner-cetin/halycon/internal/amazon/fba_inventory"
+	"github.com/caner-cetin/halycon/internal/amazon/feeds"
 	"github.com/caner-cetin/halycon/internal/amazon/listings"
 	"github.com/caner-cetin/halycon/internal/amazon/product_type_definitions"
 	"github.com/caner-cetin/halycon/internal/config"
@@ -30,6 +31,7 @@ const (
 	FBAInventoryServiceName = "services.fba.inventory"
 	// ProductTypeDefinitionsServiceName represents the Amazon Selling Partner Product Type Definitions API service
 	ProductTypeDefinitionsServiceName = "services.listings.product_type.definitions"
+	FeedsServiceName                  = "services.feeds"
 )
 
 // Client is responsible for managing the Amazon Selling Partner API services.
@@ -87,6 +89,10 @@ func (a *Client) GetProductTypeDefinitionsService() *product_type_definitions.Cl
 	return a.services[ProductTypeDefinitionsServiceName].(*product_type_definitions.ClientWithResponses)
 }
 
+func (a *Client) GetFeedsService() *feeds.ClientWithResponses {
+	return a.services[FeedsServiceName].(*feeds.ClientWithResponses)
+}
+
 // SearchCatalogItems searches for catalog items
 func (a *Client) SearchCatalogItems(ctx context.Context, params *catalog.SearchCatalogItemsParams) (*catalog.SearchCatalogItemsResp, error) {
 	return recordError(a.GetCatalogService().SearchCatalogItemsWithResponse(ctx, params, a.WithAuth(), a.WithRateLimit(SearchCatalogItemsRLKey))) //nolint:typecheck
@@ -142,6 +148,14 @@ func (a *Client) PutListingsItem(ctx context.Context, sellerId string, sku strin
 	return recordError(a.GetListingsService().PutListingsItemWithResponse(ctx, sellerId, sku, params, body, a.WithAuth(), a.WithRateLimit(CreateListingRLKey))) //nolint:typecheck
 }
 
+func (a *Client) GetFeeds(ctx context.Context, params *feeds.GetFeedsParams) (*feeds.GetFeedsResp, error) {
+	return recordError(a.GetFeedsService().GetFeedsWithResponse(ctx, params, a.WithAuth(), a.WithRateLimit(GetFeedsRLKey))) //nolint: typecheck
+}
+
+func (a *Client) CreateFeedDocument(ctx context.Context, contentType feeds.CreateFeedDocumentJSONRequestBody) (*feeds.CreateFeedDocumentResp, error) {
+	return recordError(a.GetFeedsService().CreateFeedDocumentWithResponse(ctx, contentType, a.WithAuth(), a.WithRateLimit(CreateFeedDocumentRLKey))) //nolint: typecheck
+}
+
 // rate limiter keys for client's rate limiter mapping, each one of them leads to a rate.Limiter instance.
 const (
 	SearchCatalogItemsRLKey           = "rate_limiter.catalog.searchItems"
@@ -155,6 +169,8 @@ const (
 	GetInboundOperationStatusRLKey    = "rate_limiter.fba.getInboundOperationStatus"
 	SearchProductTypeDefinitionsRLKey = "rate_limiter.listings.search_product_type_definitions"
 	GetProductTypeDefinitionRLKey     = "rate_limiter.listings.get_product_type_definitions"
+	GetFeedsRLKey                     = "rate_limiter.feeds.getFeeds"
+	CreateFeedDocumentRLKey           = "rate_limiter.feeds.createFeedDocument"
 )
 
 // SetRateLimits populates the rateLimiters map with predefined rate limits
@@ -174,6 +190,8 @@ func (a *Client) SetRateLimits() {
 		SearchProductTypeDefinitionsRLKey: rate.NewLimiter(rate.Limit(5), 10),
 		GetProductTypeDefinitionRLKey:     rate.NewLimiter(rate.Limit(5), 10),
 		CreateListingRLKey:                rate.NewLimiter(rate.Limit(5), 10),
+		GetFeedsRLKey:                     rate.NewLimiter(rate.Limit(0.0222), 10), // what the fuck is this
+		CreateFeedDocumentRLKey:           rate.NewLimiter(rate.Limit(0.5), 15),
 	}
 }
 
