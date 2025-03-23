@@ -4,9 +4,8 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"runtime"
 	"time"
-
-	osRuntime "runtime"
 
 	"github.com/caner-cetin/halycon/internal"
 	"github.com/caner-cetin/halycon/internal/amazon/catalog"
@@ -31,7 +30,8 @@ const (
 	FBAInventoryServiceName = "services.fba.inventory"
 	// ProductTypeDefinitionsServiceName represents the Amazon Selling Partner Product Type Definitions API service
 	ProductTypeDefinitionsServiceName = "services.listings.product_type.definitions"
-	FeedsServiceName                  = "services.feeds"
+	// FeedsServiceName represents the Amazon Selling Partner Feeds API service
+	FeedsServiceName = "services.feeds"
 )
 
 // Client is responsible for managing the Amazon Selling Partner API services.
@@ -89,6 +89,7 @@ func (a *Client) GetProductTypeDefinitionsService() *product_type_definitions.Cl
 	return a.services[ProductTypeDefinitionsServiceName].(*product_type_definitions.ClientWithResponses)
 }
 
+// GetFeedsService returns the Feeds service implementation from the client's service map.
 func (a *Client) GetFeedsService() *feeds.ClientWithResponses {
 	return a.services[FeedsServiceName].(*feeds.ClientWithResponses)
 }
@@ -148,29 +149,49 @@ func (a *Client) PutListingsItem(ctx context.Context, sellerId string, sku strin
 	return recordError(a.GetListingsService().PutListingsItemWithResponse(ctx, sellerId, sku, params, body, a.WithAuth(), a.WithRateLimit(CreateListingRLKey))) //nolint:typecheck
 }
 
+// GetFeeds retrieves a list of feed submissions that match the filters specified in the request parameters
 func (a *Client) GetFeeds(ctx context.Context, params *feeds.GetFeedsParams) (*feeds.GetFeedsResp, error) {
 	return recordError(a.GetFeedsService().GetFeedsWithResponse(ctx, params, a.WithAuth(), a.WithRateLimit(GetFeedsRLKey))) //nolint: typecheck
 }
 
+// CreateFeedDocument creates a new feed document for uploading feed contents
 func (a *Client) CreateFeedDocument(ctx context.Context, contentType feeds.CreateFeedDocumentJSONRequestBody) (*feeds.CreateFeedDocumentResp, error) {
 	return recordError(a.GetFeedsService().CreateFeedDocumentWithResponse(ctx, contentType, a.WithAuth(), a.WithRateLimit(CreateFeedDocumentRLKey))) //nolint: typecheck
 }
 
+// CreateFeed creates a new feed from the created document
+func (a *Client) CreateFeed(ctx context.Context, body feeds.CreateFeedJSONRequestBody) (*feeds.CreateFeedResp, error) {
+	return recordError(a.GetFeedsService().CreateFeedWithResponse(ctx, body, a.WithAuth(), a.WithRateLimit(CreateFeedRLKey))) //nolint: typecheck
+}
+
+// GetFeed retrieves a specific feed by its ID
+func (a *Client) GetFeed(ctx context.Context, id string) (*feeds.GetFeedResp, error) {
+	return recordError(a.GetFeedsService().GetFeedWithResponse(ctx, id, a.WithAuth(), a.WithRateLimit(GetFeedRLKey))) //nolint: typecheck
+}
+
+// GetFeedDocument retrieves a feed document by its ID
+func (a *Client) GetFeedDocument(ctx context.Context, id string) (*feeds.GetFeedDocumentResp, error) {
+	return recordError(a.GetFeedsService().GetFeedDocumentWithResponse(ctx, id, a.WithAuth(), a.WithRateLimit(GetFeedDocumentRLKey))) //nolint: typecheck
+}
+
 // rate limiter keys for client's rate limiter mapping, each one of them leads to a rate.Limiter instance.
 const (
-	SearchCatalogItemsRLKey           = "rate_limiter.catalog.searchItems"
-	GetCatalogItemsRLKey              = "rate_limiter.catalog.getItems"
-	GetListingsItemRLKey              = "rate_limiter.listings.getItem"
-	PatchListingsItemRLKey            = "rate_limiter.listings.patchListings"
-	DeleteListingsItemRLKey           = "rate_limiter.listings.deleteListingsItem"
-	CreateListingRLKey                = "rate_limiter.listings.createItem"
-	FBAInventorySummariesRLKey        = "rate_limiter.fba.inventorySummaries"
-	CreateInboundPlanRLKey            = "rate_limiter.fba.createInboundPlan"
-	GetInboundOperationStatusRLKey    = "rate_limiter.fba.getInboundOperationStatus"
-	SearchProductTypeDefinitionsRLKey = "rate_limiter.listings.search_product_type_definitions"
-	GetProductTypeDefinitionRLKey     = "rate_limiter.listings.get_product_type_definitions"
-	GetFeedsRLKey                     = "rate_limiter.feeds.getFeeds"
-	CreateFeedDocumentRLKey           = "rate_limiter.feeds.createFeedDocument"
+	SearchCatalogItemsRLKey           = "catalog.searchItems"
+	GetCatalogItemsRLKey              = "catalog.getItems"
+	GetListingsItemRLKey              = "listings.getItem"
+	PatchListingsItemRLKey            = "listings.patchListings"
+	DeleteListingsItemRLKey           = "listings.deleteListingsItem"
+	CreateListingRLKey                = "listings.createItem"
+	FBAInventorySummariesRLKey        = "fba.inventorySummaries"
+	CreateInboundPlanRLKey            = "fba.createInboundPlan"
+	GetInboundOperationStatusRLKey    = "fba.getInboundOperationStatus"
+	SearchProductTypeDefinitionsRLKey = "listings.search_product_type_definitions"
+	GetProductTypeDefinitionRLKey     = "listings.get_product_type_definitions"
+	GetFeedsRLKey                     = "feeds.getFeeds"
+	CreateFeedDocumentRLKey           = "feeds.createFeedDocument"
+	CreateFeedRLKey                   = "feeds.createFeed"
+	GetFeedRLKey                      = "feeds.getFeed"
+	GetFeedDocumentRLKey              = "feeds.getFeedDocument"
 )
 
 // SetRateLimits populates the rateLimiters map with predefined rate limits
@@ -192,16 +213,13 @@ func (a *Client) SetRateLimits() {
 		CreateListingRLKey:                rate.NewLimiter(rate.Limit(5), 10),
 		GetFeedsRLKey:                     rate.NewLimiter(rate.Limit(0.0222), 10), // what the fuck is this
 		CreateFeedDocumentRLKey:           rate.NewLimiter(rate.Limit(0.5), 15),
+		CreateFeedRLKey:                   rate.NewLimiter(rate.Limit(0.0083), 15), // what
+		GetFeedRLKey:                      rate.NewLimiter(rate.Limit(2), 15),
+		GetFeedDocumentRLKey:              rate.NewLimiter(rate.Limit(0.0222), 10),
 	}
 }
 
 // NewAuthorizedClient creates and returns a new authenticated SP-API client with the provided access token.
-// It sets up necessary authentication headers including:
-// - Bearer token authorization
-// - Amazon specific access token headers
-// - Host header
-// - Request timestamp
-// - User agent
 func NewAuthorizedClient() (*Client, error) {
 	client := config.Config.Amazon.Auth.DefaultClient
 	merchant := config.Config.Amazon.Auth.DefaultMerchant
@@ -238,11 +256,17 @@ func (a *Client) WithRateLimit(key string) func(ctx context.Context, req *http.R
 
 // WithAuth returns a function that is used to set the authentication information for a client operation.
 // This is typically used with the client operation configuration to ensure that the request is authenticated.
+// It sets up necessary authentication headers including:
+// - Bearer token authorization
+// - Amazon specific access token headers
+// - Host header
+// - Request timestamp
+// - User agent
 func (a *Client) WithAuth() func(ctx context.Context, req *http.Request) error {
 	return func(ctx context.Context, r *http.Request) error {
 		r.Header.Set("x-amz-access-token", a.Token)
 		r.Header.Set("x-amz-date", time.Now().UTC().Format("20060102T150405Z"))
-		r.Header.Set("user-agent", fmt.Sprintf("Halycon/%s (Language=Go; Platform=%s)", internal.Version, osRuntime.GOOS))
+		r.Header.Set("user-agent", fmt.Sprintf("Halycon/%s (Language=Go; Platform=%s)", internal.Version, runtime.GOOS))
 		r.Header.Set("host", fmt.Sprintf("https://%s", config.Config.Amazon.Auth.DefaultClient.APIEndpoint))
 		return nil
 	}

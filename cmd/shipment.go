@@ -88,7 +88,11 @@ func createShipmentPlan(cmd *cobra.Command, args []string) {
 		params.SourceAddress.Email = &cfg.Amazon.FBA.DefaultShipFrom.Email
 	}
 
-	input := internal.OpenFile(createShipmentPlanCfg.Input)
+	input, err := internal.OpenFile(createShipmentPlanCfg.Input)
+	if err != nil {
+		log.Error().Err(err).Send()
+		return
+	}
 	defer input.Close()
 	reader := csv.NewReader(input)
 	products, err := reader.ReadAll()

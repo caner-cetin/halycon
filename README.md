@@ -32,9 +32,11 @@ utilities for Amazon SP API, mostly for my annoyances
       - [why](#why-4)
       - [how](#how-8)
   - [halycon?](#halycon-1)
-    - [Image-Text to Text AI INference](#image-text-to-text-ai-inference)
+    - [Image-Text to Text AI Inference](#image-text-to-text-ai-inference)
       - [why](#why-5)
       - [how](#how-9)
+    - [Create Feed](#create-feed)
+      - [how](#how-10)
 
 ## usage
 
@@ -502,7 +504,7 @@ for current attribute values.
 ## halycon?
 
 one of ma favourite mono song https://www.youtube.com/watch?v=2_OYaI37bi0
-### Image-Text to Text AI INference
+### Image-Text to Text AI Inference
 #### why
 This is not related with SP-API, but I need it for generating details, title, bullet points, proofreading, etc.
 #### how
@@ -521,3 +523,62 @@ Wearing a maid outfit can be a fun and playful way to express yourself, but it's
 groq API key is required, see config.
 
 refer to `--help` for default models, local files, etc.
+
+
+### Create Feed
+#### how
+```bash
+halycon feeds upload -i Feed.csv --content-type text/csv --feed-type POST_FLAT_FILE_PRICEANDQUANTITYONLY_UPDATE_DATA -vvv
+...
+4:40PM INF created feed id=FEED_ID
+```
+```bash
+halycon feeds get -i FEED_ID -vvv
+...
+Feed ID: FEED_ID
+Type: POST_FLAT_FILE_PRICEANDQUANTITYONLY_UPDATE_DATA
+Created: 2025-03-23T13:40:24Z
+Status: DONE
+Started: 2025-03-23T13:40:48Z
+Completed: 2025-03-23T13:42:05Z
+Marketplaces: MARKETPLACE_ID
+Result Document: DOCUMENT_ID
+```
+```bash
+halycon feeds report -i FEED_ID -vvv
+...
+Feed Processing Summary:
+	Number of records processed		441
+	Number of records successful		436
+
+original-record-number	sku	error-code	error-type	error-message
+...
+```
+<details>
+  <summary> Warning for listing feeds </summary>
+
+  ```
+    The feed type used for this submission via the Selling Partner Feeds API will be sunset on March 31, 2025. To continue submitting listings data through APIs (including pricing and inventory updates), you will need to migrate to the Selling Partner Listings Items APIs or the JSON_LISTINGS_FEED feed type submitted via the Selling Partner Feeds API. If you have received this message through a third-party solution, please contact your solution provider. If you are using the Selling Partner Feeds API directly, more details on migrating can be found on the Selling Partner API developer documentation website here : https://developer-docs.amazon.com/sp-api/changelog/deprecation-of-feeds-api-support-for-xml-and-flat-file-listings-feeds
+  ```
+
+  > Feed types that will be sunset on March 31, 2025:
+
+  ```
+  POST_PRODUCT_DATA
+  POST_INVENTORY_AVAILABILITY_DATA
+  POST_PRODUCT_OVERRIDES_DATA
+  POST_PRODUCT_PRICING_DATA
+  POST_PRODUCT_IMAGE_DATA
+  POST_PRODUCT_RELATIONSHIP_DATA
+  POST_FLAT_FILE_INVLOADER_DATA
+  POST_FLAT_FILE_LISTINGS_DATA
+  POST_FLAT_FILE_BOOKLOADER_DATA
+  POST_FLAT_FILE_CONVERGENCE_LISTINGS_DATA
+  POST_FLAT_FILE_LISTINGS_DATA
+  POST_FLAT_FILE_PRICEANDQUANTITYONLY_UPDATE_DATA
+  POST_UIEE_BOOKLOADER_DATA
+  ```
+
+  so the flat file listings data is gone, which, is literally easiest way for me to update bulk listing prices. i will create a command for bulk editing listings later on.
+
+</details>

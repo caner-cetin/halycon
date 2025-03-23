@@ -135,11 +135,12 @@ func generateDetails(cmd *cobra.Command, args []string) {
 			return
 		}
 		req.Header.Set("user-agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36")
-		resp, err := http.DefaultClient.Do(req)
+		resp, err := http.DefaultClient.Do(req) //nolint: bodyclose
 		if err != nil {
 			ev.Error().Err(err).Msg("failed to send request to image link")
 			return
 		}
+		defer internal.CloseReader(resp.Body)
 		body, err := io.ReadAll(resp.Body)
 		if err != nil {
 			ev.Error().Err(err).Msg("failed to read image bytes")
@@ -185,12 +186,12 @@ func generateDetails(cmd *cobra.Command, args []string) {
 	client := &http.Client{
 		Timeout: time.Minute * 2,
 	}
-	resp, err := client.Do(req)
+	resp, err := client.Do(req) //nolint: bodyclose
 	if err != nil {
 		log.Error().Err(err).Msg("failed to send inference request")
 		return
 	}
-	defer internal.CloseResponseBody(resp)
+	defer internal.CloseReader(resp.Body)
 
 	if resp.StatusCode != http.StatusOK {
 		bodyBytes, _ := io.ReadAll(resp.Body)

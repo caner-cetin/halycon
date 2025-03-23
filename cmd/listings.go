@@ -221,7 +221,7 @@ func getListing(cmd *cobra.Command, args []string) {
 		if i > 0 {
 			fmt.Println(color.HiYellowString("\n%s\n", strings.Repeat("=", 80)))
 		}
-		fmt.Println(color.HiMagentaString("LISTING #%d: %s", i+1, result.Sku))
+		fmt.Println(color.New(color.Bold).Sprintf("LISTING #%d: %s", i+1, result.Sku))
 		fmt.Println(color.HiYellowString("%s\n", strings.Repeat("-", 80)))
 
 		if result.Issues != nil && len(*result.Issues) > 0 {
@@ -264,7 +264,7 @@ func getListing(cmd *cobra.Command, args []string) {
 					fmt.Printf("  %s:\n", color.BlueString("Relationship #%d", i+1))
 					fmt.Printf("    %s: %s\n", color.CyanString("Type"), string(rls.Type))
 					if rls.ChildSkus != nil {
-						fmt.Printf("    %s: %s\n", color.CyanString("Child SKUs"), strings.Join(*rls.ChildSkus, ", "))
+						fmt.Printf("    %s (%d): %s\n", color.CyanString("Child SKUs"), len(*rls.ChildSkus), strings.Join(*rls.ChildSkus, ", "))
 					}
 					if rls.ParentSkus != nil {
 						fmt.Printf("    %s: %s\n", color.CyanString("Parent SKUs"), strings.Join(*rls.ParentSkus, ", "))

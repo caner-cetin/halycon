@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"net/http"
 	"os"
 	"os/exec"
 	"runtime"
@@ -18,23 +17,23 @@ import (
 )
 
 // OpenFile opens a file at the specified path and returns a file handle.
-// It logs and exits the program with a fatal error if the file does not exist
-// or if any other error occurs while opening the file.
-func OpenFile(input string) *os.File {
+func OpenFile(input string) (*os.File, error) {
 	f, err := os.Open(input)
 	if err != nil {
-		ev := log.With().Str("path", input).Err(err).Logger()
 		if os.IsNotExist(err) {
-			ev.Fatal().Msg("path does not exist")
+			return nil, fmt.Errorf("path does not exist: %w", err)
 		}
-		ev.Fatal().Msg("unknown error while opening file")
+		return nil, fmt.Errorf("unknown error while opening file: %w", err)
 	}
-	return f
+	return f, nil
 }
 
 // ReadFile reads files contents into memory, and returns the data as a byte slice.
 func ReadFile(input string) ([]byte, error) {
-	file := OpenFile(input)
+	file, err := OpenFile(input)
+	if err != nil {
+		return nil, fmt.Errorf("error while opening file: %w", err)
+	}
 	defer file.Close()
 	contents, err := io.ReadAll(file)
 	if err != nil {
@@ -191,10 +190,10 @@ func DisplayInterface(i interface{}) {
 	})
 }
 
-// CloseResponseBody safely closes the response body and logs any errors that occur during closing.
-func CloseResponseBody(resp *http.Response) {
-	if cerr := resp.Body.Close(); cerr != nil {
-		log.Error().Err(fmt.Errorf("error closing response body: %w", cerr)).Send()
+// CloseReader safely closes an io.ReadCloser and logs any errors that occur during closure.
+func CloseReader(r io.ReadCloser) {
+	if cerr := r.Close(); cerr != nil {
+		log.Error().Err(fmt.Errorf("error closing reader: %w", cerr)).Send()
 	}
 }
 

@@ -43,14 +43,8 @@ var (
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
-	// will be global for your application.
-
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.halycon.yaml)")
 
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
 	rootCmd.AddCommand(getlookupAsinFromUpcCmd())
 	rootCmd.AddCommand(getLookupSkuFromAsinCmd())
 	rootCmd.AddCommand(getShipmentCmd())
@@ -58,6 +52,7 @@ func init() {
 	rootCmd.AddCommand(getListingsCmd())
 	rootCmd.AddCommand(getCatalogCmd())
 	rootCmd.AddCommand(getGenerateCmd())
+	rootCmd.AddCommand(getFeedsCmd())
 	rootCmd.AddCommand(versionCmd)
 
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")

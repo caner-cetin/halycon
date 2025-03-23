@@ -3,6 +3,7 @@ linters:
     - gofmt
     - govet
     - errcheck
+    - bodyclose
     - staticcheck
     - gosimple
     - ineffassign

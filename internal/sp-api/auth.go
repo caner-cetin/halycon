@@ -109,7 +109,7 @@ func (tm *TokenManager) refreshToken() (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("error making request: %w", err)
 	}
-	defer internal.CloseResponseBody(resp)
+	defer internal.CloseReader(resp.Body)
 
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)

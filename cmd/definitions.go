@@ -128,7 +128,7 @@ func fetchAndParseSchema(schemaURL string) (*fastjson.Value, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch schema from %s: %w", schemaURL, err)
 	}
-	defer internal.CloseResponseBody(resp)
+	defer internal.CloseReader(resp.Body)
 	schema_bytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Error().Str("url", schemaURL).Err(err).Msg("error while reading schema")
