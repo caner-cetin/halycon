@@ -3,27 +3,22 @@ package config
 // mapstructure tag is for https://pkg.go.dev/github.com/spf13/viper
 // yaml is for https://pkg.go.dev/gopkg.in/yaml.v3
 
-// Cfg represents the root configuration structure for the application
 type Cfg struct {
 	Amazon AmazonConfig `mapstructure:"amazon" yaml:"amazon"`
 	Groq   GroqConfig   `mapstructure:"groq" yaml:"groq"`
-	// Path is the path to the configuration yaml file
-	Path string `yaml:"-"`
+	Path   string       `yaml:"-"`
 }
 
-// GroqConfig holds the config for HF.
 type GroqConfig struct {
 	Token string `mapstructure:"token" yaml:"token"`
 }
 
-// AmazonConfig holds the configuration for Amazon-specific settings
 type AmazonConfig struct {
 	Auth               AuthConfig `mapstructure:"auth" yaml:"auth"`
 	FBA                FBAConfig  `mapstructure:"fba" yaml:"fba"`
 	DefaultLanguageTag string     `mapstructure:"default_language_tag" yaml:"default_language_tag"`
 }
 
-// AuthConfig holds the authentication configuration for Amazon clients and merchants
 type AuthConfig struct {
 	DefaultClient        ClientConfig     `yaml:"-"`
 	DefaultClientIndex   int              `yaml:"-"`
@@ -33,7 +28,6 @@ type AuthConfig struct {
 	Merchants            []MerchantConfig `mapstructure:"merchants" yaml:"merchants"`
 }
 
-// ClientConfig holds the authentication and endpoint configuration for Amazon Selling Partner API clients
 type ClientConfig struct {
 	// ID get this value when you register your application.
 	// Refer to https://developer-docs.amazon.com/sp-api/docs/viewing-your-application-information-and-credentials
@@ -67,21 +61,16 @@ type ShipFromConfig struct {
 	AddressLine1 string `mapstructure:"address_line_1" yaml:"address_line_1"`
 	// AddressLine2 is additional street address information.
 	AddressLine2 string `mapstructure:"address_line_2" yaml:"address_line_2"`
-	// City is... you guessed it. The city.
-	City string `mapstructure:"city" yaml:"city"`
+	City         string `mapstructure:"city" yaml:"city"`
 	// CompanyName is the name of the business.
 	CompanyName string `mapstructure:"company_name" yaml:"company_name"`
 	// CountryCode is the country code in two-character ISO 3166-1 alpha-2 format.
 	CountryCode string `mapstructure:"country_code" yaml:"country_code"`
-	// Email is... the email address.
-	Email string `mapstructure:"email" yaml:"email"`
+	Email       string `mapstructure:"email" yaml:"email"`
 	// Name is the name of the individual who is the primary contact.
-	Name string `mapstructure:"name" yaml:"name"`
-	// PhoneNumber is... take a gueeesss!
-	PhoneNumber string `mapstructure:"phone_number" yaml:"phone_number"`
-	// PostalCode is... can you find what it is? Mhm! The postal code!
-	PostalCode string `mapstructure:"postal_code" yaml:"postal_code"`
-	// StateOrProvince is the state or province code.
+	Name            string `mapstructure:"name" yaml:"name"`
+	PhoneNumber     string `mapstructure:"phone_number" yaml:"phone_number"`
+	PostalCode      string `mapstructure:"postal_code" yaml:"postal_code"`
 	StateOrProvince string `mapstructure:"state_or_province_code" yaml:"state_or_province_code"`
 	Default         bool   `mapstructure:"default" yaml:"default"`
 }
@@ -101,5 +90,4 @@ type MerchantConfig struct {
 	Name string `mapstructure:"name" yaml:"name"`
 }
 
-// Config holds the global configuration instance for the application
 var Config Cfg

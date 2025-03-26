@@ -27,8 +27,6 @@ type lookupSkuFromAsinConfig struct {
 	Output string
 }
 
-// FBAProduct represents a product in the Fulfillment by Amazon (FBA) system.
-// It contains the product's unique stock keeping unit (SKU) and name.
 type FBAProduct struct {
 	SKU         string
 	ProductName string

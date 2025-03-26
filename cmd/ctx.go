@@ -16,21 +16,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// ResourceType represents the type of a resource in the system.
-// It is used to categorize and differentiate between different kinds of resources
-// that can be managed by the application.
 type ResourceType int
 
 const (
-	// ResourceAmazon represents the Amazon SP-API.
 	ResourceAmazon ResourceType = iota
 )
 
-// ServiceType represents a type of service in the system.
-// It is an enumeration of different service types that can be used within the application.
 type ServiceType int
 
-// ServiceCatalog represents the Selling Partner API service for catalog-related operations.
 const (
 	ServiceCatalog ServiceType = iota
 	ServiceListings
@@ -40,29 +33,20 @@ const (
 	ServiceFeeds
 )
 
-// ResourceConfig defines the configuration structure for resources and services.
-// It contains lists of resource types and service types that are to be managed.
 type ResourceConfig struct {
 	Resources []ResourceType
 	Services  []ServiceType
 }
 
-// Amazon represents the Amazon API client configuration.
-// It holds the SP-API client and authentication token for interacting with Amazon's Selling Partner API.
 type Amazon struct {
 	Client *sp_api.Client
 	Token  string
 }
 
-// AppCtx represents the application context structure.
-// It encapsulates all the necessary dependencies and configurations
-// required for the application to function properly.
-// This includes clients for external services such as Amazon's Selling Partner API.
 type AppCtx struct {
 	Amazon Amazon
 }
 
-// WrapCommandWithResources wraps a Cobra command function with resource initialization logic.
 // It takes a command function and resource configuration, then returns a new function that:
 // 1. Initializes required resources (currently supports Amazon SP-API)
 // 2. Sets up authentication and services based on the provided configuration

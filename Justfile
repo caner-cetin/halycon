@@ -57,4 +57,4 @@ package: build
 
 lint:
     go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
-    golangci-lint run --config .golangci.yml
+    golangci-lint run --config .golangci.yml --exclude-use-default

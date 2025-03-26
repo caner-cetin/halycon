@@ -16,7 +16,6 @@ import (
 	"github.com/valyala/fastjson"
 )
 
-// OpenFile opens a file at the specified path and returns a file handle.
 func OpenFile(input string) (*os.File, error) {
 	f, err := os.Open(input)
 	if err != nil {
@@ -28,7 +27,6 @@ func OpenFile(input string) (*os.File, error) {
 	return f, nil
 }
 
-// ReadFile reads files contents into memory, and returns the data as a byte slice.
 func ReadFile(input string) ([]byte, error) {
 	file, err := OpenFile(input)
 	if err != nil {
@@ -42,8 +40,6 @@ func ReadFile(input string) ([]byte, error) {
 	return contents, nil
 }
 
-// RemoveAllNonDigit removes all non-digit characters from the input string and returns
-// the resulting string containing only digits.
 func RemoveAllNonDigit(input string) string {
 	var result strings.Builder
 	for _, char := range input {

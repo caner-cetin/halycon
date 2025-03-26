@@ -11,20 +11,17 @@ import (
 	"golang.org/x/time/rate"
 )
 
-// RateLimiterManager manages multiple rate limiters by key
 type RateLimiterManager struct {
 	limiters map[string]*rate.Limiter
 	mu       sync.RWMutex
 }
 
-// NewRateLimiterManager creates a new rate limiter manager
 func NewRateLimiterManager(limiters map[string]*rate.Limiter) *RateLimiterManager {
 	return &RateLimiterManager{
 		limiters: limiters,
 	}
 }
 
-// GetLimiter returns a rate limiter for the given key, creating one if it doesn't exist
 func (m *RateLimiterManager) GetLimiter(key string) *rate.Limiter {
 	m.mu.RLock()
 	limiter := m.limiters[key]
@@ -32,8 +29,6 @@ func (m *RateLimiterManager) GetLimiter(key string) *rate.Limiter {
 	return limiter
 }
 
-// RateLimiterInterceptor creates a request interceptor function for oapi-codegen
-// that applies rate limiting based on a key.
 func (m *RateLimiterManager) RateLimiterInterceptor(key string) func(context.Context, *http.Request) error {
 	return func(ctx context.Context, req *http.Request) error {
 		limiter := m.GetLimiter(key)
@@ -54,7 +49,13 @@ func (m *RateLimiterManager) RateLimiterInterceptor(key string) func(context.Con
 
 			select {
 			case <-time.After(delay):
-				// Waited successfully
+				// I'll just keep waiting
+				// You'll just keep waiting
+				// In the cold
+				// The supplement
+				// We lost some friends
+				// We drove the bends
+				// So small
 			case <-ctx.Done():
 				reservation.Cancel()
 				return fmt.Errorf("request context cancelled: %w", ctx.Err())

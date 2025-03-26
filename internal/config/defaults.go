@@ -8,7 +8,6 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// SetDefaultMerchant sets the default merchant for Amazon API operations
 func SetDefaultMerchant() error {
 	if len(Config.Amazon.Auth.Merchants) == 0 {
 		return fmt.Errorf("no merchants configured")
@@ -58,7 +57,6 @@ func SetDefaultMerchant() error {
 	return nil
 }
 
-// SetDefaultShipFromAddress sets the default ship-from address for Amazon FBA operations
 func SetDefaultShipFromAddress() error {
 	if Config.Amazon.FBA.Enabled {
 		if len(Config.Amazon.FBA.ShipFrom) == 0 {
@@ -115,7 +113,6 @@ func SetDefaultShipFromAddress() error {
 	return nil
 }
 
-// SetDefaultClient sets the default client for Amazon API operations
 func SetDefaultClient() error {
 	if len(Config.Amazon.Auth.Clients) == 0 {
 		return fmt.Errorf("no clients configured")
@@ -168,7 +165,6 @@ func SetDefaultClient() error {
 	return nil
 }
 
-// SetOtherDefaults sets the remaining default values for Amazon configuration
 func SetOtherDefaults() {
 	if Config.Amazon.DefaultLanguageTag == "" {
 		Config.Amazon.DefaultLanguageTag = "en_US"
