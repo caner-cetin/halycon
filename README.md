@@ -1,584 +1,440 @@
-# halycon
+# Halycon
 
-utilities for Amazon SP API, mostly for my annoyances
+[![Go Report Card](https://goreportcard.com/badge/github.com/caner-cetin/halycon)](https://goreportcard.com/report/github.com/caner-cetin/halycon)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-- [halycon](#halycon)
-  - [usage](#usage)
-    - [pre-built binaries](#pre-built-binaries)
-    - [build yourself / development](#build-yourself--development)
-  - [utilities](#utilities)
-    - [UPC to ASIN](#upc-to-asin)
-      - [what](#what)
-      - [why](#why)
-      - [how](#how)
-    - [ASIN to SKU](#asin-to-sku)
-      - [why](#why-1)
-      - [how](#how-1)
-    - [Shipments from SKU Data](#shipments-from-sku-data)
-      - [how](#how-2)
-    - [Search Product Type Definitions](#search-product-type-definitions)
-      - [why](#why-2)
-      - [how](#how-3)
-    - [Get Product Type Definitions](#get-product-type-definitions)
-      - [why](#why-3)
-      - [how](#how-4)
-    - [Create Listing](#create-listing)
-      - [how](#how-5)
-    - [Delete Listing](#delete-listing)
-      - [how](#how-6)
-    - [Create Child-Parent Listings](#create-child-parent-listings)
-      - [how](#how-7)
-    - [Editing Listings](#editing-listings)
-      - [why](#why-4)
-      - [how](#how-8)
-  - [halycon?](#halycon-1)
-    - [Image-Text to Text AI Inference](#image-text-to-text-ai-inference)
-      - [why](#why-5)
-      - [how](#how-9)
-    - [Create Feed](#create-feed)
-      - [how](#how-10)
+**Halycon is a command-line interface (CLI) tool designed to interact with the Amazon Selling Partner API (SP-API), automating various tasks related to catalog management, inventory, listings, and fulfillment.**
 
-## usage
+It provides utilities to streamline common workflows, such as converting product identifiers (UPC/ASIN/SKU), creating FBA shipment plans, managing product listings, retrieving product definitions, submitting feeds, and more.
 
-fill the `.halycon.dummy.yaml`, rename to `.halycon.yaml`, move the config to home directory, then
+- [Halycon](#halycon)
+  - [Features](#features)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+  - [Configuration](#configuration)
+  - [Usage](#usage)
+    - [Common Flags](#common-flags)
+    - [Commands](#commands)
+      - [`upc-to-asin`](#upc-to-asin)
+      - [`asin-to-sku`](#asin-to-sku)
+      - [`shipment create`](#shipment-create)
+      - [`shipment operation status`](#shipment-operation-status)
+      - [`definition search`](#definition-search)
+      - [`definition get`](#definition-get)
+      - [`listings create`](#listings-create)
+      - [`listings get`](#listings-get)
+      - [`listings patch`](#listings-patch)
+      - [`listings delete`](#listings-delete)
+      - [`catalog get`](#catalog-get)
+      - [`feeds upload` / `get` / `report`](#feeds-upload--get--report)
+      - [`generate`](#generate)
+      - [`version`](#version)
+    - [Variations (Parent/Child Listings)](#variations-parentchild-listings)
+  - [Development](#development)
+  - [Contributing](#contributing)
+  - [License](#license)
 
-### pre-built binaries
+---
 
-https://github.com/caner-cetin/halycon/releases
+## Features
 
-### build yourself / development
+*   **Identifier Conversion:**
+    *   Convert UPCs to ASINs (`upc-to-asin`).
+    *   Convert ASINs to SKUs, preparing data for shipment plans (`asin-to-sku`).
+*   **FBA Shipment Management:**
+    *   Create FBA inbound shipment plans from SKU/quantity data (`shipment create`).
+    *   Check the status of shipment plan operations (`shipment operation status`).
+    *   Handles prep/label owner requirements with caching.
+*   **Product Definitions:**
+    *   Search for Amazon product type definitions using keywords or item names (`definition search`).
+    *   Retrieve detailed product type definitions and schemas (`definition get`).
+*   **Listing Management:**
+    *   Create new product listings with attribute data (`listings create`).
+    *   Retrieve existing listing details, including attributes and relationships (`listings get`).
+    *   Update listings using JSON Patch operations (`listings patch`).
+    *   Delete listings (`listings delete`).
+    *   Support for creating Parent/Child variation relationships.
+*   **Catalog Information:**
+    *   Get detailed information about a catalog item by ASIN (`catalog get`).
+*   **Feeds API:**
+    *   Upload feed documents (`feeds upload`).
+    *   Get feed processing status (`feeds get`).
+    *   Download and display feed processing reports (`feeds report`).
+*   **SP-API Client Generation:** Includes a script (`generate_swagger_client.sh`) using `oapi-codegen` to generate Go client code from SP-API OpenAPI specifications.
+*   **Authentication & Rate Limiting:** Handles SP-API authentication (LWA token refresh) and implements rate limiting for API calls.
+*   **Configuration:** Uses a YAML file for easy configuration of credentials and settings.
+*   **(Experimental) AI Text Generation:** Includes a supplementary utility to interact with the Groq API for generating text based on prompts and images (`generate`).
 
-```bash
-# for swagger models
-just generate
-just build-current
-mv ./dist/halycon /usr/local/bin/halycon
-halycon --help
-```
-## utilities
-### UPC to ASIN
+## Prerequisites
 
-#### what
+*   **Go:** Version 1.23 or higher (see `go.mod`).
+*   **Just:** A command runner, recommended for development and building (`https://github.com/casey/just`).
+*   **Amazon SP-API Credentials:**
+    *   A registered SP-API application (Client ID & Secret).
+    *   A Refresh Token obtained by self-authorizing your application for your Seller account.
+    *   Your Seller ID (Seller Token).
+*   **(Optional) Groq API Key:** Required only for the `halycon generate` command. Store in the configuration file.
 
-converts list of UPCs or a single UPC to ASIN
+## Installation
 
-#### why
+1.  **Clone the Repository:**
+    ```bash
+    git clone https://github.com/caner-cetin/halycon.git
+    cd halycon
+    ```
+2.  **Build using `just`:** (Requires `just` to be installed)
+    *   Build for your current OS/Architecture:
+        ```bash
+        just build-current
+        # Output: dist/halycon
+        ```
+    *   Build for multiple platforms:
+        ```bash
+        just build
+        # Output: dist/halycon-<os>-<arch>[.exe]
+        ```
+    *   Build and create compressed packages for distribution:
+        ```bash
+        just package
+        # Output: dist/halycon-<os>-<arch>.(tar.gz|zip)
+        ```
+3.  **(Alternative) Go Install:**
+    ```bash
+    # Ensure GOPATH/bin is in your PATH
+    go install github.com/caner-cetin/halycon@latest
+    # Or if proxies cause issues:
+    # GOPROXY=direct go install github.com/caner-cetin/halycon@latest
+    ```
+4.  **(Optional) Pre-built Binaries:** Check the [Releases](https://github.com/caner-cetin/halycon/releases) page for pre-built binaries corresponding to the `just package` command output.
 
-On `Send To Amazon` page, while creating shipment plans, you can search by SKU, Title, ASIN and FNSKU for the products you want to ship.
+## Configuration
 
-![alt text](./static/upc-to-asin-1.jpg)
+Halycon uses a YAML configuration file named `.halycon.yaml`.
 
-Guess what is missing? UPC!!!!!!!!!!!!
+1.  **Create the File:** Copy the provided `.halycon.dummy.yaml` file.
+2.  **Rename:** Rename it to `.halycon.yaml`.
+3.  **Location:** Place the file in your user home directory (`$HOME/.halycon.yaml`). Alternatively, specify a path using the `--config` flag.
+4.  **Edit:** **Crucially, edit the file and fill in the required values.** Halycon will prompt you to select defaults if multiple clients/merchants/addresses are defined and none are marked as `default: true`.
 
-So whenever my brother sends a three page invoice to me like "create shipments for this", I have to do this
-```
-switch tab -> fba inventory -> search with upc -> copy asin -> switch tab -> send to amazon -> search with asin -> enter quantity
-```
-for every single product.
+    ```yaml
+    # .halycon.yaml
+    amazon:
+      auth:
+        # Define one or more SP-API applications
+        clients:
+          - id: YOUR_CLIENT_ID # REQUIRED
+            secret: YOUR_CLIENT_SECRET # REQUIRED
+            name: MyPrimaryApp # Optional: Reference name
+            auth_endpoint: https://api.amazon.com/auth/o2/token # Optional: Defaults provided
+            api_endpoint: sellingpartnerapi-na.amazon.com # Optional: Defaults provided (e.g., sellingpartnerapi-eu.amazon.com)
+            default: true # REQUIRED if multiple clients defined
+          # - id: ... (another client if needed)
+        # Define one or more Seller accounts you've authorized
+        merchants:
+          - refresh_token: YOUR_REFRESH_TOKEN # REQUIRED
+            seller_token: YOUR_SELLER_ID # REQUIRED
+            marketplace_id: # REQUIRED: At least one marketplace ID
+              - ATVPDKIKX0DER # Example: US
+              # - A2EUQ1WTGCTBG2 # Example: CA
+            name: MyUSAccount # Optional: Reference name
+            default: true # REQUIRED if multiple merchants defined
+          # - refresh_token: ... (another merchant)
+      fba:
+        # Set to true if you use FBA and need shipment commands
+        enable: true
+        # Define one or more ship-from addresses for FBA shipments
+        ship_from:
+          - address_line_1: 123 Main St # REQUIRED
+            address_line_2: Suite 100 # Optional
+            city: Anytown # REQUIRED
+            company_name: My Company # Optional
+            country_code: US # REQUIRED (Defaults to US)
+            email: contact@example.com # Optional
+            name: John Doe # REQUIRED (Contact Name)
+            phone_number: 555-123-4567 # REQUIRED
+            postal_code: "12345" # REQUIRED
+            state_or_province_code: CA # REQUIRED (State/Province Code)
+            default: true # REQUIRED if multiple addresses defined
+          # - address_line_1: ... (another address)
+      # Default language tag for operations requiring it (e.g., listings)
+      default_language_tag: en_US # Optional: Defaults to en_US
 
-`upc-to-asin` simplifies this process just to
-```
-send to amazon -> search with asin -> enter quantity
-```
-(dw, there is another command for creating shipment plans and skipping this process too)
+    # Required only for the 'halycon generate' command
+    groq:
+      token: YOUR_GROQ_API_KEY
+    ```
 
-#### how
-
-single upc, for debugging purposes
-```bash
-halycon upc-to-asin --single --input 754603373000 -vvv
-```
-for list of upcs
-```bash
-halycon upc-to-asin --input list.txt --output out.txt
-```
-where list is newline delimited (one per line) text file
-```bash
-754603337000
-...
-```
-output will be in same format.
-```bash
-B07H2WGKVB
-...
-```
-
-### ASIN to SKU
-
-#### why
-for creating shipment plans, you need, SKU and ASIN's.
-#### how
-
-single asin, for debugging purposes
-```bash
-halycon asin-to-sku --single --input B07H2WGKVB -vvv
-```
-for list of asins
-```bash
-halycon asin-to-sku -vvv --input out.txt --output out.csv
-```
-where input is list of ASIN's
-```bash
-B07H2WGKVB
-...
-```
-and output will be
-```
-ASIN,SKU,Product Name,Quantity
-B07H2WGKVB,some_sku,"Aneco 6 Pairs Over Knee Thigh Socks Knee-High Warm Stocking Women Boot Sock Leg Warmer High Socks for Daily Wear, Cosplay",
-```
-fill the quantity column and move on to `Shipments from SKU Data`
-
-
-### Shipments from SKU Data
-
-#### how
-```bash
-halycon shipment create -i sku.csv -v
-```
-where the input is the output of `asin-to-sku` command
-```
-ASIN,SKU,Product Name,Quantity
-B07H2WGKVB,some_sku,"Aneco 6 Pairs Over Knee Thigh Socks Knee-High Warm Stocking Women Boot Sock Leg Warmer High Socks for Daily Wear, Cosplay",5
-```
-
-so for creating a shipment from list of UPCs (which is one of the main goals here), usual workflow is
-```bash
-halycon upc-to-asin      -i upc.txt -o asin.txt
-halycon asin-to-sku      -i asin.txt -o sku.csv
-halycon shipment create  -i sku.csv -v
-```
-after this, operation and workflow ID will be displayed
-```bash
-2:40AM INF success! inbound_plan_id=wf00a0e0a5-XXXX-XXX-XXXX-XXXXXXXXXXXX operation_id=78200213-XXXX-XXX-XXXX-XXXXXXXXXXXX
-```
-then, if requested, `https://sellercentral.amazon.com/fba/sendtoamazon/confirm_content_step?wf=wf00a0e0a5-XXXX-XXX-XXXX-XXXXXXXXXXXX` will open with default browser for confirming and finalizing the shipment on dashboard.
-
-if you see the error `Please review SKUs with errors or unconfirmed SKUs` on dashboard, check the operation status.
-```bash
-halycon shipment operation status -i 78200213-XXXX-XXX-XXXX-XXXXXXXXXXXX -v
-```
-which will give you the status, if success or in progress, message will be displayed with `INFO` level, so you may not see anything.
-```bash
-2:40AM INF id=78200213-XXXX-XXX-XXXX-XXXXXXXXXXXX status=SUCCESS
-```
-if operation failed, problems will be displayed line by line
-```bash
-halycon shipment operation status -i 0aa45ad9-XXXX-XXX-XXXX-XXXXXXXXXXXX
-2:34AM WRN id=0aa45ad9-XXXX-XXX-XXXX-XXXXXXXXXXXX status=FAILED
-2:34AM WRN problem 1 code=FBA_INB_0049 details="There's an input error with the resource 'SU-XXXX-XXXX'." severity=ERROR
-```
-
-### Search Product Type Definitions
-#### why
-amazon name (product type) is required for [`PUT /listings/2021-08-01/items/{sellerId}/{sku}`](https://developer-docs.amazon.com/sp-api/lang-tr_TR/docs/listings-items-api-v2021-08-01-reference#listingsitemputrequest)
-#### how
+## Usage
 
 ```bash
-#     --item string            The title of the ASIN to get the product type recommendation. Note: Cannot be used with keywords
-#     --keywords stringArray   A comma-delimited list of keywords to search product types. Note: Cannot be used with itemName.
-halycon definition search --keywords SOCKS
-# or
-halycon definition search --item "Aneco 6 Pairs Over Knee Thigh Socks Knee-High Warm Stocking Women Boot Sock Leg Warmer High Socks for Daily Wear, Cosplay"
+halycon [command] [subcommand] [flags]
 ```
-```
-+--------------+-------------+
-| DISPLAY NAME | AMAZON NAME |
-+--------------+-------------+
-| Sock         | SOCKS       |
-+--------------+-------------+
-```
-### Get Product Type Definitions
-#### why
-attributes are required for [`PUT /listings/2021-08-01/items/{sellerId}/{sku}`](https://developer-docs.amazon.com/sp-api/lang-tr_TR/docs/listings-items-api-v2021-08-01-reference#listingsitemputrequest)
-#### how
-```bash
-halycon definition get --type SOCKS -v --detailed > reference.json
-```
-example output [can be found here](./static/example/wallet_definition.txt)
 
-required values are prefixed with `*`
+### Common Flags
 
-ctrl+f is your friend
+*   `--config <path>`: Specify a configuration file path.
+*   `-v`, `-vv`, `-vvv`: Increase output verbosity (Warn -> Info -> Debug -> Trace).
 
-### Create Listing
-#### how
-```bash
-halycon listings create --input attributes.json --type WALLET --requirements LISTING --sku W9-XXXX-XXXX --fill-marketplace-id --fill-language-tag -v
-```
-create `attributes.json` and fill with taking `halycon definition get` output as your reference OR
+### Commands
 
-<details>
+#### `upc-to-asin`
 
-  <summmary>if you are using VSCode</summary>
+Converts UPC(s) to ASIN(s). Useful for preparing product lists for other operations.
 
-  > You can refer your JSON Schema in $schema node and get your intellisense in VS Code right away. No need to configure anywhere else.
+*   **Single UPC:**
+    ```bash
+    halycon upc-to-asin --single -i 754603373000
+    ```
+*   **List of UPCs (from file):**
+    ```bash
+    # Input file (e.g., upcs.txt) should have one UPC per line
+    halycon upc-to-asin -i upcs.txt -o asins.txt
+    # Output file (asins.txt) will have one ASIN per line
+    ```
 
-  `halycon definition get` outputs the required schema https://selling-partner-definitions-prod-iad.s3.amazonaws.com/schema/..., so you can just do
-  ```json
-  {
-    "$schema": "http://json.schemastore.org/coffeelint", // change the schema link here
-  }
-  ```
-  to get the intellisense. If you get Access Denied error from the schema URL (not from browser, from the VSCode), which is, completely normal, host the schema somewhere else like pastebin.
+#### `asin-to-sku`
 
-  if you do not prefer the intellisense, `halycon definition get` output is as detailed as it can get, so it is still a solid reference. your choice.
+Looks up SKUs (and product names) for given ASIN(s). Creates a CSV file ready for shipment planning.
 
-  if using intellisense and the autofill flags (`--fill-marketplace-id` etc), please ignore the `Missing property "language_tag"` etc.
+*   **Single ASIN:**
+    ```bash
+    halycon asin-to-sku --single -i B07H2WGKVB
+    ```
+*   **List of ASINs (from file):**
+    ```bash
+    # Input file (e.g., asins.txt) should have one ASIN per line
+    halycon asin-to-sku -i asins.txt -o skus_for_shipment.csv
+    ```
+*   **Output CSV Format (`skus_for_shipment.csv`):**
+    ```csv
+    ASIN,SKU,Product Name,Quantity
+    B07H2WGKVB,YOUR_SKU_1,"Example Product Title 1",
+    B08EXAMPLE,YOUR_SKU_2,"Example Product Title 2",
+    ...
+    ```
+    *Fill in the `Quantity` column before using this file with `shipment create`.*
 
-</details>
+#### `shipment create`
 
-```json
-  {
-     "country_of_origin": [{
-        "value": "US",
-        "marketplace_id": "ATVPDKIKX0DER"
-      }],
-      "item_name": [{
-        "value": "Aneco 6 Pairs Over Knee Thigh Socks Knee-High Warm Stocking Women Boot Sock Leg Warmer High Socks for Daily Wear, Cosplay",
-        "language_tag": "en_US",
-        "marketplace_id": "ATVPDKIKX0DER"
-      }],
-      "item_type_keyword": [{
-        "value": "Thigh highs",
-        "marketplace_id": "ATVPDKIKX0DER"
-      }],
-      "brand": [{
-        "value":"something something",
-        "language_tag": "en_US",
-        "marketplace_id": "ATVPDKIKX0DER"
-      }],
-       "bullet_point": [
+Creates an FBA Inbound Shipment Plan.
+
+*   **Usage:**
+    ```bash
+    # Input CSV file requires columns: ASIN,SKU,Product Name,Quantity (Quantity must be filled)
+    halycon shipment create -i skus_for_shipment.csv -v
+    ```
+    *   Outputs the `inbound_plan_id` and `operation_id`.
+    *   Prompts to open the plan in Seller Central.
+    *   Handles prep/label owner requirements automatically, caching choices in `halycon_item_requirements.json` in the system's temp directory.
+
+#### `shipment operation status`
+
+Checks the status of an FBA inbound operation (like plan creation).
+
+*   **Usage:**
+    ```bash
+    halycon shipment operation status -i <operation_id> -v
+    ```
+    *   Displays the status (SUCCESS, FAILED, IN_PROGRESS). Shows detailed problems if the operation failed.
+
+#### `definition search`
+
+Searches for Amazon Product Type Definitions. Required for finding the correct `productType` for listing operations.
+
+*   **By Keywords:**
+    ```bash
+    halycon definition search --keywords "socks, apparel"
+    ```
+*   **By Item Name (Title):**
+    ```bash
+    halycon definition search --item "My Awesome Product Title"
+    ```
+    *   Outputs a table with Display Name and the required Amazon Name (`productType`).
+
+#### `definition get`
+
+Retrieves the detailed schema and requirements for a specific Product Type Definition. Essential for constructing the `attributes` JSON for listing operations.
+
+*   **Usage:**
+    ```bash
+    halycon definition get --type SOCKS -v > socks_definition.txt
+    # Use --detailed for full property info including constraints
+    halycon definition get --type SOCKS --detailed -v > socks_definition_detailed.json
+    ```
+    *   Outputs a summary and the schema location.
+    *   With `--detailed`, prints a structured representation of the schema properties, constraints, and requirements, useful for building the attributes JSON. The output includes the official schema URL (e.g., `https://selling-partner-definitions-prod-iad.s3.amazonaws.com/schema/...`), which can be used with editors supporting JSON Schema for validation and autocompletion (though access might be restricted).
+
+#### `listings create`
+
+Creates a new product listing or a variation relationship.
+
+*   **Usage:**
+    ```bash
+    halycon listings create --sku YOUR_NEW_SKU \
+                           --type PRODUCT_TYPE_NAME \
+                           --requirements LISTING \
+                           --input attributes.json \
+                           [--fill-marketplace-id] \
+                           [--fill-language-tag] \
+                           -v
+    ```
+    *   `--sku`: The Seller SKU for the new listing.
+    *   `--type`: The Amazon Product Type Name (from `definition search`).
+    *   `--requirements`: Usually `LISTING`.
+    *   `--input`: Path to a JSON file containing the listing attributes (based on `definition get`).
+    *   `--fill-marketplace-id`: Automatically adds the default marketplace ID to attribute objects where missing.
+    *   `--fill-language-tag`: Automatically adds the default language tag (`en_US` unless overridden in config) to attribute objects where missing.
+    *   **Validation:** If the submission fails, Halycon prints the issues reported by Amazon. Correct the `attributes.json` and retry.
+    *   **Variations:** See the [Variations](#variations) section below.
+
+#### `listings get`
+
+Retrieves details for an existing listing.
+
+*   **Usage:**
+    ```bash
+    halycon listings get --sku YOUR_EXISTING_SKU -v [--attributes] [--related]
+    ```
+    *   `--attributes`: Displays the listing's current attributes in a structured format, including JSON Paths useful for `listings patch`.
+    *   `--related`: Also fetches and displays details for related parent/child SKUs.
+
+#### `listings patch`
+
+Updates an existing listing using JSON Patch operations.
+
+*   **Usage:**
+    ```bash
+    halycon listings patch --sku YOUR_EXISTING_SKU --input patch.json -v
+    ```
+    *   `--input`: Path to a JSON file containing the patch operations (see RFC 6902 and example below). Requires a `productType` key and a `patches` array.
+    *   **Finding Paths:** Use `halycon listings get --attributes` or `halycon definition get --detailed` to find the correct JSON Pointers (`path`) for attributes.
+    *   **Example `patch.json`:**
+        ```json
         {
-          "value": "TEAM HERITAGE: Features team design......",
-          "marketplace_id": "ATVPDKIKX0DER",
-          "language_tag": "en_US"
-        },
-        {
-          "value": "PREMIUM MATERIAL: Crafted from high-quality black faux leather with durable stitching for long-lasting everyday use",
-          "marketplace_id": "ATVPDKIKX0DER",
-          "language_tag": "en_US"
-        },
-        {
-          "value": "PREMIUM MATERIAL: Crafted from high-quality black faux leather with durable stitching for long-lasting everyday use",
-          "marketplace_id": "ATVPDKIKX0DER",
-          "language_tag": "en_US"
-        },
-      ],
-  }
-```
-if you are gigalazy like me, use the `--fill-marketplace-id` flag, this will visit every object and add the `"marketplace_id": ...` for you, which, should save some time.
-
-when using `--fill-marketplace-id`, first marketplace ID from config is used, if you need to specify a different `marketplace_id`, just write it in the attribute. autofill will skip the object if `marketplace_id` key is already present.
-
-`--fill-language-tag` also exists, and works with the same logic in `--fill-marketplace-id`. so if you use both, you just have to write
-```json
-  {
-      "country_of_origin": [{"value": "US"}],
-      "item_name": [{"value": "Aneco 6 Pairs Over Knee Thigh Socks Knee-High Warm Stocking Women Boot Sock Leg Warmer High Socks for Daily Wear, Cosplay"}],
-      "item_type_keyword": [{"value": "Thigh highs"}],
-      "brand": [{"value":"something something"}],
-       "bullet_point": [
-        {"value": "TEAM HERITAGE: Features team design......"},
-        {"value": "PREMIUM MATERIAL: Crafted from high-quality black faux leather with durable stitching for long-lasting everyday use"},
-        {"value": "PREMIUM MATERIAL: Crafted from high-quality black faux leather with durable stitching for long-lasting everyday use"}
-      ]
-  }
-```
-and any extra attributes if required.
-
-for validation, you can hit
-```bash
-halycon listings create
-```
-whenever you want, there is no need for dry run. on error, operation will fail, and errors will be listed.
-```bash
-9:03AM WRN 'Model Number' is required but not supplied. attribute=model_number code=90220 severity=ERROR
-9:03AM WRN Based on the data from '[ships_globally.value]', the field '"value"' for the attribute 'Compliance - Wallet Type' is not allowed. Expected at most '0' of field '"value"' for attribute 'Compliance - Wallet Type'. attribute=compliance_wallet_type code=90248 severity=ERROR
-9:03AM WRN The provided value for 'Item Weight' is invalid. attribute=item_weight code=4000001 severity=ERROR
-9:03AM WRN 'Target Gender' is required but not supplied. attribute=target_gender code=90220 severity=ERROR
-...
-```
-also the documentation is misleading. setting `MODE` to `VALIDATION_PREVIEW` while creating a listing ([as guided here](https://developer-docs.amazon.com/sp-api/docs/listings-items-api-v2021-08-01-use-case-guide#step-1-preview-errors-for-a-listings-item-put-request)) will end up with `Invalid Payload` error. soo. i cant provide you a "dry run" option even if I wanted to, so just, attempt creating listing over and over again.
-
-if success,
-```bash
-halycon listings create -i attributes.json --type WALLET --requirements LISTING --sku W9-XXXX-XXXX --fill-marketplace-id --fill-language-tag -v
-10:47AM INF sku=W9-XXXX-XXXX status=ACCEPTED submission_id=582xxxxxxxxxxxx
-```
-then you can use the same sku for `Get Listing`
-
-### Delete Listing
-#### how
-```bash
-halycon listings delete --sku W9-XXXX-XXXX -v
-11:14AM INF sku=W9-XXXX-XXXX status=ACCEPTED submission_id=XXXXXXXXX
-```
-
-### Create Child-Parent Listings
-#### how
-same command as `Create Listing`
-```bash
-halycon listings create -i attributes.json --type WALLET --requirements LISTING --sku W9-XXXX-XXXX --fill-marketplace-id --fill-language-tag -v
-```
-create parent listing with the attributes
-```json
-{
-  "parentage_level": [{ "value": "parent" }],
-  "child_parent_sku_relationship": [{ "child_relationship_type": "variation" }],
-  "variation_theme": [{ "name": "TEAM_NAME" }]
-}
-```
-and then create the child listings with attributes
-```json
-{
-  "parentage_level": [{"value": "children"}],
-  "child_parent_sku_relationship": [{"child_relationship_type": "variation", "parent_sku": "W9-XXXX-XXXX"}],
-  "variation_theme": [{ "name": "TEAM_NAME" }]
-}
-```
-
-### Editing Listings
-#### why
-*you can edit the listing from dashboard, it is easy, why do you need this*
-
-yes, indeed you can edit the listing from dashboard, and I recommend you to do that way if you can. API for editing listings requires a bit too much manual labour, if you can, edit from dashboard. if you cant, my condolences. follow along.
-#### how
-essentially, all you need to do is writing JSON patches. see the examples here https://datatracker.ietf.org/doc/html/rfc6902#appendix-A
-
-amazon supports `add`, `replace` and `delete` operations.
-
-for example, to change scheduled pricing change for a listing:
-```json
-{
-  "productType": "PRODUCT",
-  "patches": [
-    {
-      "op": "replace",
-      "path": "/attributes/purchasable_offer/0/our_price/0/schedule/0/value_with_tax",
-      "value": [
-        {
-          "value":"14.95",
+          "productType": "PRODUCT_TYPE_NAME",
+          "patches": [
+            {
+              "op": "replace",
+              "path": "/attributes/item_name/0/value",
+              "value": "New Updated Product Title"
+            },
+            {
+              "op": "add",
+              "path": "/attributes/bullet_point/-", // Append to bullet points array
+              "value": { "value": "New Bullet Point", "language_tag": "en_US" }
+            },
+            {
+               "op": "delete",
+               "path": "/attributes/color/0", // Must match existing value for deletion
+               "value": {"marketplace_id": "ATVPDKIKX0DER", "value": "Blue"}
+            }
+          ]
         }
-      ]
-    }
-  ]
-}
-```
-where
-```
-purchasable_offer - The overall offer details for your product
-our_price - Your selling price information
-schedule - A scheduled price change configuration
-value_with_tax - The price amount including any applicable tax, set to $14.95
-```
+        ```
 
-to figure out the possible paths with your current flags, use `listings get` with the `--attributes` flag
-```bash
-halycon listings get --sku WOULD-I-LOOK-CUTE-IN-MAID-OUTFIT -v --attributes
-```
-which will give you a lengthy list of attributes with their corresponding paths and objects
-```
-      /attributes/purchasable_offer (Array)
-        /attributes/purchasable_offer/0 (Object)
-          audience: ALL (String)
-          currency: USD (String)
-          marketplace_id: ATVPDKIKX0DER (String)
-          our_price (Array)
-          /attributes/purchasable_offer/0/our_price (Array)
-            /attributes/purchasable_offer/0/our_price/0 (Object)
-              schedule (Array)
-              /attributes/purchasable_offer/0/our_price/0/schedule (Array)
-                /attributes/purchasable_offer/0/our_price/0/schedule/0 (Object)
-                  value_with_tax: 14.95 (Number)
-          /attributes/purchasable_offer/0/start_at (Object)
-            value: 2025-03-17T06:22:07.258Z (String)
-```
-if you want to find all possible attributes and dont care for your current values, use `definition get` with the `--detailed` flag and pipe the output to a file
-```bash
-halycon definition get --type CUTE-OUTFITS -vvv --detailed > log.txt
-```
-which will give you a loooooong long output.
+#### `listings delete`
 
-example:
-```
-  purchasable_offer:
-    type: "array"
-    description: "The attribute indicates the Purchasable Offer of the product"
-    title: "Purchasable Offer"
-    Items:
-        type: "object"
-        Properties:
-          map_price:
-            type: "array"
-            description: "The attribute indicates the Purchasable Offer Map Price of the product"
-            title: "Purchasable Offer Map Price"
-            Items:
-                type: "object"
-                Properties:
-                  schedule:
-                    type: "array"
-                    description: "The attribute indicates the Purchasable Offer Map Price Schedule of the product"
-                    title: "Purchasable Offer Map Price Schedule"
-                    Items:
-                        type: "object"
-                        Properties:
-                          value_with_tax:
-                            type: "number"
-                            description: "Provide the minimum advertised price"
-                            title: "Minimum Advertised Price"
-```
-here, path will be
-```
-/attributes/purchasable_offer/0/map_price/0/schedule/0/value_with_tax
- ^ editing  ^ offer details   ^ first offer
-```
-see? trust me, it is easy! just needs a bit of manual labour and parsing with your shiny, pretty eyes.
+Deletes a listing.
 
-after your patch file is ready, just send it over here
-```bash
-halycon listings patch --sku WOULD-I-LOOK-CUTE-IN-MAID-OUTFIT -i patch.json -v
-```
-then
-```bash
-halycon listings get --sku WOULD-I-LOOK-CUTE-IN-MAID-OUTFIT -v --attributes
-```
+*   **Usage:**
+    ```bash
+    halycon listings delete --sku YOUR_SKU_TO_DELETE -v [--related]
+    ```
+    *   `--related`: Also attempts to delete related parent/child SKUs associated with the target SKU.
 
-you can provide multiple patches for same attribute.
+#### `catalog get`
 
-as I understand, there are no maximum limit for patches, so, you can send all the patches for a listing in one file.
+Retrieves catalog item details by ASIN.
 
-for deleting, value array must be the same with the one currently registered. example:
-```json
-{
-  "productType": "WALLET",
-  "patches": [
-    {
-      "op": "add",
-      "path": "/attributes/fulfillment_availability",
-      "value": [
+*   **Usage:**
+    ```bash
+    halycon catalog get --asin B07H2WGKVB -v
+    ```
+
+#### `feeds upload` / `get` / `report`
+
+Submits feeds (e.g., pricing/quantity updates) and checks their status.
+**Note:** Many flat file and XML feed types are being deprecated by Amazon in favor of the Listings API or JSON feeds. See the [deprecation notice](https://developer-docs.amazon.com/sp-api/changelog/deprecation-of-feeds-api-support-for-xml-and-flat-file-listings-feeds).
+
+*   **Upload Feed:**
+    ```bash
+    halycon feeds upload -i FeedFile.csv \
+                        --feed-type FEED_TYPE_ENUM \
+                        --content-type text/csv \
+                        -v
+    # Outputs Feed ID
+    ```
+*   **Get Feed Status:**
+    ```bash
+    halycon feeds get -i <feed_id> -v
+    ```
+*   **Get Feed Report:** (Downloads and prints the processing report if available)
+    ```bash
+    halycon feeds report -i <feed_id> -v
+    ```
+
+#### `generate`
+
+**(Experimental)** Uses the Groq API for text generation based on an image and prompt. Requires `groq.token` in config.
+
+*   **Usage:**
+    ```bash
+    # Image URL and command-line prompt
+    halycon generate --input "https://example.com/image.jpg" --prompt "Describe this image."
+
+    # Local image file and prompt file
+    halycon generate --input-file ./image.png --prompt-file ./prompt.txt
+    ```
+
+#### `version`
+
+Displays the Halycon version.
+
+*   **Usage:**
+    ```bash
+    halycon version
+    ```
+
+### Variations (Parent/Child Listings)
+
+Creating variations involves creating a parent listing and then linking child listings to it.
+
+1.  **Create Parent Listing:** Use `halycon listings create` with attributes defining it as a parent and specifying the variation theme (e.g., `COLOR`, `SIZE`, `COLOR_SIZE`).
+    *   **Key Parent Attributes (`attributes.json`):**
+        ```json
         {
-          "fulfillment_channel_code": "AMAZON_NA",
-          "quantity": 0
+          "parentage_level": [{"value": "parent"}],
+          "variation_theme": [{"name": "COLOR"}]
+          // ... other parent-level attributes (brand, item_name, etc.)
         }
-      ]
-    }
-  ]
-}
-```
-if you have added a fulfillment channel_code like this, instead of doing this
-```json
-{
-  "productType": "WALLET",
-  "patches": [
-    {
-      "op": "delete",
-      "path": "/attributes/fulfillment_availability"
-    }
-  ]
-}
-```
-do this
-```json
-{
-  "productType": "WALLET",
-  "patches": [
-    {
-      "op": "delete",
-      "path": "/attributes/fulfillment_availability",
-      "value": [
+        ```
+2.  **Create Child Listing(s):** Use `halycon listings create` for each child variation. Link them to the parent SKU.
+    *   **Key Child Attributes (`child_attributes.json`):**
+        ```json
         {
-          "fulfillment_channel_code": "AMAZON_NA",
-          "quantity": 0
+          "parentage_level": [{"value": "child"}],
+          "variation_theme": [{"name": "COLOR"}], // Must match parent's theme
+           // Link to the parent SKU created in step 1
+          "relationship": [{"type": "VARIATION", "parent_sku": "PARENT_SKU_HERE"}],
+          // The specific variation attribute value for this child
+          "color": [{"value": "Red", "marketplace_id": "ATVPDKIKX0DER"}],
+          // ... other child-specific attributes (UPC/EAN, price, quantity, etc.)
         }
-      ]
-    }
-  ]
-}
+        ```
+
+## Development
+
+*   **Setup:** Clone the repository and ensure Go and Just are installed.
+*   **Generate SP-API Clients:** Run `just generate` to download OpenAPI specs and generate Go client code using `oapi-codegen`. This updates files in `internal/amazon/`.
+*   **Build:** Use `just build-current` for local builds or `just build` / `just package` for releases.
+*   **Linting:** Run `just lint` to execute `golangci-lint` using the `.golangci.yml` configuration.
+*   **Pre-commit:** Uses `pre-commit` for automated checks (formatting, linting, etc.). Install with `pip install pre-commit` and run `pre-commit install`.
+
+## Contributing
+
+Contributions are welcome! Whether it's bug reports, feature requests, or code improvements, please feel free to open an issue or submit a pull request.
+
+## License
+
+Halycon is licensed under the **GNU General Public License v3.0**. See the [LICENSE](./LICENSE) file for details.
 ```
-again, see
-```bash
-halycon listings get --sku WOULD-I-LOOK-CUTE-IN-MAID-OUTFIT -v --attributes
-```
-for current attribute values.
-## halycon?
-
-one of ma favourite mono song https://www.youtube.com/watch?v=2_OYaI37bi0
-### Image-Text to Text AI Inference
-#### why
-This is not related with SP-API, but I need it for generating details, title, bullet points, proofreading, etc.
-#### how
-load prompt from file
-```bash
-halycon generate --prompt-file  prompt.txt --input 'https://example.com/image.jpeg' -vvv
-```
-prompt from command
-```bash
-halycon generate --prompt  "would i look cute in maid outfit?" --input 'https://i.imgur.com/XXXXXXX.png"' -vvv
-```
-outputs
-```
-Wearing a maid outfit can be a fun and playful way to express yourself, but it's ultimately up to personal preference and how confident you feel in the outfit. If you're comfortable and excited to wear it, then go for it and have fun with it. If not, there are many other ways to express your personality and style.
-```
-groq API key is required, see config.
-
-refer to `--help` for default models, local files, etc.
-
-
-### Create Feed
-#### how
-```bash
-halycon feeds upload -i Feed.csv --content-type text/csv --feed-type POST_FLAT_FILE_PRICEANDQUANTITYONLY_UPDATE_DATA -vvv
-...
-4:40PM INF created feed id=FEED_ID
-```
-```bash
-halycon feeds get -i FEED_ID -vvv
-...
-Feed ID: FEED_ID
-Type: POST_FLAT_FILE_PRICEANDQUANTITYONLY_UPDATE_DATA
-Created: 2025-03-23T13:40:24Z
-Status: DONE
-Started: 2025-03-23T13:40:48Z
-Completed: 2025-03-23T13:42:05Z
-Marketplaces: MARKETPLACE_ID
-Result Document: DOCUMENT_ID
-```
-```bash
-halycon feeds report -i FEED_ID -vvv
-...
-Feed Processing Summary:
-	Number of records processed		441
-	Number of records successful		436
-
-original-record-number	sku	error-code	error-type	error-message
-...
-```
-<details>
-  <summary> Warning for listing feeds </summary>
-
-  ```
-    The feed type used for this submission via the Selling Partner Feeds API will be sunset on March 31, 2025. To continue submitting listings data through APIs (including pricing and inventory updates), you will need to migrate to the Selling Partner Listings Items APIs or the JSON_LISTINGS_FEED feed type submitted via the Selling Partner Feeds API. If you have received this message through a third-party solution, please contact your solution provider. If you are using the Selling Partner Feeds API directly, more details on migrating can be found on the Selling Partner API developer documentation website here : https://developer-docs.amazon.com/sp-api/changelog/deprecation-of-feeds-api-support-for-xml-and-flat-file-listings-feeds
-  ```
-
-  > Feed types that will be sunset on March 31, 2025:
-
-  ```
-  POST_PRODUCT_DATA
-  POST_INVENTORY_AVAILABILITY_DATA
-  POST_PRODUCT_OVERRIDES_DATA
-  POST_PRODUCT_PRICING_DATA
-  POST_PRODUCT_IMAGE_DATA
-  POST_PRODUCT_RELATIONSHIP_DATA
-  POST_FLAT_FILE_INVLOADER_DATA
-  POST_FLAT_FILE_LISTINGS_DATA
-  POST_FLAT_FILE_BOOKLOADER_DATA
-  POST_FLAT_FILE_CONVERGENCE_LISTINGS_DATA
-  POST_FLAT_FILE_LISTINGS_DATA
-  POST_FLAT_FILE_PRICEANDQUANTITYONLY_UPDATE_DATA
-  POST_UIEE_BOOKLOADER_DATA
-  ```
-
-  so the flat file listings data is gone, which, is literally easiest way for me to update bulk listing prices. i will create a command for bulk editing listings later on.
-
-</details>
