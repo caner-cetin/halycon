@@ -56,5 +56,5 @@ package: build
     zip {{name}}-windows-arm64.zip {{name}}-windows-arm64.exe
 
 lint:
-    go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
-    golangci-lint run --config .golangci.yml --exclude-use-default
+    go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.0.2
+    golangci-lint run --config .golangci.yml
