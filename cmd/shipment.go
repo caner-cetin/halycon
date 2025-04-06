@@ -59,14 +59,6 @@ func createShipmentPlan(cmd *cobra.Command, args []string) {
 
 	var params fba_inbound.CreateInboundPlanRequest
 	params.DestinationMarketplaces = cfg.Amazon.Auth.DefaultMerchant.MarketplaceID
-
-	ev := log.Error()
-	var msg string = ""
-	if msg != "" {
-		ev.Msg(msg)
-		return
-	}
-	ev.Discard()
 	params.SourceAddress = fba_inbound.AddressInput{
 		AddressLine1: cfg.Amazon.FBA.DefaultShipFrom.AddressLine1,
 		City:         cfg.Amazon.FBA.DefaultShipFrom.City,

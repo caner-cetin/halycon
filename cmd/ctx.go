@@ -2,7 +2,9 @@ package cmd
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
+	"os"
 
 	"github.com/caner-cetin/halycon/internal"
 	"github.com/caner-cetin/halycon/internal/amazon/catalog"
@@ -11,7 +13,9 @@ import (
 	"github.com/caner-cetin/halycon/internal/amazon/feeds"
 	"github.com/caner-cetin/halycon/internal/amazon/listings"
 	"github.com/caner-cetin/halycon/internal/amazon/product_type_definitions"
+	"github.com/caner-cetin/halycon/internal/db"
 	sp_api "github.com/caner-cetin/halycon/internal/sp-api"
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
@@ -20,6 +24,7 @@ type ResourceType int
 
 const (
 	ResourceAmazon ResourceType = iota
+	ResourceDB
 )
 
 type ServiceType int
@@ -45,6 +50,9 @@ type Amazon struct {
 
 type AppCtx struct {
 	Amazon Amazon
+	DB     *sql.DB
+	Query  *db.Queries
+	Ctx    context.Context
 }
 
 // It takes a command function and resource configuration, then returns a new function that:
@@ -58,7 +66,8 @@ func WrapCommandWithResources(fn func(cmd *cobra.Command, args []string), resour
 	return func(cmd *cobra.Command, args []string) {
 		app := AppCtx{}
 		for _, resource := range resourceConfig.Resources {
-			if resource == ResourceAmazon {
+			switch resource {
+			case ResourceAmazon:
 				var err error
 				app.Amazon.Client, err = sp_api.NewAuthorizedClient()
 				if err != nil {
@@ -115,9 +124,33 @@ func WrapCommandWithResources(fn func(cmd *cobra.Command, args []string), resour
 						app.Amazon.Client.AddService(sp_api.FeedsServiceName, client)
 					}
 				}
-
+			case ResourceDB:
+				_, err := os.Stat(cfg.Sqlite.Path)
+				if err != nil {
+					if os.IsNotExist(err) {
+						_, err := os.Create(cfg.Sqlite.Path)
+						if err != nil {
+							log.Error().Err(err).Str("path", cfg.Sqlite.Path).Msg("failed to create database")
+							return
+						}
+					} else {
+						log.Error().Err(err).Str("path", cfg.Sqlite.Path).Msg("failed to get info about database file")
+						return
+					}
+				}
+				app.DB, err = sql.Open("sqlite3", cfg.Sqlite.Path)
+				if err != nil {
+					log.Error().Err(err).Msg("failed to open sqlite database")
+					return
+				}
+				if err := db.Migrate(app.DB); err != nil {
+					log.Error().Err(err).Msg("failed to migrate database")
+					return
+				}
+				app.Query = db.New(app.DB)
 			}
 		}
+		app.Ctx = cmd.Context()
 		cmd.SetContext(context.WithValue(cmd.Context(), internal.APP_CONTEXT, app))
 		fn(cmd, args)
 	}

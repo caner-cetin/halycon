@@ -2,6 +2,7 @@ package internal
 
 import (
 	"bufio"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -186,10 +187,36 @@ func DisplayInterface(i interface{}) {
 	})
 }
 
-// CloseReader safely closes an io.ReadCloser and logs any errors that occur during closure.
+// all of the following is used for defers
+// cmd/inventory.go:138:20: Error return value of `tx.Rollback` is not checked (errcheck)
+//
+//	defer tx.Rollback()
+//	^
+//
+// will they ever run, or will they ever log errors?
+// no.
+// will they shut up linters and give me *waow, high quality code* card? yes.
 func CloseReader(r io.ReadCloser) {
 	if cerr := r.Close(); cerr != nil {
 		log.Error().Err(fmt.Errorf("error closing reader: %w", cerr)).Send()
+	}
+}
+
+func CloseStmt(s *sql.Stmt) {
+	if cerr := s.Close(); cerr != nil {
+		log.Error().Err(fmt.Errorf("error closing stmt: %w", cerr)).Send()
+	}
+}
+
+func CloseRows(r *sql.Rows) {
+	if cerr := r.Close(); cerr != nil {
+		log.Error().Err(fmt.Errorf("error closing rows: %w", cerr)).Send()
+	}
+}
+
+func Rollback(t *sql.Tx) {
+	if cerr := t.Rollback(); cerr != nil {
+		log.Error().Err(fmt.Errorf("error rolling back stmt: %w", cerr)).Send()
 	}
 }
 

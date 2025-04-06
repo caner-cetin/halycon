@@ -3,7 +3,7 @@ default: build
 name := "halycon"
 
 build_dir := "dist"
-build_flags := "-trimpath -ldflags='-s -w -X github.com/caner-cetin/halycon/internal.Version=0.3'"
+build_flags := "-trimpath -ldflags='-s -w -X github.com/caner-cetin/halycon/internal.Version=0.3' --tags 'fts5'"
 
 
 list:

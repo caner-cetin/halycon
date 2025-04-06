@@ -1,110 +1,113 @@
+version: "2"
+run:
+  build-tags:
+    - integration
+  tests: true
+  allow-parallel-runners: true
 linters:
   enable:
-    - gofmt
-    - govet
-    - errcheck
     - bodyclose
-    - staticcheck
-    - gosimple
-    - ineffassign
-    - typecheck
-    - gocritic
-    - revive
     - dupl
-    - goconst
-    - misspell
-    - prealloc
-    - unused
-    - gosec
     - errorlint
     - gocheckcompilerdirectives
+    - goconst
+    - gocritic
     - goprintffuncname
+    - gosec
     - maintidx
+    - misspell
     - nilnil
+    - prealloc
     - predeclared
+    - revive
     - thelper
     - tparallel
     - wrapcheck
-
-linters-settings:
-  gocyclo:
-    min-complexity: 15
-  dupl:
-    threshold: 150
-  goconst:
-    min-len: 3
-    min-occurrences: 3
-  revive:
+  settings:
+    dupl:
+      threshold: 150
+    errcheck:
+      check-type-assertions: false
+      check-blank: false
+      exclude-functions:
+        - (*os.File).Close
+        - os.Remove
+        - (*github.com/spf13/cobra.Command).MarkFlagRequired
+        - (*github.com/fatih/color.Color).Println
+        - (*github.com/fatih/color.Color).Print
+        - (*github.com/fatih/color.Color).Printf
+    gocognit:
+      min-complexity: 20
+    goconst:
+      min-len: 3
+      min-occurrences: 3
+    gocyclo:
+      min-complexity: 15
+    godot:
+      scope: declarations
+      capital: true
+    gosec:
+      excludes:
+        - G306
+        - G104
+        - G204
+        - G304
+      severity: low
+      confidence: low
+    maintidx:
+      under: 20
+    nilnil:
+      checked-types:
+        - ptr
+        - func
+        - iface
+        - map
+        - chan
+    revive:
+      rules:
+        - name: exported
+          arguments:
+            - checkPrivateReceivers
+            - disableStutteringCheck
+    wrapcheck:
+      ignore-sigs:
+        - .Errorf(
+        - errors.New(
+        - errors.Unwrap(
+        - .Wrap(
+        - .Wrapf(
+      ignore-package-globs:
+        - github.com/caner-cetin/halycon/internal/*
+  exclusions:
+    generated: lax
+    presets:
+      - comments # noise generator
     rules:
-      - name: exported
-        arguments:
-          - "checkPrivateReceivers"
-          - "disableStutteringCheck"
-  gocognit:
-    min-complexity: 20
-  godot:
-    scope: declarations
-    capital: true
-  maintidx:
-    under: 20
-  nilnil:
-    checked-types:
-      - ptr
-      - func
-      - iface
-      - map
-      - chan
-  wrapcheck:
-    ignoreSigs:
-      - .Errorf(
-      - errors.New(
-      - errors.Unwrap(
-      - .Wrap(
-      - .Wrapf(
-    ignorePackageGlobs:
-      - github.com/caner-cetin/halycon/internal/*
-  errcheck:
-    check-type-assertions: false
-    check-blank: false
-    exclude-functions:
-      - (*os.File).Close
-      - os.Remove
-      - (*github.com/spf13/cobra.Command).MarkFlagRequired
-  gosec:
-    exclude-generated: false
-    severity: low
-    confidence: low
-    excludes:
-      - G306
-      - G104 # already have errcheck
-      - G204
-      - G304
-
-
+      - linters:
+          - dupl
+          - gocognit
+          - goconst
+          - gosec
+        path: _test\.go
+      - linters:
+          - staticcheck
+        text: 'SA1019:'
+      - linters:
+          - revive
+        text: 'package-comments:'
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
 issues:
-  exclude-use-default: false
   max-issues-per-linter: 0
   max-same-issues: 0
-
-  exclude-rules:
-    - path: _test\.go
-      linters:
-        - dupl
-        - gosec
-        - gocognit
-        - goconst
-
-    - linters:
-        - staticcheck
-      text: "SA1019:"
-
-    - linters:
-        - revive
-      text: "package-comments:"
-
-run:
-  timeout: 5m
-  allow-parallel-runners: true
-  tests: true
-  build-tags:
-    - integration
+formatters:
+  enable:
+    - gofmt
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$

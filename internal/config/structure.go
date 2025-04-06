@@ -7,6 +7,7 @@ type Cfg struct {
 	Amazon AmazonConfig `mapstructure:"amazon" yaml:"amazon"`
 	Groq   GroqConfig   `mapstructure:"groq" yaml:"groq"`
 	Path   string       `yaml:"-"`
+	Sqlite SqliteConfig `mapstructure:"sqlite" yaml:"sqlite"`
 }
 
 type GroqConfig struct {
@@ -88,6 +89,10 @@ type MerchantConfig struct {
 	// Name of merchant, not used for anything Amazon related, only for referencing the client throughout the code.
 	// If not specified, merchant will be referenced by its seller token.
 	Name string `mapstructure:"name" yaml:"name"`
+}
+
+type SqliteConfig struct {
+	Path string `mapstructure:"path" yaml:"path"`
 }
 
 var Config Cfg

@@ -53,6 +53,7 @@ func init() {
 	rootCmd.AddCommand(getCatalogCmd())
 	rootCmd.AddCommand(getGenerateCmd())
 	rootCmd.AddCommand(getFeedsCmd())
+	rootCmd.AddCommand(getInventoryCmd())
 	rootCmd.AddCommand(versionCmd)
 
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
@@ -111,7 +112,10 @@ func initConfig() {
 		log.Error().Err(err).Msg("failed to set default ship from address")
 		return
 	}
-	config.SetOtherDefaults()
+	if err := config.SetOtherDefaults(); err != nil {
+		log.Error().Err(err).Msg("failed to set other defaults")
+		return
+	}
 	if err := config.SnapshotToDisk(); err != nil {
 		log.Error().Err(err).Msg("failed to write config to disk")
 		return

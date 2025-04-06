@@ -2,6 +2,8 @@ package config
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/caner-cetin/halycon/internal"
@@ -165,8 +167,13 @@ func SetDefaultClient() error {
 	return nil
 }
 
-func SetOtherDefaults() {
-	if Config.Amazon.DefaultLanguageTag == "" {
-		Config.Amazon.DefaultLanguageTag = "en_US"
+func SetOtherDefaults() error {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return fmt.Errorf("failed to get home directory: %w", err)
 	}
+
+	Config.Amazon.DefaultLanguageTag = "en_US"
+	Config.Sqlite.Path = filepath.Join(home, ".halycon.db")
+	return nil
 }

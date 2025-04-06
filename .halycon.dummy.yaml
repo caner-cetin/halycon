@@ -64,6 +64,8 @@ amazon:
         # ...
         default: false
   default_language_tag: en_US
+  sqlite:
+    path: # default $HOME/.halycon.db
 # required for AI generation commands
 groq:
   token:
