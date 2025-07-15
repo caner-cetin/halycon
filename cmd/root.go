@@ -13,10 +13,9 @@ import (
 	yaml "gopkg.in/yaml.v3"
 )
 
-var cfg = &config.Config // i seriously dont want to write config.Config.
+var cfg = &config.Config
 var cfgFile string
 
-// rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "halycon",
 	Short: "utility tools for amazon seller API",
@@ -27,8 +26,6 @@ var versionCmd = &cobra.Command{
 	Run: displayVersion,
 }
 
-// Execute adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	err := rootCmd.Execute()
 	if err != nil {
@@ -54,6 +51,7 @@ func init() {
 	rootCmd.AddCommand(getGenerateCmd())
 	rootCmd.AddCommand(getFeedsCmd())
 	rootCmd.AddCommand(getInventoryCmd())
+	rootCmd.AddCommand(getConfigCmd())
 	rootCmd.AddCommand(versionCmd)
 
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
@@ -63,7 +61,6 @@ func init() {
 
 }
 
-// initConfig reads in config file and ENV variables if set.
 func initConfig() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	switch verbosity {
@@ -124,7 +121,6 @@ func initConfig() {
 func displayVersion(cmd *cobra.Command, args []string) {
 	_, err := color.New(color.Bold).Printf("Halycon %s \n", internal.Version)
 	if err != nil {
-		// how the fuck does this even throw error
 		log.Error().Err(err).Send()
 	}
 }
