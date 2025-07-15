@@ -30,6 +30,7 @@ It provides utilities to streamline common workflows, such as converting product
       - [`feeds upload` / `get` / `report`](#feeds-upload--get--report)
       - [`inventory build`](#inventory-build)
       - [`inventory count`](#inventory-count)
+      - [`config`](#config)
       - [`generate` (Experimental)](#generate-experimental)
       - [`version`](#version)
     - [Variations (Parent/Child Listings)](#variations-parentchild-listings)
@@ -64,11 +65,11 @@ It provides utilities to streamline common workflows, such as converting product
     *   Get feed processing status (`feeds get`).
     *   Download and display feed processing reports, handling decompression (`feeds report`).
 *   **FBA Inventory Caching & Search:**
-    *   Build and maintain a local SQLite database of your FBA inventory summary (`inventory build`).
-    *   Perform fast, local full-text searches (FTS5) on cached inventory titles (`inventory count`), filtering by criteria (e.g., zero quantity) and outputting results to console or CSV.
+    *   Build and maintain a local SQLite database of your FBA inventory summary with UPC data (`inventory build`).
+    *   Interactive inventory management with advanced filtering, sorting, and multiple output formats (`inventory count`). Includes UPC tracking, quantity-based filtering, and preview functionality.
 *   **SP-API Client Generation:** Includes a script (`generate_swagger_client.sh`) using `oapi-codegen` to generate Go client code from SP-API OpenAPI specifications.
 *   **Authentication & Rate Limiting:** Handles SP-API authentication (LWA token refresh) and implements rate limiting for API calls based on documented SP-API limits.
-*   **Configuration:** Uses a YAML file (`.halycon.yaml`) for easy configuration of credentials, endpoints, FBA addresses, and other settings. Handles multiple profiles (clients, merchants, addresses) with default selection.
+*   **Configuration:** Uses a YAML file (`.halycon.yaml`) for easy configuration of credentials, endpoints, FBA addresses, and other settings. Handles multiple profiles (clients, merchants, addresses) with default selection. Includes an interactive configuration generator (`config`).
 *   **Database Migrations:** Uses `goose` for managing the SQLite database schema migrations.
 *   **(Experimental) AI Text Generation:** Includes a supplementary utility to interact with the Groq API for generating text based on prompts and images (`generate`).
 
@@ -203,9 +204,7 @@ Converts UPC(s) to ASIN(s) using the Catalog API. Handles batching requests.
     ```
 *   **List of UPCs (from file):**
     ```bash
-    # Input file (e.g., upcs.txt) should have one UPC per line
     halycon upc-to-asin -i upcs.txt -o asins.txt
-    # Output file (asins.txt) will have one ASIN per line for matched UPCs
     ```
 
 #### `asin-to-sku`
@@ -218,7 +217,6 @@ Looks up SKUs (and product names) for given ASIN(s) using the **local FBA invent
     ```
 *   **List of ASINs (from file):**
     ```bash
-    # Input file (e.g., asins.txt) should have one ASIN per line
     halycon asin-to-sku -i asins.txt -o skus_for_shipment.csv
     ```
 *   **Output CSV Format (`skus_for_shipment.csv`):**
@@ -236,7 +234,6 @@ Creates an FBA Inbound Shipment Plan using the FBA Inbound API.
 
 *   **Usage:**
     ```bash
-    # Input CSV file requires columns: ASIN,SKU,Product Name,Quantity (Quantity must be filled)
     halycon shipment create -i skus_for_shipment.csv -v
     ```
     *   Outputs the `inbound_plan_id` and `operation_id`.
@@ -380,43 +377,66 @@ Submits feeds, checks their status, and retrieves reports using the Feeds API.
                         --feed-type JSON_LISTINGS_FEED \
                         --content-type application/json; charset=UTF-8 \
                         -v
-    # Outputs Feed ID after creating the feed document and submitting the feed
     ```
 *   **Get Feed Status:**
     ```bash
     halycon feeds get --id <feed_id> -v
     ```
-*   **Get Feed Report:** (Downloads, decompresses if necessary, and prints the processing report)
+*   **Get Feed Report:**
     ```bash
     halycon feeds report --id <feed_id> -v
     ```
 
 #### `inventory build`
 
-Fetches the FBA inventory summary from the SP-API and populates/updates a local SQLite database (`$HOME/.halycon.db` by default). Creates an FTS5 index for searching product titles.
+Fetches the FBA inventory summary from the SP-API and populates/updates a local SQLite database (`$HOME/.halycon.db` by default). Creates an FTS5 index for searching product titles. Now includes UPC data collection from Amazon's Catalog API.
 
 *   **Usage:**
     ```bash
-    # First time or to refresh data
     halycon inventory build -v
-
-    # Force rebuild even if data exists
     halycon inventory build --force-rebuild -v
     ```
 
 #### `inventory count`
 
-Queries the **local FBA inventory cache** (built by `inventory build`) using Full-Text Search (FTS5) on product titles. Currently filters for items with zero total quantity.
+Interactive inventory management tool that queries the **local FBA inventory cache** (built by `inventory build`) with advanced filtering, sorting, and output options. Features an interactive form interface for ease of use.
+
+*   **Interactive Features:**
+    *   **Search Keywords:** Wildcard pattern support (e.g., `*phone*`)
+    *   **Quantity Filtering:** Zero quantity, low stock (≤5), normal stock (6-50), high stock (>50), custom ranges, or show all
+    *   **Sorting Options:** By title, total quantity, or fulfillable quantity (ascending/descending)
+    *   **Output Formats:** Interactive table, CSV file, or JSON file (with timestamps)
+    *   **Preview Mode:** Shows first 5 results with key metrics before generating full output
+    *   **UPC Display:** Shows Universal Product Codes alongside inventory data
 
 *   **Usage:**
     ```bash
-    # Search for items containing "keyword" with 0 quantity
+    halycon inventory count
     halycon inventory count -k "keyword"
-
-    # Output results to CSV
-    halycon inventory count -k "another keyword" -o inventory_report.csv
+    halycon inventory count -k "keyword" -o inventory_report.csv
     ```
-    *   Outputs matching items to the console (pretty-printed) or to a CSV file if `-o` is specified.
+    *   Maintains backward compatibility with existing command-line flags while providing enhanced interactive experience
+
+#### `config`
+
+Interactive configuration generator that creates a complete `.halycon.yaml` configuration file through a guided, form-based wizard. Eliminates the need to manually create or edit YAML configuration files.
+
+*   **Interactive Setup Wizard:**
+    *   **Amazon SP-API Configuration:** Default language tag, client credentials, API endpoints
+    *   **Client Management:** Multiple client support with default selection
+    *   **Merchant Configuration:** Refresh tokens, seller tokens, marketplace IDs
+    *   **FBA Settings:** Ship-from addresses with complete contact information
+    *   **Optional Services:** Groq AI integration, SQLite database settings
+    *   **Validation:** Input validation and secure handling of sensitive data
+
+*   **Usage:**
+    ```bash
+    halycon config
+    halycon config --config /path/to/custom/.halycon.yaml
+    ```
+    *   Creates a fully functional `.halycon.yaml` file with proper formatting and validation
+    *   Provides preview option to review generated configuration
+    *   Maintains compatibility with existing configuration file structure
 
 #### `generate` (Experimental)
 
@@ -424,10 +444,7 @@ Uses the Groq API for text generation based on an image and prompt. Requires `gr
 
 *   **Usage:**
     ```bash
-    # Image URL and command-line prompt
     halycon generate --input "https://example.com/image.jpg" --prompt "Describe this image."
-
-    # Local image file and prompt file
     halycon generate --input-file ./product_image.png --prompt-file ./description_prompt.txt
     ```
 
