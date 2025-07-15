@@ -28,7 +28,6 @@ func getConfigCmd() *cobra.Command {
 
 func generateConfig(cmd *cobra.Command, args []string) {
 	var newConfig config.Cfg
-	
 	var configPath string
 	if cfgFile != "" {
 		configPath = cfgFile
@@ -40,65 +39,68 @@ func generateConfig(cmd *cobra.Command, args []string) {
 		}
 		configPath = filepath.Join(home, ".halycon.yaml")
 	}
-	
+
 	headerStyle := lipgloss.NewStyle().
 		Foreground(lipgloss.Color("#7C3AED")).
 		Bold(true).
 		MarginBottom(1)
-	
+
 	fmt.Printf("%s\n", headerStyle.Render("Halycon Configuration Generator"))
 	fmt.Printf("Creating configuration file at: %s\n\n", configPath)
-	
+
 	if err := configureAmazonBasics(&newConfig); err != nil {
 		log.Error().Err(err).Msg("failed to configure Amazon basics")
 		return
 	}
-	
+
 	if err := configureClients(&newConfig); err != nil {
 		log.Error().Err(err).Msg("failed to configure clients")
 		return
 	}
-	
+
 	if err := configureMerchants(&newConfig); err != nil {
 		log.Error().Err(err).Msg("failed to configure merchants")
 		return
 	}
-	
+
 	if err := configureFBA(&newConfig); err != nil {
 		log.Error().Err(err).Msg("failed to configure FBA")
 		return
 	}
-	
+
 	if err := configureOptionalServices(&newConfig); err != nil {
 		log.Error().Err(err).Msg("failed to configure optional services")
 		return
 	}
-	
+
 	yamlData, err := yaml.Marshal(newConfig)
 	if err != nil {
 		log.Error().Err(err).Msg("failed to marshal config to yaml")
 		return
 	}
-	
+
 	if err := os.WriteFile(configPath, yamlData, 0644); err != nil {
 		log.Error().Err(err).Msg("failed to write config file")
 		return
 	}
-	
+
 	successStyle := lipgloss.NewStyle().
 		Foreground(lipgloss.Color("#22C55E")).
 		Bold(true)
-	
+
 	fmt.Printf("\n%s\n", successStyle.Render("✅ Configuration generated successfully!"))
 	fmt.Printf("📁 Config file: %s\n", configPath)
 	fmt.Println("\n🎉 You can now use other halycon commands with your configuration.")
-	
+
 	var viewConfig bool
-	huh.NewConfirm().
+	if err := huh.NewConfirm().
 		Title("View generated configuration?").
 		Value(&viewConfig).
-		Run()
-	
+		Run(); err != nil {
+		log.Error().Err(err).Msg("failed to run view config confirm")
+		return
+	}
+
 	if viewConfig {
 		fmt.Printf("\n--- Generated Configuration ---\n%s\n", string(yamlData))
 	}
@@ -109,9 +111,9 @@ func configureAmazonBasics(newConfig *config.Cfg) error {
 		Foreground(lipgloss.Color("#3B82F6")).
 		Bold(true).
 		MarginTop(1)
-	
+
 	fmt.Printf("%s\n", headerStyle.Render("🔧 Amazon Selling Partner API Configuration"))
-	
+
 	var languageTag string
 	err := huh.NewInput().
 		Title("Default Language Tag").
@@ -119,16 +121,16 @@ func configureAmazonBasics(newConfig *config.Cfg) error {
 		Value(&languageTag).
 		Placeholder("en_US").
 		Run()
-	
+
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to run language tag input: %w", err)
 	}
-	
+
 	if languageTag == "" {
 		languageTag = "en_US"
 	}
 	newConfig.Amazon.DefaultLanguageTag = languageTag
-	
+
 	return nil
 }
 
@@ -137,9 +139,9 @@ func configureClients(newConfig *config.Cfg) error {
 		Foreground(lipgloss.Color("#3B82F6")).
 		Bold(true).
 		MarginTop(1)
-	
+
 	fmt.Printf("%s\n", headerStyle.Render("🔑 Amazon API Clients"))
-	
+
 	var clientCountStr string
 	err := huh.NewInput().
 		Title("Number of clients").
@@ -156,23 +158,23 @@ func configureClients(newConfig *config.Cfg) error {
 			return nil
 		}).
 		Run()
-	
+
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to run client count input: %w", err)
 	}
-	
+
 	if clientCountStr == "" {
 		clientCountStr = "1"
 	}
-	
+
 	clientCount, err := strconv.Atoi(clientCountStr)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to parse client count: %w", err)
 	}
-	
+
 	for i := 0; i < clientCount; i++ {
 		var client config.ClientConfig
-		
+
 		form := huh.NewForm(
 			huh.NewGroup(
 				huh.NewInput().
@@ -185,7 +187,7 @@ func configureClients(newConfig *config.Cfg) error {
 						}
 						return nil
 					}),
-				
+
 				huh.NewInput().
 					Title("Client Secret").
 					Description("Your Amazon API Client Secret (required)").
@@ -197,19 +199,19 @@ func configureClients(newConfig *config.Cfg) error {
 						}
 						return nil
 					}),
-				
+
 				huh.NewInput().
 					Title("Client Name").
 					Description("Friendly name for this client (optional)").
 					Value(&client.Name).
 					Placeholder("My Amazon Client"),
-				
+
 				huh.NewInput().
 					Title("Auth Endpoint").
 					Description("OAuth2 token endpoint").
 					Value(&client.AuthEndpoint).
 					Placeholder("https://api.amazon.com/auth/o2/token"),
-				
+
 				huh.NewInput().
 					Title("API Endpoint").
 					Description("Selling Partner API endpoint (without https://)").
@@ -217,30 +219,33 @@ func configureClients(newConfig *config.Cfg) error {
 					Placeholder("sellingpartnerapi-na.amazon.com"),
 			),
 		)
-		
+
 		if err := form.Run(); err != nil {
-			return err
+			return fmt.Errorf("failed to run client form: %w", err)
 		}
-		
+
 		if client.AuthEndpoint == "" {
 			client.AuthEndpoint = "https://api.amazon.com/auth/o2/token"
 		}
 		if client.APIEndpoint == "" {
 			client.APIEndpoint = "sellingpartnerapi-na.amazon.com"
 		}
-		
+
 		if i == 0 {
 			client.Default = true
 		} else {
-			huh.NewConfirm().
+			if err := huh.NewConfirm().
 				Title("Make this the default client?").
 				Value(&client.Default).
-				Run()
+				Run(); err != nil {
+				log.Error().Err(err).Msg("failed to run client default confirm")
+				return fmt.Errorf("failed to run client default confirm: %w", err)
+			}
 		}
-		
+
 		newConfig.Amazon.Auth.Clients = append(newConfig.Amazon.Auth.Clients, client)
 	}
-	
+
 	return nil
 }
 
@@ -249,9 +254,9 @@ func configureMerchants(newConfig *config.Cfg) error {
 		Foreground(lipgloss.Color("#3B82F6")).
 		Bold(true).
 		MarginTop(1)
-	
+
 	fmt.Printf("%s\n", headerStyle.Render("🏪 Amazon Merchants"))
-	
+
 	var merchantCountStr string
 	err := huh.NewInput().
 		Title("Number of merchants").
@@ -268,24 +273,24 @@ func configureMerchants(newConfig *config.Cfg) error {
 			return nil
 		}).
 		Run()
-	
+
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to run merchant count input: %w", err)
 	}
-	
+
 	if merchantCountStr == "" {
 		merchantCountStr = "1"
 	}
-	
+
 	merchantCount, err := strconv.Atoi(merchantCountStr)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to parse merchant count: %w", err)
 	}
-	
+
 	for i := 0; i < merchantCount; i++ {
 		var merchant config.MerchantConfig
 		var marketplaceIDs string
-		
+
 		form := huh.NewForm(
 			huh.NewGroup(
 				huh.NewInput().
@@ -299,7 +304,7 @@ func configureMerchants(newConfig *config.Cfg) error {
 						}
 						return nil
 					}),
-				
+
 				huh.NewInput().
 					Title("Seller Token").
 					Description("Your Amazon seller token (required)").
@@ -311,13 +316,13 @@ func configureMerchants(newConfig *config.Cfg) error {
 						}
 						return nil
 					}),
-				
+
 				huh.NewInput().
 					Title("Merchant Name").
 					Description("Friendly name for this merchant (optional)").
 					Value(&merchant.Name).
 					Placeholder("My Amazon Store"),
-				
+
 				huh.NewInput().
 					Title("Marketplace IDs").
 					Description("Comma-separated marketplace IDs").
@@ -325,11 +330,11 @@ func configureMerchants(newConfig *config.Cfg) error {
 					Placeholder("ATVPDKIKX0DER (US)"),
 			),
 		)
-		
+
 		if err := form.Run(); err != nil {
-			return err
+			return fmt.Errorf("failed to run merchant form: %w", err)
 		}
-		
+
 		if marketplaceIDs == "" {
 			merchant.MarketplaceID = []string{"ATVPDKIKX0DER"}
 		} else {
@@ -338,19 +343,22 @@ func configureMerchants(newConfig *config.Cfg) error {
 				merchant.MarketplaceID[j] = strings.TrimSpace(merchant.MarketplaceID[j])
 			}
 		}
-		
+
 		if i == 0 {
 			merchant.Default = true
 		} else {
-			huh.NewConfirm().
+			if err := huh.NewConfirm().
 				Title("Make this the default merchant?").
 				Value(&merchant.Default).
-				Run()
+				Run(); err != nil {
+				log.Error().Err(err).Msg("failed to run merchant default confirm")
+				return fmt.Errorf("failed to run merchant default confirm: %w", err)
+			}
 		}
-		
+
 		newConfig.Amazon.Auth.Merchants = append(newConfig.Amazon.Auth.Merchants, merchant)
 	}
-	
+
 	return nil
 }
 
@@ -359,26 +367,26 @@ func configureFBA(newConfig *config.Cfg) error {
 		Foreground(lipgloss.Color("#3B82F6")).
 		Bold(true).
 		MarginTop(1)
-	
+
 	fmt.Printf("%s\n", headerStyle.Render("📦 FBA Configuration"))
-	
+
 	var fbaEnabled bool
 	err := huh.NewConfirm().
 		Title("Enable FBA features?").
 		Description("Enable Fulfillment by Amazon functionality").
 		Value(&fbaEnabled).
 		Run()
-	
+
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to run FBA confirm: %w", err)
 	}
-	
+
 	newConfig.Amazon.FBA.Enabled = fbaEnabled
-	
+
 	if !fbaEnabled {
 		return nil
 	}
-	
+
 	var shipFromCountStr string
 	err = huh.NewInput().
 		Title("Number of ship-from addresses").
@@ -395,23 +403,23 @@ func configureFBA(newConfig *config.Cfg) error {
 			return nil
 		}).
 		Run()
-	
+
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to run ship from count input: %w", err)
 	}
-	
+
 	if shipFromCountStr == "" {
 		shipFromCountStr = "1"
 	}
-	
+
 	shipFromCount, err := strconv.Atoi(shipFromCountStr)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to parse ship from count: %w", err)
 	}
-	
+
 	for i := 0; i < shipFromCount; i++ {
 		var shipFrom config.ShipFromConfig
-		
+
 		form := huh.NewForm(
 			huh.NewGroup(
 				huh.NewInput().
@@ -424,12 +432,12 @@ func configureFBA(newConfig *config.Cfg) error {
 						}
 						return nil
 					}),
-				
+
 				huh.NewInput().
 					Title("Address Line 2").
 					Description("Apartment, suite, etc. (optional)").
 					Value(&shipFrom.AddressLine2),
-				
+
 				huh.NewInput().
 					Title("City").
 					Description("City name (required)").
@@ -440,7 +448,7 @@ func configureFBA(newConfig *config.Cfg) error {
 						}
 						return nil
 					}),
-				
+
 				huh.NewInput().
 					Title("State/Province").
 					Description("State or province code (required)").
@@ -451,7 +459,7 @@ func configureFBA(newConfig *config.Cfg) error {
 						}
 						return nil
 					}),
-				
+
 				huh.NewInput().
 					Title("Postal Code").
 					Description("ZIP or postal code (required)").
@@ -463,19 +471,19 @@ func configureFBA(newConfig *config.Cfg) error {
 						return nil
 					}),
 			),
-			
+
 			huh.NewGroup(
 				huh.NewInput().
 					Title("Country Code").
 					Description("Two-letter country code").
 					Value(&shipFrom.CountryCode).
 					Placeholder("US"),
-				
+
 				huh.NewInput().
 					Title("Company Name").
 					Description("Business name (optional)").
 					Value(&shipFrom.CompanyName),
-				
+
 				huh.NewInput().
 					Title("Contact Name").
 					Description("Primary contact person (required)").
@@ -486,12 +494,12 @@ func configureFBA(newConfig *config.Cfg) error {
 						}
 						return nil
 					}),
-				
+
 				huh.NewInput().
 					Title("Email").
 					Description("Contact email (optional)").
 					Value(&shipFrom.Email),
-				
+
 				huh.NewInput().
 					Title("Phone Number").
 					Description("Contact phone number (required)").
@@ -504,27 +512,30 @@ func configureFBA(newConfig *config.Cfg) error {
 					}),
 			),
 		)
-		
+
 		if err := form.Run(); err != nil {
-			return err
+			return fmt.Errorf("failed to run ship from form: %w", err)
 		}
-		
+
 		if shipFrom.CountryCode == "" {
 			shipFrom.CountryCode = "US"
 		}
-		
+
 		if i == 0 {
 			shipFrom.Default = true
 		} else {
-			huh.NewConfirm().
+			if err := huh.NewConfirm().
 				Title("Make this the default ship-from address?").
 				Value(&shipFrom.Default).
-				Run()
+				Run(); err != nil {
+				log.Error().Err(err).Msg("failed to run ship from default confirm")
+				return fmt.Errorf("failed to run ship from default confirm: %w", err)
+			}
 		}
-		
+
 		newConfig.Amazon.FBA.ShipFrom = append(newConfig.Amazon.FBA.ShipFrom, shipFrom)
 	}
-	
+
 	return nil
 }
 
@@ -533,20 +544,20 @@ func configureOptionalServices(newConfig *config.Cfg) error {
 		Foreground(lipgloss.Color("#3B82F6")).
 		Bold(true).
 		MarginTop(1)
-	
+
 	fmt.Printf("%s\n", headerStyle.Render("🔧 Optional Services"))
-	
+
 	var enableGroq bool
 	err := huh.NewConfirm().
 		Title("Enable Groq AI integration?").
 		Description("Configure Groq AI for enhanced features").
 		Value(&enableGroq).
 		Run()
-	
+
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to run Groq confirm: %w", err)
 	}
-	
+
 	if enableGroq {
 		var groqToken string
 		err = huh.NewInput().
@@ -561,32 +572,32 @@ func configureOptionalServices(newConfig *config.Cfg) error {
 				return nil
 			}).
 			Run()
-		
+
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to run Groq token input: %w", err)
 		}
-		
+
 		newConfig.Groq.Token = groqToken
 	}
-	
+
 	var enableSQLite bool
 	err = huh.NewConfirm().
 		Title("Enable SQLite database?").
 		Description("Configure local SQLite database for caching and storage").
 		Value(&enableSQLite).
 		Run()
-	
+
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to run SQLite confirm: %w", err)
 	}
-	
+
 	if enableSQLite {
 		home, err := os.UserHomeDir()
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to get home directory: %w", err)
 		}
 		defaultDBPath := filepath.Join(home, ".halycon.db")
-		
+
 		var dbPath string
 		err = huh.NewInput().
 			Title("Database Path").
@@ -594,16 +605,16 @@ func configureOptionalServices(newConfig *config.Cfg) error {
 			Value(&dbPath).
 			Placeholder(defaultDBPath).
 			Run()
-		
+
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to run database path input: %w", err)
 		}
-		
+
 		if dbPath == "" {
 			dbPath = defaultDBPath
 		}
 		newConfig.Sqlite.Path = dbPath
 	}
-	
+
 	return nil
 }
